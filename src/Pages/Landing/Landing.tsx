@@ -1,9 +1,10 @@
+
 const LandingPage = () => {
 
   return (
-    <p>
-      landing page
-    </p>
+    <div style={{padding:'50px'}}>
+      landing page!!!
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LandingPage from './Pages/Landing/Landing';
 import AboutPage from './Pages/About/About';
@@ -8,11 +8,13 @@ import FeedbackPage from './Pages/Feedback/Feedback';
 import ProfilePage from './Pages/Profile/Profile';
 import AdminPage from './Pages/Admin/Admin';
 import LoginPage from './Pages/Login/Login';
+import Navbar from './Components/Navbar';
 
 function App() {
   return (
     <div className="App">
-      <header>
+      <Navbar/>
+      <div>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -25,7 +27,7 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </BrowserRouter>
-      </header>
+      </div>
     </div>
   );
 }

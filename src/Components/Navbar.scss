@@ -1,0 +1,34 @@
+.nav-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: aquamarine;
+    padding: 10px 20px;
+    height: 10%;
+}
+
+.nav-subsection {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.icon {
+    font-size: 40px !important;
+}
+
+.logo {
+    height: 40px;
+}
+
+.clickable {
+    cursor: pointer;
+}
