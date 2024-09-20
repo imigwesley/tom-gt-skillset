@@ -2,7 +2,7 @@ const FeedbackPage = () => {
 
     return (
       <p>
-        feedback page
+        contact page
       </p>
     );
   };
