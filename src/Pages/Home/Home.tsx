@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.scss';
-import { Card, CardContent, CardMedia, CircularProgress, LinearProgress, Typography } from "@mui/material";
+import { Card, CardContent, CardMedia, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
-import { WidthFull } from '@mui/icons-material';
 
 const HomePage = () => {
 

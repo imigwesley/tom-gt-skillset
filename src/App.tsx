@@ -28,6 +28,7 @@ const App = () => {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
+          <div className='footer' />
         </BrowserRouter>
       </div>
     </div>
