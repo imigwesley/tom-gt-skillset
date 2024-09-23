@@ -8,9 +8,11 @@ import FeedbackPage from './Pages/Contact/Contact';
 import ProfilePage from './Pages/Profile/Profile';
 import AdminPage from './Pages/Admin/Admin';
 import LoginPage from './Pages/Login/Login';
-import Navbar from './Components/Navbar';
+import Navbar from './Components/Navbar/Navbar';
+import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
 
-function App() {
+const App = () => {
+
   return (
     <div className="App">
       <div>
@@ -19,7 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
-            {/* <Route path="/modules" element={<TrainingModulesPage />} /> */} {/*TODO: workshop implementation of modules page*/}
+            <Route path="/modules/:moduleName" element={<TrainingModulesPage />} /> {/*TODO: workshop implementation of modules page*/}
             <Route path="/about" element={<AboutPage />} />
             <Route path="/members" element={<MembersPage />} />
             <Route path="/contact" element={<FeedbackPage />} />

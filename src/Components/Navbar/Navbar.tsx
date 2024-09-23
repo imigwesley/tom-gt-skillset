@@ -1,5 +1,5 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, IconButton, Menu, MenuItem } from '@mui/material';
+import { Avatar, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import './Navbar.scss';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -55,9 +55,9 @@ const Navbar = () => {
   return (
     <div className='nav-container'>
       <div className='nav-subsection clickable' onClick={() => handlePageClick('home')}>
-        <p>
+        <Typography variant='h5'>
           Skillset - by
-        </p>
+        </Typography>
         <img src='/tom-gt-logo.png' alt='tom logo' className='logo'/>
       </div>
       <div className='nav-subsection'>
@@ -67,9 +67,9 @@ const Navbar = () => {
         </IconButton>
         <div className='profile-section clickable' onClick={() => handlePageClick('profile')}>
         <Avatar>{initials}</Avatar> 
-           <div>
+           <Typography>
               Profile
-           </div> 
+           </Typography> 
         </div>
       </div>
       <Menu
