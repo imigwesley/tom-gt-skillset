@@ -1,0 +1,11 @@
+.progress-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.progress-bar {
+    min-width: 35px;
+    flex: 1;
+}

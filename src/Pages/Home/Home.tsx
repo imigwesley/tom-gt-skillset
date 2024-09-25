@@ -2,13 +2,15 @@ import { useNavigate } from 'react-router-dom';
 import './Home.scss';
 import { Card, CardContent, CardMedia, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
+import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
 
 const HomePage = () => {
 
   interface Module {
     name: string,
     progress: number,
-    src: string
+    src: string,
+    isAssigned: boolean
   };
 
   interface ModulesAndProgress {
@@ -44,11 +46,11 @@ const HomePage = () => {
           resolve({
             name: 'Wesley',
             modules: [
-              { name: "Uluru or Ayer's Rock", progress: 67.77 },
-              { name: "Shrimp on the Barbie", progress: 0.00 },
-              { name: "Didgeridoos", progress: 0.00 },
-              { name: "Dingos", progress: 12.00 },
-              { name: "Kangaroos", progress: 0.00 },
+              { name: "Uluru or Ayer's Rock", progress: 67.77, isAssigned: false },
+              { name: "Shrimp on the Barbie", progress: 0.00, isAssigned: true },
+              { name: "Didgeridoos", progress: 0.00, isAssigned: false },
+              { name: "Dingos", progress: 12.00, isAssigned: false },
+              { name: "Kangaroos", progress: 0.00, isAssigned: false },
             ]
           });
         }, 500); // Simulate network delay
@@ -74,9 +76,15 @@ const HomePage = () => {
         const progressModule = (personalProgress as any).modules.find((m: Module) => m.name === module.name);
         return {
           ...module,
-          progress: progressModule ? progressModule.progress : 0
+          progress: progressModule ? progressModule.progress : 0,
+          isAssigned: progressModule.isAssigned,
         };
       });
+
+      console.log(combinedModules)
+      combinedModules.sort((a: Module, b:Module) => {
+        return Number(b.isAssigned) - Number(a.isAssigned)
+      })
 
       setModulesAndProgress({
         name: (personalProgress as any).name,
@@ -111,15 +119,16 @@ const HomePage = () => {
           <div className='module-card-container'>
             {modulesAndProgress.modules.map((module, index) => {
               return (
-                <Card className="module-card" onClick={() => handleCardClick(module.name)} key={index}>
+                <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.name)} key={index}>
                   <CardMedia
                     className='module-image'
                     image={module.src}
                   />
-                  <CardContent>
+                  <CardContent className='card-content'>
                     <Typography>
                       {module.name}
                     </Typography>
+                    <LinearProgressWithLabel progress={module.progress} />
                   </CardContent>
                 </Card>
               );
