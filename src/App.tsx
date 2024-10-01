@@ -18,16 +18,18 @@ const App = () => {
       <div>
         <BrowserRouter>
           <Navbar/>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/modules/:moduleName" element={<TrainingModulesPage />} /> {/*TODO: workshop implementation of modules page*/}
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/members" element={<MembersPage />} />
-            <Route path="/contact" element={<FeedbackPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/admin" element={<AdminPage />} />
-          </Routes>
+          <div className='main-body'>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/modules/:moduleName" element={<TrainingModulesPage />} /> {/*TODO: workshop implementation of modules page*/}
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/members" element={<MembersPage />} />
+              <Route path="/contact" element={<FeedbackPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/admin" element={<AdminPage />} />
+            </Routes>
+          </div>
           <div className='footer' />
         </BrowserRouter>
       </div>
