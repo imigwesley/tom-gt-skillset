@@ -144,7 +144,7 @@ const MembersPage = () => {
               {membersAlphabetically.map((letterGroup) => {
                 return (
                   <div>
-                    <Typography variant='h3'>{letterGroup.letter}</Typography>
+                    <Typography variant='h3'>{letterGroup.letter.toUpperCase()}</Typography>
                     <div>
                       {letterGroup.members.map((member, index) => {
                         return (

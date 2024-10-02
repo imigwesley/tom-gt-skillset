@@ -88,7 +88,7 @@ const Navbar = () => {
         >
           <MenuItem onClick={() => handlePageClick('about')}>About</MenuItem>
           <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem>
-          <MenuItem onClick={() => handlePageClick('members')}>Members/Teams</MenuItem>
+          <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
           {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
           <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem>
         </Menu>
