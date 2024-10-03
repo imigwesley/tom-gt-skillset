@@ -34,7 +34,8 @@
     padding: 15px;
 
     .modal-content {
-
+        width: 570px;
+        height: 450px;
     }
 
     .modal-footer {
@@ -48,3 +49,15 @@
     color: red !important;
 }
 
+.feedback-container {
+    position: fixed;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    z-index: 999;
+    
+    .feedback {
+      color: #423c3c;
+    }
+  }

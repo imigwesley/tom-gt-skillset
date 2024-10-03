@@ -1,9 +1,14 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Modal, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
+import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, Divider, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import './Admin.scss';
 import { useState } from 'react';
-import React from 'react';
+
 
 const AdminPage = () => {
+
+  interface APIResponse {
+    code: number,
+    message: string
+  }
 
   enum Operations {
     NULL = 'NULL',
@@ -21,28 +26,88 @@ const AdminPage = () => {
     DELETE_MODULE = 'DELETE_MODULE',
   }
 
+  enum ModalPages {
+    NULL,
+    EDIT_USER_INFO,
+    SELECT_USER,
+    CONFIRM,
+    CONFIRM_DELETE,
+    EDIT_TEAM_INFO,
+    SELECT_TEAM,
+    EDIT_SUBSECTION,
+    SELECT_SUBSECTION,
+    EDIT_MODULE,
+    SELECT_MODULE
+  }
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [currentOperation, setCurrentOperation] = useState<Operations>(Operations.NULL);
+  const [isWaitingOnApi, setIsWaitingOnApi] = useState(false);
+  const [responseType, setResponseType] = useState<APIResponse>({code: 0, message: ''});
   
-  const stepSets: Record<Operations, string[]> = {
-    [Operations.NULL]: [''],
-    [Operations.ADD_USER]: ['Input User Information', 'Confirm'],
-    [Operations.EDIT_USER]: ['Select User', 'Input User Information', 'Confirm'],
-    [Operations.DELETE_USER]: ['Select User', 'Confirm Choice'],
+  const stepSets: Record<Operations, ModalPages[]> = {
+    [Operations.NULL]: [ModalPages.NULL],
+    [Operations.ADD_USER]: [ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM],
+    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM],
+    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE],
   
-    [Operations.ADD_TEAM]: ['Input Team Details', 'Confirm'],
-    [Operations.EDIT_TEAM]: ['Select Team', 'Edit Team Details', 'Confirm'],
-    [Operations.DELETE_TEAM]: ['Select Team', 'Confirm Choice'],
+    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM],
+    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM],
+    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE],
   
-    [Operations.ADD_SUBSECTION]: ['Input Subsection Details', 'Confirm'],
-    [Operations.EDIT_SUBSECTION]: ['Select Subsection', 'Edit Subsection Details', 'Confirm'],
-    [Operations.DELETE_SUBSECTION]: ['Select Subsection', 'Confirm Choice'],
+    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM],
+    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM],
+    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE],
   
-    [Operations.ADD_MODULE]: ['Input Module Details', 'Confirm'],
-    [Operations.EDIT_MODULE]: ['Select Module', 'Edit Module Details', 'Confirm'],
-    [Operations.DELETE_MODULE]: ['Select Module', 'Confirm Choice'],
+    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM],
+    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM],
+    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE],
   };
+
+  const modalHtml = {
+    [ModalPages.NULL]: <div />,
+    [ModalPages.EDIT_USER_INFO]: 
+      <div> 
+        input user info
+      </div>,
+    [ModalPages.SELECT_USER]: 
+      <div>
+        select user
+      </div>,
+    [ModalPages.CONFIRM]:
+      <div>
+        Are you sure you want to use this?
+      </div>,
+    [ModalPages.CONFIRM_DELETE]:
+      <div>
+        Are you sure you want to delete this?
+      </div>,
+    [ModalPages.EDIT_TEAM_INFO]: 
+      <div> 
+        input team info
+      </div>,
+    [ModalPages.SELECT_TEAM]: 
+      <div>
+        select team
+      </div>,
+    [ModalPages.EDIT_SUBSECTION]:
+      <div>
+        edit subsection
+      </div>,
+    [ModalPages.SELECT_SUBSECTION]:
+      <div>
+        select subsection
+      </div>,
+    [ModalPages.EDIT_MODULE]:
+      <div>
+        edit module
+      </div>,
+    [ModalPages.SELECT_MODULE]:
+      <div>
+        select module
+      </div>
+  }
 
   const handleOpenModal = (entity: Operations) => {
     console.log(entity);
@@ -58,9 +123,27 @@ const AdminPage = () => {
 
   const handleNext = () => {
     if (activeStep === stepSets[currentOperation].length - 1) {
-      handleCloseModal(); // Close the modal when on the last step
-      // TODO: add here the api call
-      // TODO: turn on spinner while waiting on api response
+      handleCloseModal();
+      setIsWaitingOnApi(true);
+
+      // make api call
+      const response = {
+        code: 500,
+        message: 'Error 500: Internal Server Error'
+      }
+
+      setTimeout(() => {
+        setIsWaitingOnApi(false);
+        setResponseType(response);
+      }, 300);
+
+      setTimeout(() => {
+        setResponseType({
+          code: 0,
+          message: ''
+        });
+        
+      }, 900)
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }
@@ -187,6 +270,7 @@ const AdminPage = () => {
             </div>
           </Paper>
         </div>
+
         <Dialog
           open={isModalOpen}
           onClose={handleCloseModal}
@@ -202,11 +286,8 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
-                  <div style={{width: '570px', height: '450px'}} />
+                  {modalHtml[stepSets[currentOperation][activeStep]]}
                 </div>
-                
-
                 <div className='modal-footer'>
                   <Button
                     className='cancel-button'
@@ -226,13 +307,26 @@ const AdminPage = () => {
                     Back
                   </Button>
                   <Button onClick={handleNext}>
-                    {activeStep === stepSets[currentOperation].length - 1 ? 'Finish' : 'Next'}
+                    {activeStep === stepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
                   </Button>
                 </div>
 
               </div>
           </Box>
         </Dialog>
+
+        <Backdrop
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+          open={isWaitingOnApi}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+        {responseType.code !== 0 &&
+          <div className='feedback-container'>
+            <Alert className='feedback' severity={responseType.code === 200 ? 'success' : 'error'}>{responseType.message}</Alert>
+          </div>
+        }
+
 
       </div>
     );

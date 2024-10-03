@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Members.scss';
-import { Avatar, Button, ButtonGroup, Card, CardContent, Paper, Typography } from '@mui/material';
+import { Avatar, Button, ButtonGroup, Typography } from '@mui/material';
 import members from './MembersSample';
 import MemberInfoCard from '../../Components/MemberInfoCard/MemberInfoCard';
 
@@ -12,7 +12,7 @@ const MembersPage = () => {
   }
   interface Member {
     name: string,
-    email: string,
+    email: string[],
     teamMembership: string,
     teamsAdvising: string[],
     role: string,

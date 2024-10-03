@@ -3,7 +3,7 @@ import './MemberInfoCard.scss';
 
 interface Member {
   name: string,
-  email: string,
+  email: string[],
   teamMembership: string,
   teamsAdvising: string[],
   role: string,
@@ -23,7 +23,7 @@ const MemberInfoCard = ({member, isEven}: MemberCardProps) => {
           <Typography className='table-section'>{member.name}</Typography>
           <Typography className='table-section'>{member.teamMembership}</Typography>
           <Typography sx={{fontStyle: 'italic'}} className='table-section'>{member.role}</Typography>
-          <Typography className='table-section'>{member.email}</Typography>
+          <Typography className='table-section'>{member.email[0]}</Typography>
           <Typography className='table-section'>
             {member.teamsAdvising.length > 0 &&
               'Advising: ' + member.teamsAdvising.reduce((acc, team, index) => {return acc + (index > 0 ? ', ' : '') + team})
