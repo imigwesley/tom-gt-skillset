@@ -30,21 +30,21 @@ const AdminPage = () => {
   // mapping of which pages are needed to do each operation
   const stepSets: Record<Operations, ModalPages[]> = {
     [Operations.NULL]: [ModalPages.NULL],
-    [Operations.ADD_USER]: [ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM_USER],
-    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM_USER],
-    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE],
+    [Operations.ADD_USER]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
+    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
+    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE_USER],
   
-    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM_TEAM],
-    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM_TEAM],
-    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE],
+    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
+    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
+    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE_TEAM],
   
-    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SUBSECTION],
-    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SUBSECTION],
-    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE],
+    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
+    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
+    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE_SUBSECTION],
   
-    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_MODULE],
-    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_MODULE],
-    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE],
+    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
+    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
+    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE_MODULE],
   };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,32 +62,27 @@ const AdminPage = () => {
 
   const isDataValid = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
-    const defaultUserObj = {
-      name: '',
-      email: [''],
-      gtID: '',
-      teamMembership: [],
-      teamsAdvising: [],
-      role: '',
-      isExec: false,
-      moduleProgress: [{
-        moduleName: '',
-        percentComplete: 0.0,
-        isAssigned: false,
-        subsectionsComplete: []
-      }]
-    }
+
     // console.log(apiData)
-    console.log('apiData.user ', apiData.user)
+    console.log('validating user: ', apiData.user)
+    console.log('validating team: ', apiData.team)
     return (
-      apiData.user?.name !== ''
-      && (apiData.user?.email?.length !== 0 || apiData.user.email[0] !== '')
-      && apiData.user?.email.some(email => emailRegex.test(email)) 
-      && apiData.user?.gtID && apiData.user?.gtID.length === 9
-      && !isNaN(Number(apiData.user?.gtID))
-      && apiData.user?.teamMembership?.length && apiData.user?.teamMembership.length > 0
-      && apiData.user?.role !== ''
-    ) // or () or () 
+      ( // user is valid
+      apiData.user
+      && apiData.user.name !== ''
+      && (apiData.user.email?.length !== 0 && apiData.user.email[0] !== '')
+      && apiData.user.email.some(email => emailRegex.test(email)) 
+      && apiData.user.gtID && apiData.user?.gtID.length === 9
+      && !isNaN(Number(apiData.user.gtID))
+      && apiData.user.teamMembership.length > 0
+      && apiData.user.role !== ''
+    )
+    || ( // or if team is valid
+      apiData.team
+      && apiData.team.teamName !== ''
+      && (apiData.team.membership?.length !== 0 && apiData.team.membership[0] !== '')
+      && (apiData.team.advisors?.length !== 0 && apiData.team.advisors[0] !== '')
+    )) // or () or () 
   }
 
   const handleOpenModal = (entity: Operations) => {
@@ -99,12 +94,6 @@ const AdminPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setInvalidApiData(false);
-    setApiData({
-      user: undefined,
-      module: undefined,
-      subsection: undefined,
-      team: undefined
-    });
     handleReset();
     setCurrentOperation(Operations.NULL);
   }
@@ -139,13 +128,21 @@ const AdminPage = () => {
       // else if ((isneedingvalidation and isvalid) or (not needing validation)) move forward
       console.log('is data valid?? ', isDataValid())
       console.log('current page is ', stepSets[currentOperation][activeStep])
+      const infoInputPages = [ModalPages.EDIT_MODULE, 
+        ModalPages.EDIT_SUBSECTION, 
+        ModalPages.EDIT_TEAM, 
+        ModalPages.EDIT_USER, 
+        ModalPages.SELECT_MODULE, 
+        ModalPages.SELECT_SUBSECTION, 
+        ModalPages.SELECT_TEAM, 
+        ModalPages.SELECT_USER
+      ];
 
-      if ((activeStep + 1 === stepSets[currentOperation].length - 1 && stepSets[currentOperation][activeStep + 1] !== ModalPages.CONFIRM_DELETE && !isDataValid())) {
-        // if needs validation but invalid
+      if (infoInputPages.includes(stepSets[currentOperation][activeStep]) && !isDataValid()) {
+        // if current step is something where information has to be input and information is invalid, throw err
         console.log('error')
         setInvalidApiData(true);
-      } else if ((activeStep + 1 === stepSets[currentOperation].length - 1 && stepSets[currentOperation][activeStep + 1] !== ModalPages.CONFIRM_DELETE && isDataValid()) // on second to last and valid (before confirming)
-        || ((stepSets[currentOperation][activeStep] === ModalPages.SELECT_USER || stepSets[currentOperation][activeStep] === ModalPages.SELECT_MODULE || stepSets[currentOperation][activeStep] === ModalPages.SELECT_SUBSECTION || stepSets[currentOperation][activeStep] === ModalPages.SELECT_TEAM) && isDataValid())) { // on select page and something is selected
+      } else {
         console.log('no error')
         setInvalidApiData(false);
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -159,6 +156,12 @@ const AdminPage = () => {
 
   const handleReset = () => {
     setActiveStep(0);
+    setApiData({
+      user: undefined,
+      module: undefined,
+      subsection: undefined,
+      team: undefined
+    });
   }
 
 

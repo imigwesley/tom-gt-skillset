@@ -6,7 +6,7 @@ import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/Li
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
 import Module from 'module';
-import { MemberInformation, ModuleInformation, MyInterface, PersonalModuleProgress } from '../../Types/types';
+import { MemberInformation, ModuleInformation, MyInterface, ModuleProgress } from '../../Types/types';
 
 const HomePage = () => {
 
@@ -63,7 +63,7 @@ const HomePage = () => {
         setPersonalInfo(membersSample[0]);
 
         const combinedModules = modules.map((module: ModuleInformation) => {
-        const matchingProgressModule = personalInfo.moduleProgress.find((m: PersonalModuleProgress) => m.moduleName === module.moduleName);
+        const matchingProgressModule = personalInfo.moduleProgress.find((m: ModuleProgress) => m.moduleName === module.moduleName);
           return {
             ...module,
             progress: matchingProgressModule ? matchingProgressModule.percentComplete : 0,

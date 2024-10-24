@@ -1,19 +1,29 @@
 export enum ModalPages {
     NULL,
-    EDIT_USER_INFO,
+    EDIT_USER,
     SELECT_USER,
-    CONFIRM_USER,
-    CONFIRM_MODULE,
-    CONFIRM_SUBSECTION,
-    CONFIRM_TEAM,
-    CONFIRM_DELETE,
-    EDIT_TEAM_INFO,
+    EDIT_TEAM,
     SELECT_TEAM,
     EDIT_SUBSECTION,
     SELECT_SUBSECTION,
     EDIT_MODULE,
-    SELECT_MODULE
+    SELECT_MODULE,
+    CONFIRM_SAVE_USER,
+    CONFIRM_SAVE_MODULE,
+    CONFIRM_SAVE_SUBSECTION,
+    CONFIRM_SAVE_TEAM,
+    CONFIRM_DELETE_USER,
+    CONFIRM_DELETE_MODULE,
+    CONFIRM_DELETE_SUBSECTION,
+    CONFIRM_DELETE_TEAM,
+    
 };
+
+export interface ModulesPromise {
+    moduleName: string,
+    subsections: string[],
+    imageURL: string
+}
 
 export interface ModuleProgress {
     moduleName: string,
@@ -21,9 +31,6 @@ export interface ModuleProgress {
     isAssigned: boolean,
     subsectionsComplete: string[]
 }
-  
-
-
 
 export interface AdminModalContentProps {
     page: ModalPages,
@@ -33,8 +40,8 @@ export interface AdminModalContentProps {
 
 export interface TeamInformation {
     teamName: string,
-    membership: number[],
-    advisors: number[]
+    membership: string[],
+    advisors: string[]
 }
 
 export interface SubsectionInformation {
@@ -42,20 +49,6 @@ export interface SubsectionInformation {
     subsectionName: string,
     subsectionHtml: string
 }
-
-export interface ModulesPromise {
-    moduleName: string,
-    subsections: string[],
-    imageURL: string
-}
-
-
-export interface PersonalModuleProgress {
-    moduleName: string, 
-    percentComplete: number,
-    isAssigned: boolean,
-    subsectionsComplete: string[]
-};
 
 export interface MemberInformation {
     gtID: string,
@@ -65,7 +58,7 @@ export interface MemberInformation {
     teamsAdvising: string[],
     role: string,
     isExec: boolean,
-    moduleProgress: PersonalModuleProgress[]
+    moduleProgress: ModuleProgress[]
 }
 
 export interface ModuleInformation {
@@ -100,3 +93,6 @@ export interface ApiInformation {
     team: TeamInformation | undefined
 }
 
+export interface NameGTidMap {
+    [key: string]: string
+}
