@@ -3,99 +3,91 @@ import './Home.scss';
 import { Card, CardContent, CardMedia, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
+import modulesSample from '../../SampleData/ModulesSample';
+import membersSample from '../../SampleData/MembersSample';
+import Module from 'module';
+import { MemberInformation, ModuleInformation, MyInterface, PersonalModuleProgress } from '../../Types/types';
 
 const HomePage = () => {
 
-  interface Module {
-    name: string,
-    progress: number,
-    src: string,
-    isAssigned: boolean
-  };
-
-  interface ModulesAndProgress {
-    name: string,
-    modules: Module[]
-  }
-
   const navigate = useNavigate();
 
-  const [modulesAndProgress, setModulesAndProgress] = useState<ModulesAndProgress>({
-    name: '',
-    modules: []
+  const [personalInfo, setPersonalInfo] = useState<MemberInformation>({
+      gtID: '',
+      name: '',
+      email: ['', ''],
+      teamMembership: [''],
+      teamsAdvising: ['', ''],
+      role: '',
+      isExec: false,
+      moduleProgress: [
+        { 
+            moduleName: '', 
+            percentComplete: 0,
+            isAssigned: false,
+            subsectionsComplete: ['', '', '']
+        }
+      ]
   });
 
+  const [modules, setModules] = useState<ModuleInformation[]>([
+    {
+      moduleName: '',
+      subsections: ['', ''],
+      imageURL: ''
+    }
+  ]);
+
+  const [modulesAndProgress, setModulesAndProgress] = useState<MyInterface>(
+    {
+      name: '',
+      modules: [
+        {
+          isAssigned: false,
+          progress: 0,
+          moduleName: '',
+          subsections: ['', ''],
+          imageURL: '',
+        }
+      ]
+  })
   const [isLoading, setIsLoading] = useState(true);
-
-  // idea for modules is to store html in a dynamo table. Make call to retrieve html code. admins can edit it and post/update it. 
-  // will need to make api call to grab html. Since there won't be really anything dynamic it should be fine to do this.
-  // will need to make a GET /modules/allsubsections/{module_name}: get html code. Should do a useState, {isSubsection1 && <Subsection1/>}
-
-  // TODO: need to put image, module name in dynamo tables
-  // going to need to also put html in sections for next page
-
-  // should also load person's progress and match it up with all modules
-
+  
   
 
   useEffect(() => {
     const fetchData = async () => {
-      // Simulating API call for personal progress
-      const personalProgress = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            name: 'Wesley',
-            modules: [
-              { name: "Uluru or Ayer's Rock", progress: 67.77, isAssigned: false },
-              { name: "Shrimp on the Barbie", progress: 0.00, isAssigned: true },
-              { name: "Didgeridoos", progress: 0.00, isAssigned: false },
-              { name: "Dingos", progress: 12.00, isAssigned: false },
-              { name: "Kangaroos", progress: 0.00, isAssigned: false },
-            ]
-          });
-        }, 500); // Simulate network delay
-      });
+      // Simulating API calls
+      setTimeout(() => {
+        setModules(modulesSample);
+        setPersonalInfo(membersSample[0]);
 
-      // Simulating API call for returned modules
-      const returnedModules = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            modules: [
-              { name: "Uluru or Ayer's Rock", src: "/ayersrockuluru.jpg" },
-              { name: "Shrimp on the Barbie", src: "/barbieshrimp.jpg" },
-              { name: "Didgeridoos", src: "/didgeridoo.jpg" },
-              { name: "Dingos", src: "/dingobaby.jpg" },
-              { name: "Kangaroos", src: "/kangaroo.jpg" },
-            ]
-          });
-        }, 500); // Simulate network delay
-      });
-
-      // Combine personalProgress and returnedModules
-      const combinedModules = (returnedModules as any).modules.map((module: Module) => {
-        const progressModule = (personalProgress as any).modules.find((m: Module) => m.name === module.name);
-        return {
-          ...module,
-          progress: progressModule ? progressModule.progress : 0,
-          isAssigned: progressModule.isAssigned,
-        };
-      });
-
-      console.log(combinedModules)
-      combinedModules.sort((a: Module, b:Module) => {
-        return Number(b.isAssigned) - Number(a.isAssigned)
-      })
-
-      setModulesAndProgress({
-        name: (personalProgress as any).name,
-        modules: combinedModules
-      });
-      setIsLoading(false);
+        const combinedModules = modules.map((module: ModuleInformation) => {
+        const matchingProgressModule = personalInfo.moduleProgress.find((m: PersonalModuleProgress) => m.moduleName === module.moduleName);
+          return {
+            ...module,
+            progress: matchingProgressModule ? matchingProgressModule.percentComplete : 0,
+            isAssigned: matchingProgressModule ? matchingProgressModule.isAssigned : false
+          }
+        })
+        console.log('combined 1', combinedModules);
+    
+        combinedModules.sort((a, b) => {
+          return Number(b.isAssigned) - Number(a.isAssigned);
+        })
+        console.log('combined 2', combinedModules);
+    
+        setModulesAndProgress({
+          name: (personalInfo as any).name,
+          modules: combinedModules
+        });
+        setIsLoading(false);
+      }, 300);
     };
 
     setIsLoading(true);
     fetchData();
-  }, []);
+  }, [modules, personalInfo]);
   
 
   const handleCardClick = (moduleName: string) => {
@@ -113,20 +105,20 @@ const HomePage = () => {
         <div>
           <div className='header'>
             <Typography variant='h4' align='center'>
-              Hello, {modulesAndProgress.name}! What would you like to learn today?
+              Hello, {modulesAndProgress.name.substring(0, modulesAndProgress.name.indexOf(' '))}! What would you like to learn today?
             </Typography>
           </div>
           <div className='module-card-container'>
             {modulesAndProgress.modules.map((module, index) => {
               return (
-                <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.name)} key={index}>
+                <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
                   <CardMedia
                     className='module-image'
-                    image={module.src}
+                    image={module.imageURL}
                   />
-                  <CardContent className='card-content'>
+                  <CardContent className='module-card-content'>
                     <Typography>
-                      {module.name}
+                      {module.moduleName}
                     </Typography>
                     <LinearProgressWithLabel progress={module.progress} />
                   </CardContent>

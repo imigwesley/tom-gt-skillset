@@ -1,112 +1,93 @@
 import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, Divider, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import './Admin.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
+import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
+import { ApiInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation } from '../../Types/types';
 
 
 const AdminPage = () => {
 
-  interface APIResponse {
-    code: number,
-    message: string
-  }
-
+  // enum for each api call on the page
   enum Operations {
-    NULL = 'NULL',
-    ADD_USER = 'ADD_USER',
-    EDIT_USER = 'EDIT_USER',
-    DELETE_USER = 'DELETE_USER',
-    ADD_TEAM = 'ADD_TEAM',
-    EDIT_TEAM = 'EDIT_TEAM',
-    DELETE_TEAM = 'DELETE_TEAM',
-    ADD_SUBSECTION = 'ADD_SUBSECTION',
-    EDIT_SUBSECTION = 'EDIT_SUBSECTION',
-    DELETE_SUBSECTION = 'DELETE_SUBSECTION',
-    ADD_MODULE = 'ADD_MODULE',
-    EDIT_MODULE = 'EDIT_MODULE',
-    DELETE_MODULE = 'DELETE_MODULE',
-  }
-
-  enum ModalPages {
     NULL,
-    EDIT_USER_INFO,
-    SELECT_USER,
-    CONFIRM,
-    CONFIRM_DELETE,
-    EDIT_TEAM_INFO,
-    SELECT_TEAM,
+    ADD_USER,
+    EDIT_USER,
+    DELETE_USER,
+    ADD_TEAM,
+    EDIT_TEAM,
+    DELETE_TEAM,
+    ADD_SUBSECTION,
     EDIT_SUBSECTION,
-    SELECT_SUBSECTION,
+    DELETE_SUBSECTION,
+    ADD_MODULE,
     EDIT_MODULE,
-    SELECT_MODULE
-  }
+    DELETE_MODULE
+  };
+
+  // enum for each page within the operation
+
+  // mapping of which pages are needed to do each operation
+  const stepSets: Record<Operations, ModalPages[]> = {
+    [Operations.NULL]: [ModalPages.NULL],
+    [Operations.ADD_USER]: [ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM_USER],
+    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM_USER],
+    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE],
+  
+    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM_TEAM],
+    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM_TEAM],
+    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE],
+  
+    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SUBSECTION],
+    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SUBSECTION],
+    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE],
+  
+    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_MODULE],
+    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_MODULE],
+    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE],
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [currentOperation, setCurrentOperation] = useState<Operations>(Operations.NULL);
   const [isWaitingOnApi, setIsWaitingOnApi] = useState(false);
   const [responseType, setResponseType] = useState<APIResponse>({code: 0, message: ''});
-  
-  const stepSets: Record<Operations, ModalPages[]> = {
-    [Operations.NULL]: [ModalPages.NULL],
-    [Operations.ADD_USER]: [ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM],
-    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER_INFO, ModalPages.CONFIRM],
-    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE],
-  
-    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM],
-    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM_INFO, ModalPages.CONFIRM],
-    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE],
-  
-    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM],
-    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM],
-    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE],
-  
-    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM],
-    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM],
-    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE],
-  };
+  const [invalidApiData, setInvalidApiData] = useState(false);
+  const [apiData, setApiData] = useState<ApiInformation>({
+    user: undefined,
+    module: undefined,
+    subsection: undefined,
+    team: undefined
+  });
 
-  const modalHtml = {
-    [ModalPages.NULL]: <div />,
-    [ModalPages.EDIT_USER_INFO]: 
-      <div> 
-        input user info
-      </div>,
-    [ModalPages.SELECT_USER]: 
-      <div>
-        select user
-      </div>,
-    [ModalPages.CONFIRM]:
-      <div>
-        Are you sure you want to use this?
-      </div>,
-    [ModalPages.CONFIRM_DELETE]:
-      <div>
-        Are you sure you want to delete this?
-      </div>,
-    [ModalPages.EDIT_TEAM_INFO]: 
-      <div> 
-        input team info
-      </div>,
-    [ModalPages.SELECT_TEAM]: 
-      <div>
-        select team
-      </div>,
-    [ModalPages.EDIT_SUBSECTION]:
-      <div>
-        edit subsection
-      </div>,
-    [ModalPages.SELECT_SUBSECTION]:
-      <div>
-        select subsection
-      </div>,
-    [ModalPages.EDIT_MODULE]:
-      <div>
-        edit module
-      </div>,
-    [ModalPages.SELECT_MODULE]:
-      <div>
-        select module
-      </div>
+  const isDataValid = () => {
+    const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
+    const defaultUserObj = {
+      name: '',
+      email: [''],
+      gtID: '',
+      teamMembership: [],
+      teamsAdvising: [],
+      role: '',
+      isExec: false,
+      moduleProgress: [{
+        moduleName: '',
+        percentComplete: 0.0,
+        isAssigned: false,
+        subsectionsComplete: []
+      }]
+    }
+    // console.log(apiData)
+    console.log('apiData.user ', apiData.user)
+    return (
+      apiData.user?.name !== ''
+      && (apiData.user?.email?.length !== 0 || apiData.user.email[0] !== '')
+      && apiData.user?.email.some(email => emailRegex.test(email)) 
+      && apiData.user?.gtID && apiData.user?.gtID.length === 9
+      && !isNaN(Number(apiData.user?.gtID))
+      && apiData.user?.teamMembership?.length && apiData.user?.teamMembership.length > 0
+      && apiData.user?.role !== ''
+    ) // or () or () 
   }
 
   const handleOpenModal = (entity: Operations) => {
@@ -117,12 +98,20 @@ const AdminPage = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setInvalidApiData(false);
+    setApiData({
+      user: undefined,
+      module: undefined,
+      subsection: undefined,
+      team: undefined
+    });
     handleReset();
     setCurrentOperation(Operations.NULL);
   }
 
   const handleNext = () => {
     if (activeStep === stepSets[currentOperation].length - 1) {
+      // submit button
       handleCloseModal();
       setIsWaitingOnApi(true);
 
@@ -145,7 +134,22 @@ const AdminPage = () => {
         
       }, 900)
     } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      // clicking 'next'
+      // if (isneedingvalidation and isnotvalid) setErr
+      // else if ((isneedingvalidation and isvalid) or (not needing validation)) move forward
+      console.log('is data valid?? ', isDataValid())
+      console.log('current page is ', stepSets[currentOperation][activeStep])
+
+      if ((activeStep + 1 === stepSets[currentOperation].length - 1 && stepSets[currentOperation][activeStep + 1] !== ModalPages.CONFIRM_DELETE && !isDataValid())) {
+        // if needs validation but invalid
+        console.log('error')
+        setInvalidApiData(true);
+      } else if ((activeStep + 1 === stepSets[currentOperation].length - 1 && stepSets[currentOperation][activeStep + 1] !== ModalPages.CONFIRM_DELETE && isDataValid()) // on second to last and valid (before confirming)
+        || ((stepSets[currentOperation][activeStep] === ModalPages.SELECT_USER || stepSets[currentOperation][activeStep] === ModalPages.SELECT_MODULE || stepSets[currentOperation][activeStep] === ModalPages.SELECT_SUBSECTION || stepSets[currentOperation][activeStep] === ModalPages.SELECT_TEAM) && isDataValid())) { // on select page and something is selected
+        console.log('no error')
+        setInvalidApiData(false);
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
     }
   };
   
@@ -156,6 +160,51 @@ const AdminPage = () => {
   const handleReset = () => {
     setActiveStep(0);
   }
+
+
+  // type guards
+
+  function isMemberInformation(info: any): info is MemberInformation {
+    return (info as MemberInformation).gtID !== undefined;
+  }
+  
+  function isModuleInformation(info: any): info is ModuleInformation {
+    return (info as ModuleInformation).moduleName !== undefined;
+  }
+  
+  function isSubsectionInformation(info: any): info is SubsectionInformation {
+    return (info as SubsectionInformation).subsectionName !== undefined;
+  }
+  
+  function isTeamInformation(info: any): info is TeamInformation {
+    return (info as TeamInformation).teamName !== undefined;
+  }
+
+  const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
+    console.log('info is ', info)
+    if (isMemberInformation(info)) {
+      let temp = {...apiData};
+      temp.user = info;
+      setApiData(temp);
+    } else if (isModuleInformation(info)) {
+      let temp = {...apiData};
+      temp.module = info;
+      setApiData(temp);
+    } else if (isSubsectionInformation(info)) {
+      let temp = {...apiData};
+      temp.subsection = info;
+      setApiData(temp);
+    } else if (isTeamInformation(info)) {
+      let temp = {...apiData};
+      temp.team = info;
+      setApiData(temp);
+    }
+    // console.log('apiData inside Admin.tsx is ', apiData)
+  }
+
+  useEffect(() => {
+    console.log('apiData changed', apiData);
+  }, [apiData])
 
 
     return (
@@ -277,17 +326,18 @@ const AdminPage = () => {
           transitionDuration={0}
         >
           <Box className={'modal'}>
-            <Stepper activeStep={activeStep}>
+            <Stepper activeStep={activeStep} className='modal-stepper'>
               {stepSets[currentOperation].map((label) => (
                 <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
+                  <StepLabel/>
                 </Step>
               ))}
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  {modalHtml[stepSets[currentOperation][activeStep]]}
+                  <AdminModalContent page={stepSets[currentOperation][activeStep]} passedApiInformation={apiData} onApiInformationUpdate={handleApiInfoChange}/>
                 </div>
+                {invalidApiData && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>
                   <Button
                     className='cancel-button'

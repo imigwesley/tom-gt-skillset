@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './Members.scss';
 import { Avatar, Button, ButtonGroup, Typography } from '@mui/material';
-import members from './MembersSample';
+import members from '../../SampleData/MembersSample';
 import MemberInfoCard from '../../Components/MemberInfoCard/MemberInfoCard';
 
 const MembersPage = () => {
@@ -13,7 +13,7 @@ const MembersPage = () => {
   interface Member {
     name: string,
     email: string[],
-    teamMembership: string,
+    teamMembership: string[],
     teamsAdvising: string[],
     role: string,
     isExec: boolean,
@@ -58,7 +58,7 @@ const MembersPage = () => {
       tempByTeam.push(
         {
           'team': team,
-          'members': allMembers.filter((member) => member.teamMembership === team),
+          'members': allMembers.filter((member) => member.teamMembership.includes(team)),
           'advisors': allMembers.filter((member) => member.teamsAdvising.includes(team))
         }
       );

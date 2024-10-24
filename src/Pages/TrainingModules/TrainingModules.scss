@@ -1,11 +1,12 @@
 .module-page-container {
     display: flex;
     flex-direction: row;
-    padding: 0% 10% 0% 10%;
+    padding: 1% 5% 0% 5%;
     gap: 100px;
 
     .subsection-links-container {
         width: fit-content;
+        padding-top: 5%;
     }
     
     .module-container {

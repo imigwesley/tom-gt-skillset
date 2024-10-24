@@ -1,4 +1,21 @@
+@font-face {
+  font-family: "TOMFont";
+  src: url("./fonts/AvenirLTStd-Medium.otf") format("opentype");
+}
+
+
 body {
+  margin: 0;
+  font-family: "TOMFont", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: 'MyFont', sans-serif;
+}
+
+/* body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -10,4 +27,4 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
-}
+} */

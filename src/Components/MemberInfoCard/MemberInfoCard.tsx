@@ -4,7 +4,7 @@ import './MemberInfoCard.scss';
 interface Member {
   name: string,
   email: string[],
-  teamMembership: string,
+  teamMembership: string[],
   teamsAdvising: string[],
   role: string,
   isExec: boolean,
@@ -19,7 +19,7 @@ const MemberInfoCard = ({member, isEven}: MemberCardProps) => {
   return (
     <div>
       <Card square elevation={0} className={isEven ? 'light' : 'dark'}>
-        <CardContent className='card-content'>
+        <CardContent className='member-card-content'>
           <Typography className='table-section'>{member.name}</Typography>
           <Typography className='table-section'>{member.teamMembership}</Typography>
           <Typography sx={{fontStyle: 'italic'}} className='table-section'>{member.role}</Typography>

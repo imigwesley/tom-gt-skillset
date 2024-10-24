@@ -24,21 +24,21 @@ const FeedbackPage = () => {
   }
 
     return (
-      <div className='feedback-container'>
+      <div className='contact-container'>
         <Typography variant='h2'>
-          Contact/Feedback
+          Contact Us/Site Feedback
         </Typography>
         <div className='question-section'>
           <Typography variant='h4'>
             What did you think?
           </Typography>
-          <TextField multiline fullWidth rows={4} onChange={handleFirstInputChange} value={firstFeedback}/>
+          <TextField multiline fullWidth rows={4} onChange={handleFirstInputChange} value={firstFeedback} className='input-section'/>
         </div>
         <div className='question-section'>
           <Typography variant='h4'>
             What would you change?
           </Typography>
-          <TextField multiline fullWidth rows={3} onChange={handleSecondInputChange} value={secondFeedback}/>
+          <TextField multiline fullWidth rows={3} onChange={handleSecondInputChange} value={secondFeedback} className='input-section'/>
         </div>
         <Button variant='contained' disableRipple onClick={handleSubmitFeedback}>
           submit

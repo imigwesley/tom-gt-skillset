@@ -1,23 +1,24 @@
-import { CheckCircleOutline, RadioButtonUncheckedOutlined } from '@mui/icons-material';
+import { CheckCircleOutline, RadioButtonUncheckedOutlined, TaskAlt } from '@mui/icons-material';
 import './SubsectionLink.scss';
 import { Typography } from '@mui/material';
 
 interface SubsectionLinkProps {
   isCompleted: boolean,
-  name: string
+  name: string,
+  isCurrent: boolean,
 }
 
-const SubsectionLink = ({isCompleted, name}: SubsectionLinkProps) => {
+const SubsectionLink = ({isCompleted, name, isCurrent}: SubsectionLinkProps) => {
 
   return (
     <div className='link-container'>
       {isCompleted
       ?
-        <CheckCircleOutline />
+        <TaskAlt />
       :
         <RadioButtonUncheckedOutlined />
       }
-      <Typography variant='body2'>{name}</Typography>
+      <Typography variant='body1' className={`${isCurrent ? 'current' : ''}`}>{name}</Typography>
     </div>
   );
 }
