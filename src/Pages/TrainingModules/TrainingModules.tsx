@@ -7,12 +7,12 @@ import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
-import { ModuleProgress, ModulesPromise } from '../../Types/types';
+import { ModuleProgress, ModuleInformation } from '../../Types/types';
 
 const TrainingModulesPage = () => {
 
   const { moduleName } = useParams();
-  const [module, setModule] = useState<ModulesPromise>({
+  const [module, setModule] = useState<ModuleInformation>({
     moduleName: '',
     subsections: [],
     imageURL: ''

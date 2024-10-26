@@ -19,12 +19,6 @@ export enum ModalPages {
     
 };
 
-export interface ModulesPromise {
-    moduleName: string,
-    subsections: string[],
-    imageURL: string
-}
-
 export interface ModuleProgress {
     moduleName: string,
     percentComplete: number,
@@ -34,8 +28,9 @@ export interface ModuleProgress {
 
 export interface AdminModalContentProps {
     page: ModalPages,
-    passedApiInformation: ApiInformation,
+    passedApiInformation: ApiReceiveInformation,
     onApiInformationUpdate: (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => void;
+    onImageProvided:(file: File) => void;
 }
 
 export interface TeamInformation {
@@ -45,7 +40,6 @@ export interface TeamInformation {
 }
 
 export interface SubsectionInformation {
-    moduleName: string,
     subsectionName: string,
     subsectionHtml: string
 }
@@ -84,9 +78,16 @@ export interface MyModulesInterface {
 export interface APIResponse {
     code: number,
     message: string
-  }
+}
 
-export interface ApiInformation {
+export interface ApiReceiveInformation {
+    users: MemberInformation[] | undefined,
+    modules: ModuleInformation[] | undefined,
+    subsections: SubsectionInformation[] | undefined,
+    teams: TeamInformation[] | undefined
+}
+
+export interface ApiSendInformation {
     user: MemberInformation | undefined,
     module: ModuleInformation | undefined,
     subsection: SubsectionInformation | undefined,

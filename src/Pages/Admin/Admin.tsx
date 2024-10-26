@@ -3,7 +3,11 @@ import './Admin.scss';
 import { useEffect, useState } from 'react';
 import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { ApiInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation } from '../../Types/types';
+import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
+import membersSample from '../../SampleData/MembersSample';
+import teamsSample from '../../SampleData/TeamsSample';
+import modulesSample from '../../SampleData/ModulesSample';
+import subSectionsSample from '../../SampleData/SubsectionsSample';
 
 
 const AdminPage = () => {
@@ -52,37 +56,61 @@ const AdminPage = () => {
   const [currentOperation, setCurrentOperation] = useState<Operations>(Operations.NULL);
   const [isWaitingOnApi, setIsWaitingOnApi] = useState(false);
   const [responseType, setResponseType] = useState<APIResponse>({code: 0, message: ''});
-  const [invalidApiData, setInvalidApiData] = useState(false);
-  const [apiData, setApiData] = useState<ApiInformation>({
+  const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
+  // holds info received from api, puts into modal prop
+  const [apiDataReceived, setApiDataReceived] = useState<ApiReceiveInformation>({
+    users: undefined,
+    modules: undefined,
+    subsections: undefined,
+    teams: undefined
+  });
+  // holds info to send to api on admin 'submit' function
+  const [apiDataToSend, setapiDataToSend] = useState<ApiSendInformation>({
     user: undefined,
     module: undefined,
     subsection: undefined,
     team: undefined
   });
+  const [imageFile, setImageFile] = useState<File | undefined>(undefined);
 
   const isDataValid = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
-    // console.log(apiData)
-    console.log('validating user: ', apiData.user)
-    console.log('validating team: ', apiData.team)
+    // console.log(apiDataToSend)
+    console.log('validating user: ', apiDataToSend.user)
+    console.log('validating team: ', apiDataToSend.team)
+    console.log('validating module: ', apiDataToSend.module)
+    console.log('validating image ', imageFile);
+
     return (
       ( // user is valid
-      apiData.user
-      && apiData.user.name !== ''
-      && (apiData.user.email?.length !== 0 && apiData.user.email[0] !== '')
-      && apiData.user.email.some(email => emailRegex.test(email)) 
-      && apiData.user.gtID && apiData.user?.gtID.length === 9
-      && !isNaN(Number(apiData.user.gtID))
-      && apiData.user.teamMembership.length > 0
-      && apiData.user.role !== ''
+      apiDataToSend.user
+      && apiDataToSend.user.name !== ''
+      && (apiDataToSend.user.email?.length !== 0 && apiDataToSend.user.email[0] !== '')
+      && apiDataToSend.user.email.some(email => emailRegex.test(email)) 
+      && apiDataToSend.user.gtID && apiDataToSend.user?.gtID.length === 9
+      && !isNaN(Number(apiDataToSend.user.gtID))
+      && apiDataToSend.user.teamMembership.length > 0
+      && apiDataToSend.user.role !== ''
     )
     || ( // or if team is valid
-      apiData.team
-      && apiData.team.teamName !== ''
-      && (apiData.team.membership?.length !== 0 && apiData.team.membership[0] !== '')
-      && (apiData.team.advisors?.length !== 0 && apiData.team.advisors[0] !== '')
-    )) // or () or () 
+      apiDataToSend.team
+      && apiDataToSend.team.teamName !== ''
+      && (apiDataToSend.team.membership?.length !== 0 && apiDataToSend.team.membership[0] !== '')
+      && (apiDataToSend.team.advisors?.length !== 0 && apiDataToSend.team.advisors[0] !== '')
+    )
+    || ( // or if module is valid (necessary info exists, image is uploaded)
+      apiDataToSend.module
+      && apiDataToSend.module.moduleName !== ''
+      && (apiDataToSend.module.subsections?.length !== 0 && apiDataToSend.module.subsections[0] !== '')
+      && imageFile
+    )
+    || ( // or if subsection is valid
+      apiDataToSend.subsection
+      && apiDataToSend.subsection.subsectionName !== ''
+      && apiDataToSend.subsection.subsectionHtml !== ''
+    )
+  ) // or () or () 
   }
 
   const handleOpenModal = (entity: Operations) => {
@@ -93,7 +121,7 @@ const AdminPage = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setInvalidApiData(false);
+    setInvalidapiDataToSend(false);
     handleReset();
     setCurrentOperation(Operations.NULL);
   }
@@ -105,6 +133,11 @@ const AdminPage = () => {
       setIsWaitingOnApi(true);
 
       // make api call
+      // if no image provided, call straight up
+      // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update module info table 
+
+
+      // sample response
       const response = {
         code: 500,
         message: 'Error 500: Internal Server Error'
@@ -132,7 +165,7 @@ const AdminPage = () => {
         ModalPages.EDIT_SUBSECTION, 
         ModalPages.EDIT_TEAM, 
         ModalPages.EDIT_USER, 
-        ModalPages.SELECT_MODULE, 
+        // ModalPages.SELECT_MODULE,
         ModalPages.SELECT_SUBSECTION, 
         ModalPages.SELECT_TEAM, 
         ModalPages.SELECT_USER
@@ -141,10 +174,10 @@ const AdminPage = () => {
       if (infoInputPages.includes(stepSets[currentOperation][activeStep]) && !isDataValid()) {
         // if current step is something where information has to be input and information is invalid, throw err
         console.log('error')
-        setInvalidApiData(true);
+        setInvalidapiDataToSend(true);
       } else {
         console.log('no error')
-        setInvalidApiData(false);
+        setInvalidapiDataToSend(false);
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
     }
@@ -155,13 +188,15 @@ const AdminPage = () => {
   };
 
   const handleReset = () => {
+    console.log('reset')
     setActiveStep(0);
-    setApiData({
+    setapiDataToSend({
       user: undefined,
       module: undefined,
       subsection: undefined,
       team: undefined
     });
+    setImageFile(undefined);
   }
 
 
@@ -186,28 +221,54 @@ const AdminPage = () => {
   const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
     console.log('info is ', info)
     if (isMemberInformation(info)) {
-      let temp = {...apiData};
+      let temp = {...apiDataToSend};
       temp.user = info;
-      setApiData(temp);
+      setapiDataToSend(temp);
     } else if (isModuleInformation(info)) {
-      let temp = {...apiData};
+      let temp = {...apiDataToSend};
       temp.module = info;
-      setApiData(temp);
+      setapiDataToSend(temp);
     } else if (isSubsectionInformation(info)) {
-      let temp = {...apiData};
+      let temp = {...apiDataToSend};
       temp.subsection = info;
-      setApiData(temp);
+      setapiDataToSend(temp);
     } else if (isTeamInformation(info)) {
-      let temp = {...apiData};
+      let temp = {...apiDataToSend};
       temp.team = info;
-      setApiData(temp);
+      setapiDataToSend(temp);
     }
-    // console.log('apiData inside Admin.tsx is ', apiData)
+    // console.log('apiDataToSend inside Admin.tsx is ', apiDataToSend)
+  }
+
+  const handleImageProvided = (file: File) => {
+    console.log('file is ', file);
+    setImageFile(file);
   }
 
   useEffect(() => {
-    console.log('apiData changed', apiData);
-  }, [apiData])
+    console.log('apiDataToSend changed', apiDataToSend);
+  }, [apiDataToSend])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setTimeout(() => {
+        const _users = membersSample;
+        const _teams = teamsSample;
+        const _modules = modulesSample;
+        const _subsections = subSectionsSample;
+
+        let temp: ApiReceiveInformation = {
+          users: _users,
+          teams: _teams,
+          modules: _modules,
+          subsections: _subsections
+        }
+        setApiDataReceived(temp);
+      }, 300);
+    };
+
+    fetchData();
+  }, [])
 
 
     return (
@@ -338,9 +399,9 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <AdminModalContent page={stepSets[currentOperation][activeStep]} passedApiInformation={apiData} onApiInformationUpdate={handleApiInfoChange}/>
+                  <AdminModalContent page={stepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
                 </div>
-                {invalidApiData && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
+                {invalidapiDataToSend && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>
                   <Button
                     className='cancel-button'

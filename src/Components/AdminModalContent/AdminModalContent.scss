@@ -50,13 +50,18 @@
 
 .confirm-section {
     padding: 8px 0px;
+}
 
-    .italics {
-        font-style: italic;
-    }
-    
-    .indent {
-        padding-left: 15px;
-    }
+.image-upload-section {
+    display: flex;
+    flex-direction: row;
+}
+
+.italics {
+    font-style: italic;
+}
+
+.indent {
+    padding-left: 15px;
 }
 

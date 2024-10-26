@@ -1,23 +1,29 @@
-import { Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Popper, Select, styled, TextField, Typography } from '@mui/material';
 import './AdminModalContent.scss';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import Checkbox from '@mui/material/Checkbox';
-import { AdminModalContentProps, ApiInformation, MemberInformation, ModalPages, NameGTidMap, TeamInformation } from '../../Types/types';
-import { Add, DeleteOutline } from '@mui/icons-material';
+import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPages, ModuleInformation, NameGTidMap, SubsectionInformation, TeamInformation } from '../../Types/types';
+import { Add, AddPhotoAlternate, DeleteOutline } from '@mui/icons-material';
+import { validateEmailString } from '../../utils/Utils';
 
 
-const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate }: AdminModalContentProps) => {
-  // const [apiInformation, setApiInformation] = useState<ApiInformation>(passedApiInformation);
+const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
+  
+  // user input errors
+  const [incorrectUserNameError, setIncorrectUserNameError] = useState(false);
   const [incorrectGTIDValueError, setIncorrectGTIDValueError] = useState(false);
-  const [notProvidedError, setNotProvidedError] = useState(false);
-  const [userSelected, setUserSelected] = useState<string>();
-  const [teamSelected, setTeamSelected] = useState<string>();
   const [emailErrors, setEmailErrors] = useState<boolean[]>([false]);
+
+  const [userSelected, setUserSelected] = useState<string>(); // used??
+  const [teamSelected, setTeamSelected] = useState<string>(); // used??
+  const [moduleSelected, setModuleSelected] = useState<string>(); // used??
+  const [subsectionSelected, setSubsectionSelected] = useState<string>(); // used??
   const [usersGTidMap, setUsersGTidMap] = useState<NameGTidMap>({});
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
 
   // local data for editing in modal and sending to api
@@ -40,15 +46,24 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
     teamName: '',
     membership: [],
     advisors: []
+  });
+  const [localModuleData, setLocalModuleData] = useState<ModuleInformation | null>({
+    moduleName: '',
+    subsections: [],
+    imageURL: ''
+  })
+  const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation | null>({
+    subsectionName: '',
+    subsectionHtml: ''
   })
 
   // all data from api
-  const [teamsData, setTeamsData] = useState<TeamInformation[]>([{
-    teamName: '',
-    membership: [],
-    advisors: []
-  }]);
-  const [usersData, setUsersData] = useState<MemberInformation[]>([{
+  const teamsData: TeamInformation[] = passedApiInformation.teams || [{
+      teamName: '',
+      membership: [],
+      advisors: []
+    }];
+  const usersData: MemberInformation[] = passedApiInformation.users || [{
     name: '',
     email: [''],
     gtID: '',
@@ -62,36 +77,48 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
       isAssigned: false,
       subsectionsComplete: []
     }]
-  }]);
+  }];
+  const modulesData: ModuleInformation[] = passedApiInformation.modules || [{
+    moduleName: '',
+    subsections: [],
+    imageURL: ''
+  }];
+  const subsectionsData: SubsectionInformation[] = passedApiInformation.subsections || [{
+    subsectionName: '',
+    subsectionHtml: ''
+  }];
 
   useEffect(() => {
-    const fetchData = async () => {
-      setTimeout(() => {
-        setTeamsData(teamsSample);
-        setUsersData(membersSample);
-        setUsersGTidMap(membersSample.reduce((acc: {[key: string]: string}, member) => {
-          acc[member.gtID] = member.name;
-          return acc;
-        }, {}));
-      }, 300);
-    };
+    console.log('here too, ', passedApiInformation);
+    if (passedApiInformation.users) {
+      setUsersGTidMap(passedApiInformation?.users.reduce((acc: {[key: string]: string}, member) => {
+        acc[member.gtID] = member.name;
+        return acc;
+      }, {}));
+    } else {
+      console.warn('no users found. Gtid map cannot be set.')
+    }
+    
+  }, [passedApiInformation])
 
-    fetchData();
-  }, []);
 
-  useEffect(() => {
-    // console.log('changed to ', emailErrors)
-  }, [emailErrors])
-
-  useEffect(() => {
-    // console.log('localUser', localUserData);
-  }, [localUserData]);
 
   /////////////////////////////////////////// USER ACTIONS //////////////////////////////////////////////
+  const handleUserNameBlur = (name: string) => {
+    console.log('name on blur is', name);
+    if (name === '') {
+      setIncorrectUserNameError(true);
+    }
+  }
+
   const handleChangeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const _name = event.target.value;
+    if (_name !== '') {
+      setIncorrectUserNameError(false);
+    }
     const temp: MemberInformation = {
       gtID: localUserData?.gtID || '',
-      name: event.target.value,
+      name: _name,
       email: localUserData?.email || [],
       teamMembership: localUserData?.teamMembership || [],
       teamsAdvising: localUserData?.teamsAdvising || [],
@@ -190,24 +217,13 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
     });
   };
 
-
-  const validateEmailString = (email: string) => {
-    console.log('validating')
-    const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
-    if (email?.length !== 0 && !emailRegex.test(email)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   const handleEmailBlur = (email: string, index: number) => {
     const newErrors = [...emailErrors];
     const isValid = validateEmailString(email);
+    console.log('is it valid? ', isValid)
     newErrors[index] = isValid;
-    console.log('setting errors handleblur')
     setEmailErrors(newErrors);
-
+    
   }
 
   const handleChangeUserGtid = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -259,9 +275,6 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
     if (event.target.value.length != 9) {
       setIncorrectGTIDValueError(true)
     } 
-    // else if (!isNaN(Number(event.target.value))) {
-    //   setIncorrectGTIDValueError(false);
-    // }
   }
 
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
@@ -309,7 +322,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
     onApiInformationUpdate(temp);
   }
 
-  ///////////////////////////// TEAM ACTIONS //////////////////////////////////////////////
+  ///////////////////////////// TEAM ACTIONS ////////////////////////////////////////////////////////////////////
   const handleChangeTeamName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const temp: TeamInformation = {
       teamName: event.target.value,
@@ -320,26 +333,88 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
     onApiInformationUpdate(temp);
   };
 
-  const handleChangeTeamAdvisors = (event: { target: { value: any; }; }) => {
+  const handleChangeTeamAdvisors = (event: SyntheticEvent<Element, Event>,
+    newValue: MemberInformation[],
+    reason: AutocompleteChangeReason) => {
     const temp: TeamInformation = {
       teamName: localTeamData?.teamName || '',
-      advisors: event.target.value,
+      advisors: newValue.map((user) => user.gtID),
       membership: localTeamData?.membership || [],
     };
     setLocalTeamData(temp);
     onApiInformationUpdate(temp);
   };
 
-  const handleChangeTeamMembership = (event: { target: { value: any; }; }) => {
+  const handleChangeTeamMembership = (event: SyntheticEvent<Element, Event>,
+    newValue: MemberInformation[],
+    reason: AutocompleteChangeReason) => {
     const temp: TeamInformation = {
       teamName: localTeamData?.teamName || '',
       advisors: localTeamData?.advisors || [],
-      membership: event.target.value,
+      membership: newValue.map((user) => user.gtID),
     };
     setLocalTeamData(temp);
     onApiInformationUpdate(temp);
   };
-  // const handleChangeTeamAdvisors;
+
+  ////////////////////////// MODULE ACTIONS /////////////////////////////////////////////////////////
+
+  const handleChangeModuleName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const temp: ModuleInformation = {
+      moduleName: event.target.value,
+      subsections: localModuleData?.subsections || [],
+      imageURL: localModuleData?.imageURL || '',
+    };
+    setLocalModuleData(temp);
+    onApiInformationUpdate(temp);
+  }
+
+  const handleChangeModuleSubsectionsSelection = (event: SyntheticEvent<Element, Event>,
+    newValue: SubsectionInformation[],
+    reason: AutocompleteChangeReason) => {
+    const temp: ModuleInformation = {
+      moduleName: localModuleData?.moduleName || '',
+      subsections: newValue.map((subsection) => subsection.subsectionName),
+      imageURL: localModuleData?.imageURL || '',
+    };
+    setLocalModuleData(temp);
+    onApiInformationUpdate(temp);
+  }
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImage(imageUrl);
+      onImageProvided(file); // TODO: will need to update the url based on what s3 says
+    }
+  };
+
+
+  //////////////////////////////// SUBSECTION ACTIONS /////////////////////////////////////////////////////////
+  const handleChangeSubsectionName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const temp: SubsectionInformation = {
+      subsectionName: event.target.value,
+      subsectionHtml: localSubsectionData?.subsectionHtml || '',
+    };
+    setLocalSubsectionData(temp);
+    onApiInformationUpdate(temp);
+  };
+
+  const handleChangeSubsectionHtml = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const temp: SubsectionInformation = {
+      subsectionName: localSubsectionData?.subsectionName || '',
+      subsectionHtml: event.target.value,
+    };
+    setLocalSubsectionData(temp);
+    onApiInformationUpdate(temp);
+  }
+
+  const StyledPaper = styled(Paper)(({ theme }) => ({
+    maxHeight: '200px', // Set your desired max height
+    overflowY: 'auto',   // Enable vertical scrolling if needed
+  }));
+
 
   return (
     <div className='input-info-container'>
@@ -348,7 +423,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
           <Typography variant='h4'>Edit User Information</Typography>
           <div className='input-info-section'>
             <Typography>Name (first and last)*:</Typography>
-            <TextField fullWidth value={localUserData?.name} onChange={handleChangeUserName} className='input-box'/>
+            <TextField 
+              fullWidth 
+              value={localUserData?.name} 
+              onChange={handleChangeUserName} 
+              onBlur={() => handleUserNameBlur(localUserData?.name ?? '')} 
+              error={incorrectUserNameError}
+              helperText={incorrectUserNameError ? 'User name must be provided' : ''}
+              className='input-box'
+            />
           </div>
           <div className='input-info-section'>
             <Typography>Primary Email*:</Typography>
@@ -528,16 +611,16 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
         <div className='selector-centering'>
           <Typography variant='h5'>Select a user account:</Typography>
           <FormControl fullWidth>
-            <Select  
-              renderValue={(selected) => <Typography>{localUserData?.name}</Typography>}
-              value={localUserData?.gtID}
-              onChange={(e) => {
-                const user = usersData.find((user) => user.gtID === e.target.value);
-                if (user) {
-                  setLocalUserData(user);
-                  onApiInformationUpdate(user);
+            <Autocomplete
+              options={usersData.sort((a, b) => (a.name > b.name ? 1 : -1))}
+              getOptionLabel={(option) => option.name}
+              value={localUserData}
+              onChange={(event, newValue) => {
+                if (newValue) {
+                  setLocalUserData(newValue);
+                  onApiInformationUpdate(newValue);
                 } else {
-                  setLocalUserData(usersData?.find((user) => user.gtID === userSelected) || {
+                  setLocalUserData({
                     name: '',
                     email: [''],
                     gtID: '',
@@ -553,17 +636,24 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
                     }]
                   });
                 }
-              }}              
-              >
-              {usersData.sort((a, b) => a.name > b.name ? 0 : -1).map((user) => (
-                <MenuItem key={user.gtID} value={user.gtID}>
-                  {user.name}
-                </MenuItem>
-              ))}
-            </Select>
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Select User" variant="outlined" />
+              )}
+              renderOption={(props, option) => (
+                <li {...props} key={option.gtID}>
+                  <Typography>{option.name}</Typography>
+                </li>
+              )}
+            />
           </FormControl>
         </div>
       ) 
+
+
+
+
+
       : page == ModalPages.EDIT_TEAM ?
         <div>
           <Typography variant='h4'>Edit Team Information</Typography>
@@ -574,96 +664,80 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
           <div className='input-info-section'>
             <Typography>Team Members*:</Typography>
             <FormControl fullWidth className='input-box'>
-              <Select
-                value={localTeamData?.membership}
-                onChange={handleChangeTeamMembership}
+              <Autocomplete
                 multiple
-                displayEmpty
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: 'top',
-                    horizontal: 'right',
-                  },
-                  transformOrigin: {
-                    vertical: 'top',
-                    horizontal: 'right',
-                  },
-                  style: {maxHeight: '300px'}
-                }}
-                renderValue={(selected) => (
+                options={usersData}
+                value={usersData.filter((user) => localTeamData?.membership.includes(user.gtID))}
+                onChange={handleChangeTeamMembership}
+                disableCloseOnSelect
+                PaperComponent={(props) => <StyledPaper {...props} />}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" placeholder={localTeamData?.membership.length === 0 ? "None Selected" : ''} />
+                )}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props} key={option.gtID}>
+                    <ListItemText primary={option.name} />
+                  </li>
+                )}
+                renderTags={(selected) =>
                   selected.length === 0 ? (
                     <Typography variant="body2" color="textSecondary">
                       None Selected
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((gtid) => {
-                        const userName = usersGTidMap[gtid];
-                        return <Chip key={gtid} label={userName || gtid} />;
-                      })}
+                      {selected.map((user) => (
+                        <Chip key={user.gtID} label={usersGTidMap[user.gtID] || user.gtID} />
+                      ))}
                     </Box>
                   )
-                )}
-              >
-                {usersData.map((user) => (
-                  <MenuItem key={user.name} value={user.gtID}>
-                    <Checkbox checked={localTeamData?.membership.includes(user.gtID)} />
-                    <ListItemText primary={user.name} />
-                  </MenuItem>
-                ))}
-              </Select>
+                }
+              />
             </FormControl>
           </div>
           <div className='input-info-section'>
             <Typography>Team Advisors*:</Typography>
             <FormControl fullWidth className='input-box'>
-              <Select
-                value={localTeamData?.advisors}
-                onChange={handleChangeTeamAdvisors}
+              <Autocomplete
                 multiple
-                displayEmpty
-                MenuProps={{
-                  anchorOrigin: {
-                    vertical: 'top',
-                    horizontal: 'right',
-                  },
-                  transformOrigin: {
-                    vertical: 'top',
-                    horizontal: 'right',
-                  },
-                  style: {maxHeight: '300px'}
-                }}
-                renderValue={(selected) => (
+                options={usersData}
+                value={usersData.filter((user) => localTeamData?.advisors.includes(user.gtID))}
+                onChange={handleChangeTeamAdvisors}
+                disableCloseOnSelect
+                PaperComponent={(props) => <StyledPaper {...props} />}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" placeholder={localTeamData?.advisors.length === 0 ? "None Selected" : ''} />
+                )}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props} key={option.gtID}>
+                    <ListItemText primary={option.name} />
+                  </li>
+                )}
+                renderTags={(selected) =>
                   selected.length === 0 ? (
                     <Typography variant="body2" color="textSecondary">
                       None Selected
                     </Typography>
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((gtid) => {
-                        const userName = usersGTidMap[gtid];
-                        return <Chip key={gtid} label={userName || gtid} />;
-                      })}
+                      {selected.map((user) => (
+                        <Chip key={user.gtID} label={usersGTidMap[user.gtID] || user.gtID} />
+                      ))}
                     </Box>
                   )
-                )}
-              >
-                {usersData.map((user) => (
-                  <MenuItem key={user.name} value={user.gtID}>
-                    <Checkbox checked={localTeamData?.advisors.includes(user.gtID)} />
-                    <ListItemText primary={user.name} />
-                  </MenuItem>
-                ))}
-              </Select>
+                }
+              />
             </FormControl>
           </div>
         </div>
-      : page == ModalPages.SELECT_TEAM ?
+      : page == ModalPages.SELECT_TEAM ? (
         <div className='selector-centering'>
           <Typography variant='h5'>Select a team:</Typography>
           <FormControl fullWidth>
             <Select  
-              renderValue={(selected) => <Typography>{localTeamData?.teamName}</Typography>}
+              renderValue={() => <Typography>{localTeamData?.teamName}</Typography>}
               value={localTeamData?.teamName}
               onChange={(e) => {
                 const team = teamsData.find((team) => team.teamName === e.target.value);
@@ -687,21 +761,191 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
             </Select>
           </FormControl>
         </div>
+      )
+
+
+      // maybe have html string stored, display it dynamically as dangerouslysetinnerhtml
+
       : page == ModalPages.EDIT_SUBSECTION ?
         <div>
-          edit sb
+          <Typography variant='h4'>Edit Subsection Information</Typography>
+          <div className='input-info-section'>
+            <Typography>Subsection Name*:</Typography>
+            <TextField fullWidth value={localSubsectionData?.subsectionName} onChange={handleChangeSubsectionName} className='input-box'/>
+          </div>
+          <div className='input-info-section'>
+            <Typography>Subsection HTML*:</Typography>
+            <TextField fullWidth value={localSubsectionData?.subsectionHtml} onChange={handleChangeSubsectionHtml} className='input-box'/>
+          </div>
         </div>
-      : page == ModalPages.EDIT_MODULE ?
-        <div>
-          edit module
+      : page == ModalPages.SELECT_SUBSECTION ?
+        <div className='selector-centering'>
+          <Typography variant='h5'>Select a subsection:</Typography>
+          <FormControl fullWidth>
+            <Select  
+              renderValue={() => <Typography>{localSubsectionData?.subsectionName}</Typography>}
+              value={localSubsectionData?.subsectionName}
+              onChange={(e) => {
+                const subsection = subsectionsData.find((subsection) => subsection.subsectionName === e.target.value);
+                if (subsection) {
+                  setLocalSubsectionData(subsection);
+                  onApiInformationUpdate(subsection);
+                } else {
+                  setLocalSubsectionData(subsectionsData?.find((subsection) => subsection.subsectionName === subsectionSelected) || {
+                    subsectionName: '',
+                    subsectionHtml: ''
+                  });
+                }
+              }}  
+              MenuProps={{
+                anchorOrigin: {
+                  vertical: 'top',
+                  horizontal: 'right',
+                },
+                transformOrigin: {
+                  vertical: 'top',
+                  horizontal: 'right',
+                },
+                style: {maxHeight: '300px'}
+              }}            
+              >
+              {subsectionsData.map((subsection) => (
+                <MenuItem key={subsection.subsectionName} value={subsection.subsectionName}>
+                  <ListItemText primary={subsection.subsectionName} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
-      : page == ModalPages.SELECT_MODULE ?
+
+
+
+
+
+      : page == ModalPages.EDIT_MODULE ? (
         <div>
-          select moduel
+          <Typography variant='h4'>Edit Module Information</Typography>
+          <div className='input-info-section'>
+            <Typography>Module Name*:</Typography>
+            <TextField fullWidth value={localModuleData?.moduleName} onChange={handleChangeModuleName} className='input-box'/>
+          </div>
+          <div className='input-info-section'>
+            <Typography>Module Subsections*:</Typography>
+            <Typography className='italics'>Subsections need to be created before added to a module</Typography>
+            <FormControl fullWidth className='input-box'>
+              <Autocomplete
+                multiple
+                options={subsectionsData}
+                value={subsectionsData.filter((subsection) => localModuleData?.subsections.includes(subsection.subsectionName))}
+                onChange={handleChangeModuleSubsectionsSelection}
+                disableCloseOnSelect
+                PaperComponent={(props) => <StyledPaper {...props} />}
+                getOptionLabel={(option) => option.subsectionName}
+                renderInput={(params) => (
+                  <TextField {...params} variant="outlined" placeholder={localModuleData?.subsections.length === 0 ? "None Selected" : ''} />
+                )}
+                renderOption={(props, option, { selected }) => (
+                  <li {...props} key={option.subsectionName}>
+                    <Checkbox checked={selected} />
+                    <ListItemText primary={option.subsectionName} />
+                  </li>
+                )}
+                renderTags={(selected) =>
+                  selected.length === 0 ? (
+                    <Typography variant="body2" color="textSecondary">
+                      None Selected
+                    </Typography>
+                  ) : (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((subsection) => (
+                        <Chip key={subsection.subsectionName} label={subsection.subsectionName} />
+                      ))}
+                    </Box>
+                  )
+                }
+              />
+            </FormControl>
+          </div>
+          <div className='input-info-section'>
+            <Typography>Module Image*:</Typography>
+            <Typography className='italics'>Include an preview for the home screen. Must be a png.</Typography>
+              <input 
+                accept='image/png'
+                id='upload-module-image'
+                type='file'
+                style={{ display: 'none' }}
+                onChange={handleImageUpload}
+              />
+              {selectedImage ? (
+                <div className='image-upload-section'>
+                  <Box>
+                    <img src={selectedImage} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
+                  </Box>
+                  <label htmlFor='upload-module-image' >
+                    <Button color="primary" component="span">
+                      <AddPhotoAlternate />
+                      <Typography>
+                        change selection
+                      </Typography>
+                    </Button>
+                  </label>
+                </div>
+              )
+              : (
+                <label htmlFor='upload-module-image' >
+                  <Button color="primary" component="span">
+                    <AddPhotoAlternate />
+                    <Typography>
+                      upload photo
+                    </Typography>
+                  </Button>
+                </label>
+              )}
+          </div>
         </div>
-      : page == ModalPages.CONFIRM_SAVE_USER ?
+      )
+      : page == ModalPages.SELECT_MODULE ? (
+        <div className='selector-centering'>
+          <Typography variant='h5'>Select a module:</Typography>
+          <FormControl fullWidth>
+            <Select  
+              renderValue={() => <Typography>{localModuleData?.moduleName}</Typography>}
+              value={localModuleData?.moduleName}
+              onChange={(e) => {
+                const module = modulesData.find((module) => module.moduleName === e.target.value);
+                console.log('e is ', e)
+                console.log('module is ', module)
+                if (module) {
+                  setLocalModuleData(module);
+                  onApiInformationUpdate(module);
+                } else {
+                  console.log('made it in here')
+                  // TODO: does this ever get reached?
+                  setLocalModuleData(modulesData?.find((module) => module.moduleName === moduleSelected) || {
+                    moduleName: '',
+                    subsections: [],
+                    imageURL: ''
+                  });
+                }
+              }}              
+              >
+              {modulesData.sort((a, b) => a.moduleName > b.moduleName ? 0 : -1).map((module) => (
+                <MenuItem key={module.moduleName} value={module.moduleName}>
+                  {module.moduleName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+      )
+
+
+
+
+
+      : (page === ModalPages.CONFIRM_SAVE_USER || page === ModalPages.CONFIRM_DELETE_USER) ?
         <div>
-          <Typography variant='h4'> Confirm User Information:</Typography>
+          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_USER ? 'Confirm User Information:' : 'Confirm User Deletion:'}</Typography>
           <div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Name:</Typography>
@@ -718,7 +962,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
                   {localUserData?.email.map((_email, index) => {
                     if (index > 0) {
                       return (
-                        <Typography className='indent'>{localUserData?.email[index]}</Typography>
+                        <Typography className='indent' key={index}>{localUserData?.email[index]}</Typography>
                       )
                     }
                   })}
@@ -730,7 +974,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Teams advising:</Typography>
-              <Typography className='indent'>{(localUserData?.teamsAdvising && localUserData?.teamsAdvising.length > 1) ? localUserData?.teamsAdvising : 'No teams advising'}</Typography>
+              <Typography className='indent'>{(localUserData?.teamsAdvising && localUserData?.teamsAdvising.length > 1) ? localUserData?.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Role:</Typography>
@@ -738,95 +982,56 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate 
             </div>
           </div>
         </div>
-      : page == ModalPages.CONFIRM_SAVE_MODULE ?
+      : (page === ModalPages.CONFIRM_SAVE_MODULE || page === ModalPages.CONFIRM_DELETE_MODULE) ?
         <div>
-          <Typography variant='h3'> Confirm</Typography>
-          <div>
-            {/* add when get there */}
-            {/* {localModuleData ? <div>User: {JSON.stringify(localModuleData)}</div> : <div>No user information found.</div>} */}
-          </div>
-        </div>
-      : page == ModalPages.CONFIRM_SAVE_SUBSECTION ?
-        <div>
-          <Typography variant='h3'> Confirm</Typography>
-          <div>
-            {/* add when get there */}
-            {/* {localSubsectionData ? <div>User: {JSON.stringify(localSubsectionData)}</div> : <div>wesley</div>} */}
-          </div>
-        </div>
-      : page == ModalPages.CONFIRM_SAVE_TEAM ?
-        <div>
-          <Typography variant='h3'> Confirm</Typography>
-          <div>
-            {/* add when get there */}
-            {/* {localTeamData ? <div>User: {JSON.stringify(localTeamData)}</div> : <div>wesley</div>} */}
-          </div>
-        </div>
-      : page == ModalPages.CONFIRM_DELETE_USER ?
-        <div>
-          <Typography variant='h4'> Confirm User Deletion:</Typography>
+          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_MODULE ? 'Confirm Module Information:' : 'Confirm Module Deletion:'}</Typography>
           <div>
             <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Name:</Typography>
-              <Typography className='indent'>{localUserData?.name}</Typography>
+              <Typography variant="h6" className='italics'>Module name:</Typography>
+              <Typography className='indent'>{localModuleData?.moduleName}</Typography>
             </div>
             <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Primary email:</Typography>
-              <Typography className='indent'>{localUserData?.email[0]}</Typography>
-            </div>
-
-            {(localUserData?.email && localUserData?.email.length > 1) &&
-              <div className='confirm-section'>
-                <Typography variant="h6" className='italics'>Other emails:</Typography>
-                  {localUserData?.email.map((_email, index) => {
-                    if (index > 0) {
-                      return (
-                        <Typography className='indent'>{localUserData?.email[index]}</Typography>
-                      )
-                    }
-                  })}
-              </div>
-            }
-            <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Team:</Typography>
-              <Typography className='indent'>{localUserData?.teamMembership}</Typography>
+              <Typography variant="h6" className='italics'>Subsections:</Typography>
+              <Typography className='indent'>{localModuleData?.subsections.join(', ')}</Typography>
             </div>
             <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Teams advising:</Typography>
-              <Typography className='indent'>{(localUserData?.teamsAdvising && localUserData?.teamsAdvising.length > 1) ? localUserData?.teamsAdvising : 'No teams advising'}</Typography>
-            </div>
-            <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Role:</Typography>
-              <Typography className='indent'>{localUserData?.role}</Typography>
+              <Typography variant="h6" className='italics'>Module Image:</Typography>
+              <img src={selectedImage || ''} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
             </div>
           </div>
         </div>
-      : page == ModalPages.CONFIRM_DELETE_MODULE ?
+      : (page === ModalPages.CONFIRM_SAVE_SUBSECTION || page === ModalPages.CONFIRM_DELETE_SUBSECTION) ?
         <div>
-          delete module
+          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_SUBSECTION ? 'Confirm Subsection Information:' : 'Confirm Subsection Deletion:'}</Typography>
+          <div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>Subsection name:</Typography>
+              <Typography className='indent'>{localSubsectionData?.subsectionName}</Typography>
+            </div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>Subsection Preview:</Typography>
+              <div dangerouslySetInnerHTML={{__html: localSubsectionData?.subsectionHtml || ''}}/>
+            </div>
+          </div>
         </div>
-      : page == ModalPages.CONFIRM_DELETE_SUBSECTION ?
+      : (page === ModalPages.CONFIRM_SAVE_TEAM || page === ModalPages.CONFIRM_DELETE_TEAM) ?
         <div>
-          delete subsection
+          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_TEAM ? 'Confirm Team Information:' : 'Confirm Team Deletion:'}</Typography>
+          <div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>Team name:</Typography>
+              <Typography className='indent'>{localTeamData?.teamName}</Typography>
+            </div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>Team Members:</Typography>
+              <Typography className='indent'>{localTeamData?.membership.map((gtid) => usersGTidMap[gtid]).join(', ')}</Typography>
+            </div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>Team Advisor(s):</Typography>
+              <Typography className='indent'>{(localTeamData?.advisors && localTeamData?.advisors.length > 0) ? localTeamData?.advisors.map((gtid) => usersGTidMap[gtid]).join(', ') : 'No advisors'}</Typography>
+            </div>
+          </div>
         </div>
-      : page == ModalPages.CONFIRM_DELETE_TEAM ?
-      <div>
-      <Typography variant='h4'> Confirm Team Deletion:</Typography>
-      <div>
-        <div className='confirm-section'>
-          <Typography variant="h6" className='italics'>Team name:</Typography>
-          <Typography className='indent'>{localTeamData?.teamName}</Typography>
-        </div>
-        <div className='confirm-section'>
-          <Typography variant="h6" className='italics'>Team Members:</Typography>
-          <Typography className='indent'>{localTeamData?.membership.map((gtid) => usersGTidMap[gtid])}</Typography>
-        </div>
-        <div className='confirm-section'>
-          <Typography variant="h6" className='italics'>Team Advisor(s):</Typography>
-          <Typography className='indent'>{(localTeamData?.advisors && localTeamData?.advisors.length > 0) ? localTeamData?.advisors.map((gtid) => usersGTidMap[gtid]) : 'No advisors'}</Typography>
-        </div>
-      </div>
-    </div>
       :
         <div /> // ModalPages.NULL
       }
