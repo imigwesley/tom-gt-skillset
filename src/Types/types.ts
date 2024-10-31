@@ -61,7 +61,7 @@ export interface ModuleInformation {
   imageURL: string
 }
 
-export interface MyInterface {
+export interface PersonalModuleProgress {
   name: string
   modules: MyModulesInterface[]
 }

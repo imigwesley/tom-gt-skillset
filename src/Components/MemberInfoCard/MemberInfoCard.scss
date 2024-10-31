@@ -1,17 +1,39 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .light {
-    background-color: rgb(223, 215, 185) !important;
+    background-color: $accent-white !important;
 }
 
 .dark {
-    background-color: rgb(225, 206, 138) !important;
+    background-color: rgba($tom-blue, 0.1) !important;
+}
+
+.first {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.last {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 .member-card-content {
     display: flex;
     flex-direction: row;
-    
+    justify-content: space-between;
 
     .table-section {
-        width: 20%;
+        min-width: 145px;
     }
+
+    .table-section-wide {
+        min-width: 250px;
+    }
+
 }
+
+// .css-46bh2p-MuiCardContent-root :last-child {
+//     /* padding-bottom: 24px; */
+//     padding: 15px;
+// }

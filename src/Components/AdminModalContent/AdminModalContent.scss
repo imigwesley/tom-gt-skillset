@@ -1,8 +1,11 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .input-info-container {
     height: 90%;
     width: 100%;
     overflow: scroll;
     padding: 10px;
+    
 
     .input-info-section {
         padding: 5px 0px 5px 0px;
@@ -52,6 +55,12 @@
     padding: 8px 0px;
 }
 
+.preview-section {
+    border-style: solid;
+    border-radius: 5px;
+    min-height: 250px;
+}
+
 .image-upload-section {
     display: flex;
     flex-direction: row;
@@ -65,3 +74,6 @@
     padding-left: 15px;
 }
 
+.ql-editor {
+    min-height: 200px;
+}

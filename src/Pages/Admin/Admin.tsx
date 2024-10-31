@@ -385,6 +385,8 @@ const AdminPage = () => {
         </div>
 
         <Dialog
+          fullWidth
+          maxWidth='md'
           open={isModalOpen}
           onClose={handleCloseModal}
           transitionDuration={0}

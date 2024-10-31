@@ -6,7 +6,7 @@ import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/Li
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
 import Module from 'module';
-import { MemberInformation, ModuleInformation, MyInterface, ModuleProgress } from '../../Types/types';
+import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress } from '../../Types/types';
 
 const HomePage = () => {
 
@@ -38,7 +38,7 @@ const HomePage = () => {
     }
   ]);
 
-  const [modulesAndProgress, setModulesAndProgress] = useState<MyInterface>(
+  const [personalProgress, setPersonalProgress] = useState<PersonalModuleProgress>(
     {
       name: '',
       modules: [
@@ -77,7 +77,7 @@ const HomePage = () => {
         })
         console.log('combined 2', combinedModules);
     
-        setModulesAndProgress({
+        setPersonalProgress({
           name: (personalInfo as any).name,
           modules: combinedModules
         });
@@ -105,11 +105,11 @@ const HomePage = () => {
         <div>
           <div className='header'>
             <Typography variant='h4' align='center'>
-              Hello, {modulesAndProgress.name.substring(0, modulesAndProgress.name.indexOf(' '))}! What would you like to learn today?
+              Hello, {personalProgress.name.substring(0, personalProgress.name.indexOf(' '))}! What would you like to learn today?
             </Typography>
           </div>
           <div className='module-card-container'>
-            {modulesAndProgress.modules.map((module, index) => {
+            {personalProgress.modules.map((module, index) => {
               return (
                 <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
                   <CardMedia

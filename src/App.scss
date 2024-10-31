@@ -1,5 +1,7 @@
+@import './Themes/TOMThemeVariables.scss';
+
 .App {
-    background-color: rgb(255 244 204);
+    background-color: $background;
     min-height: 100vh;
 }
 

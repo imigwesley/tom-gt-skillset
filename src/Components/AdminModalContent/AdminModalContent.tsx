@@ -9,6 +9,17 @@ import Checkbox from '@mui/material/Checkbox';
 import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPages, ModuleInformation, NameGTidMap, SubsectionInformation, TeamInformation } from '../../Types/types';
 import { Add, AddPhotoAlternate, DeleteOutline } from '@mui/icons-material';
 import { validateEmailString } from '../../utils/Utils';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+const toolbarOptions = [
+  [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
+  [{size: []}],
+  ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+  [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
+  ['link', 'image', 'video'],
+  ['clean'] // remove formatting button
+];
 
 
 const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
@@ -393,6 +404,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   //////////////////////////////// SUBSECTION ACTIONS /////////////////////////////////////////////////////////
   const handleChangeSubsectionName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('inside name')
     const temp: SubsectionInformation = {
       subsectionName: event.target.value,
       subsectionHtml: localSubsectionData?.subsectionHtml || '',
@@ -401,14 +413,23 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     onApiInformationUpdate(temp);
   };
 
-  const handleChangeSubsectionHtml = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const temp: SubsectionInformation = {
-      subsectionName: localSubsectionData?.subsectionName || '',
-      subsectionHtml: event.target.value,
-    };
-    setLocalSubsectionData(temp);
-    onApiInformationUpdate(temp);
-  }
+
+  const handleChangeSubsectionHtml = (previousSelection: any, source: string, editor: any) => {  
+    console.log('editor.getHtml() is ', editor.getHTML());
+  
+    setLocalSubsectionData((prev) => {
+      if (prev?.subsectionHtml === editor.getHTML()) return prev; // prevent infinite loop
+      const updatedData: SubsectionInformation = {
+        subsectionName: prev?.subsectionName || '',
+        subsectionHtml: editor.getHTML(),
+      };
+
+      onApiInformationUpdate(updatedData); // Call your API update function
+
+      return updatedData; // Return the updated data
+    })
+
+  };
 
   const StyledPaper = styled(Paper)(({ theme }) => ({
     maxHeight: '200px', // Set your desired max height
@@ -638,7 +659,11 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                 }
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Select User" variant="outlined" />
+                <TextField 
+                  {...params} 
+                  placeholder="Select/type user name"
+                  variant="outlined" 
+                />
               )}
               renderOption={(props, option) => (
                 <li {...props} key={option.gtID}>
@@ -774,8 +799,9 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <TextField fullWidth value={localSubsectionData?.subsectionName} onChange={handleChangeSubsectionName} className='input-box'/>
           </div>
           <div className='input-info-section'>
-            <Typography>Subsection HTML*:</Typography>
-            <TextField fullWidth value={localSubsectionData?.subsectionHtml} onChange={handleChangeSubsectionHtml} className='input-box'/>
+            <Typography>Subsection Content*:</Typography>
+            {/* <TextField fullWidth value={localSubsectionData?.subsectionHtml} onChange={handleChangeSubsectionHtml} className='input-box'/> */}
+            <ReactQuill value={localSubsectionData?.subsectionHtml} onBlur={handleChangeSubsectionHtml} modules={{toolbar: toolbarOptions}}/>
           </div>
         </div>
       : page == ModalPages.SELECT_SUBSECTION ?
@@ -1010,7 +1036,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Subsection Preview:</Typography>
-              <div dangerouslySetInnerHTML={{__html: localSubsectionData?.subsectionHtml || ''}}/>
+              <div className='preview-section' dangerouslySetInnerHTML={{__html: localSubsectionData?.subsectionHtml || ''}}/>
             </div>
           </div>
         </div>

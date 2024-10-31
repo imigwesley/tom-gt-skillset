@@ -10,20 +10,16 @@ import AdminPage from './Pages/Admin/Admin';
 import LoginPage from './Pages/Login/Login';
 import Navbar from './Components/Navbar/Navbar';
 import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
+import tomTheme from './Themes/TOMTheme';
 
-const theme = createTheme({
-  typography: {
-    fontFamily: 'TOMFont, Arial, sans-serif',
-  },
-});
 
 const App = () => {
 
   return (
     <div className="App">
       <div>
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={tomTheme}>
           <BrowserRouter>
             <Navbar/>
             <div className='main-body'>

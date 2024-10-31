@@ -107,7 +107,7 @@ const MembersPage = () => {
             <div>
               {membersByRole.officers.map((member, index) => {
                 return (
-                  <MemberInfoCard member={member} isEven={index % 2 === 0} />
+                  <MemberInfoCard member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
                 )
               })}
             </div>
@@ -115,7 +115,7 @@ const MembersPage = () => {
             <div>
               {membersByRole.members.map((member, index) => {
                 return (
-                  <MemberInfoCard member={member} isEven={index % 2 === 0}/>
+                  <MemberInfoCard member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
                 )
               })}
             </div>
@@ -127,10 +127,10 @@ const MembersPage = () => {
               return (
                 <div>
                   <Typography variant='h3'>{team.team}</Typography>
-                  <div>
+                  <div style={{borderRadius: '5px'}} id='wesley'>
                     {team.members.map((member, index) => {
                       return (
-                        <MemberInfoCard member={member} isEven={index % 2 === 0}/>
+                        <MemberInfoCard member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === team.members.length - 1}/>
                       )
                     })}
                   </div>
@@ -148,7 +148,7 @@ const MembersPage = () => {
                     <div>
                       {letterGroup.members.map((member, index) => {
                         return (
-                          <MemberInfoCard member={member} isEven={index % 2 === 0}/>
+                          <MemberInfoCard member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === letterGroup.members.length - 1}/>
                         )
                       })}
                     </div>
