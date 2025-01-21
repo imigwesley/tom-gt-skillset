@@ -1,3 +1,5 @@
+import { Ref } from "react";
+
 export enum ModalPages {
     NULL,
     EDIT_USER,
@@ -41,7 +43,8 @@ export interface TeamInformation {
 
 export interface SubsectionInformation {
     subsectionName: string,
-    subsectionHtml: string
+    subsectionHtml: string,
+    htmlEdited: boolean
 }
 
 export interface MemberInformation {

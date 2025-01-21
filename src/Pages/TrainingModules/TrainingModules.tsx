@@ -85,7 +85,11 @@ const TrainingModulesPage = () => {
                 <div>
                   training module page: {moduleName}
                 </div> */}
-                <div dangerouslySetInnerHTML={{__html: subsectionHtml}}/>
+                <div className='quill'>
+                  <div className='ql-snow'>
+                    <div className='ql-editor' dangerouslySetInnerHTML={{__html: subsectionHtml || ''}}/>
+                  </div>
+                </div>
               </div>
           </div>
         }

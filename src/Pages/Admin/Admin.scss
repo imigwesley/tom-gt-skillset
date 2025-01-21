@@ -1,3 +1,5 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .admin-container {
     display: flex;
     flex-direction: column;
@@ -61,7 +63,19 @@
 }
 
 .cancel-button {
-    color: red !important;
+    color: rgb(123, 0, 0) !important;
+    background-color: rgba(123, 0, 0, .1) !important;
+    &:hover {
+        background-color: rgba(123, 0, 0, .15) !important;
+    }
+}
+
+.proceed-button {
+    color: $tom-blue !important;
+    background-color: rgba(1, 145, 183, .1) !important;
+    &:hover {
+        background-color: rgba(1, 145, 183, .2) !important; 
+    }
 }
 
 .feedback-container {

@@ -1,6 +1,6 @@
 import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Popper, Select, styled, TextField, Typography } from '@mui/material';
 import './AdminModalContent.scss';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
@@ -10,11 +10,10 @@ import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPag
 import { Add, AddPhotoAlternate, DeleteOutline } from '@mui/icons-material';
 import { validateEmailString } from '../../utils/Utils';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
 const toolbarOptions = [
-  [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-  [{size: []}],
+  [{ 'header': [1, 2, 3, false] }],
+  ['blockquote', 'code-block'],
   ['bold', 'italic', 'underline', 'strike', 'blockquote'],
   [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
   ['link', 'image', 'video'],
@@ -29,12 +28,20 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   const [incorrectGTIDValueError, setIncorrectGTIDValueError] = useState(false);
   const [emailErrors, setEmailErrors] = useState<boolean[]>([false]);
 
+  // team input errors
+  const [incorrectTeamNameError, setIncorrectTeamNameError] = useState(false);
+
+  // subsection input errors
+  const [incorrectSubsectionNameError, setIncorrectSubsectionNameError] = useState(false);
+
   const [userSelected, setUserSelected] = useState<string>(); // used??
   const [teamSelected, setTeamSelected] = useState<string>(); // used??
   const [moduleSelected, setModuleSelected] = useState<string>(); // used??
   const [subsectionSelected, setSubsectionSelected] = useState<string>(); // used??
   const [usersGTidMap, setUsersGTidMap] = useState<NameGTidMap>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const quillRef = useRef<ReactQuill>(null);
 
 
   // local data for editing in modal and sending to api
@@ -65,7 +72,8 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   })
   const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation | null>({
     subsectionName: '',
-    subsectionHtml: ''
+    subsectionHtml: '',
+    htmlEdited: false
   })
 
   // all data from api
@@ -96,7 +104,8 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   }];
   const subsectionsData: SubsectionInformation[] = passedApiInformation.subsections || [{
     subsectionName: '',
-    subsectionHtml: ''
+    subsectionHtml: '',
+    htmlEdited: false
   }];
 
   useEffect(() => {
@@ -120,6 +129,18 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     if (name === '') {
       setIncorrectUserNameError(true);
     }
+
+    const temp: MemberInformation = {
+      gtID: localUserData?.gtID || '',
+      name: name,
+      email: localUserData?.email || [],
+      teamMembership: localUserData?.teamMembership || [],
+      teamsAdvising: localUserData?.teamsAdvising || [],
+      role: localUserData?.role || '',
+      isExec: localUserData?.isExec || false,
+      moduleProgress: localUserData?.moduleProgress || [],
+    };
+    onApiInformationUpdate(temp);
   }
 
   const handleChangeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,40 +160,20 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     };
     
     setLocalUserData(temp);
-    onApiInformationUpdate(temp);
   };
 
-  const handleChangeUserPrimaryEmail = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!validateEmailString(event.target.value)) {
+  const handleChangeEmails = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    if (validateEmailString(event.target.value)) {
+      console.log('valid on email change')
       setEmailErrors((prev) => {
         const newErrors = [...prev];
-        newErrors[0] = false;
+        newErrors[index] = false;
         return newErrors;
       });
     }
 
-    const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: [event.target.value, ...(localUserData?.email.slice(1) || [])], // Safe slicing
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
-    };
-
-    setLocalUserData(temp);
-    onApiInformationUpdate(temp);
-  };
-
-  const handleChangeUserOtherEmails = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    if (!validateEmailString(event.target.value)) {
-      emailErrors[index + 1] = false;
-    }
-
     const newEmails = [...(localUserData?.email || [])];
-    newEmails[index + 1] = event.target.value;
+    newEmails[index] = event.target.value;
 
     const temp: MemberInformation = {
       gtID: localUserData?.gtID || '',
@@ -186,8 +187,32 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     };
 
     setLocalUserData(temp);
-    onApiInformationUpdate(temp);
   };
+
+  const handleEmailBlur = (email: string, index: number) => {
+    if (!validateEmailString(email)) {
+      console.log('invalid on email blur')
+      setEmailErrors((prev) => {
+        const newErrors = [...prev];
+        newErrors[index] = true;
+        return newErrors;
+      });
+    } else {
+      const newEmails = [...(localUserData?.email || [])];
+      newEmails[index] = email;
+      const temp: MemberInformation = {
+        gtID: localUserData?.gtID || '',
+        name: localUserData?.name || '',
+        email: newEmails,
+        teamMembership: localUserData?.teamMembership || [],
+        teamsAdvising: localUserData?.teamsAdvising || [],
+        role: localUserData?.role || '',
+        isExec: localUserData?.isExec || false,
+        moduleProgress: localUserData?.moduleProgress || [],
+      };
+      onApiInformationUpdate(temp);
+    }    
+  }
 
   const handleDeleteOtherEmail = (index: number) => {
     let newEmails = [...(localUserData?.email || [])];
@@ -211,7 +236,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleOpenNewEmailTextField = () => {
     setLocalUserData((prev) => {
-      const newEmails = [...(prev?.email || []), ""]; // Safe fallback
+      const newEmails = [...(prev?.email || []), ''];
       const updatedUserData: MemberInformation = {
         gtID: prev?.gtID || '',
         name: prev?.name || '',
@@ -228,63 +253,50 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     });
   };
 
-  const handleEmailBlur = (email: string, index: number) => {
-    const newErrors = [...emailErrors];
-    const isValid = validateEmailString(email);
-    console.log('is it valid? ', isValid)
-    newErrors[index] = isValid;
-    setEmailErrors(newErrors);
-    
-  }
-
   const handleChangeUserGtid = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-
-    // Check if the value is a valid number
     if (isNaN(Number(value))) {
+      // do not allow to write
       console.warn('nan');
       setIncorrectGTIDValueError(true);
-    } else if (value.length === 9) {
-      // This block is executed if the value is numeric and has the correct length
-      setIncorrectGTIDValueError(false);
-      
-      const temp: MemberInformation = {
-          gtID: value,
-          name: localUserData?.name || '', // Default value if null
-          email: localUserData?.email || [],
-          teamMembership: localUserData?.teamMembership || [],
-          teamsAdvising: localUserData?.teamsAdvising || [],
-          role: localUserData?.role || '',
-          isExec: localUserData?.isExec || false,
-          moduleProgress: localUserData?.moduleProgress || [],
-      };
-
-      setLocalUserData(temp);
-      onApiInformationUpdate(temp);
     } else {
-      // Handle cases where the length is not 9 but it is a valid number
+      // allow to write
       const temp: MemberInformation = {
-          gtID: value,
-          name: localUserData?.name || '',
-          email: localUserData?.email || [],
-          teamMembership: localUserData?.teamMembership || [],
-          teamsAdvising: localUserData?.teamsAdvising || [],
-          role: localUserData?.role || '',
-          isExec: localUserData?.isExec || false,
-          moduleProgress: localUserData?.moduleProgress || [],
+        gtID: value,
+        name: localUserData?.name || '', // Default value if null
+        email: localUserData?.email || [],
+        teamMembership: localUserData?.teamMembership || [],
+        teamsAdvising: localUserData?.teamsAdvising || [],
+        role: localUserData?.role || '',
+        isExec: localUserData?.isExec || false,
+        moduleProgress: localUserData?.moduleProgress || [],
       };
-
       setLocalUserData(temp);
-      onApiInformationUpdate(temp);
-    }
+      if (value.length === 9) {
+        // if gtid is fine, turn off error
+        setIncorrectGTIDValueError(false);
+      }
+    } 
   };
 
 
-
   const handleGtIDBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-    // console.log(event.target.value);
     if (event.target.value.length != 9) {
-      setIncorrectGTIDValueError(true)
+      // invalid
+      setIncorrectGTIDValueError(true);
+    } else {
+      // valid, send info
+      const temp: MemberInformation = {
+        gtID: event.target.value,
+        name: localUserData?.name || '', // Default value if null
+        email: localUserData?.email || [],
+        teamMembership: localUserData?.teamMembership || [],
+        teamsAdvising: localUserData?.teamsAdvising || [],
+        role: localUserData?.role || '',
+        isExec: localUserData?.isExec || false,
+        moduleProgress: localUserData?.moduleProgress || [],
+      };
+      onApiInformationUpdate(temp);
     } 
   }
 
@@ -335,14 +347,29 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   ///////////////////////////// TEAM ACTIONS ////////////////////////////////////////////////////////////////////
   const handleChangeTeamName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.value.length !== 0) {
+      setIncorrectTeamNameError(false);
+    }
     const temp: TeamInformation = {
       teamName: event.target.value,
       advisors: localTeamData?.advisors || [],
       membership: localTeamData?.membership || [],
     };
     setLocalTeamData(temp);
-    onApiInformationUpdate(temp);
   };
+
+  const handleTeamNameBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (event.target.value.length !== 0) {
+      const temp: TeamInformation = {
+        teamName: event.target.value,
+        advisors: localTeamData?.advisors || [],
+        membership: localTeamData?.membership || [],
+      };
+      onApiInformationUpdate(temp);
+    } else {
+      setIncorrectTeamNameError(true);
+    }
+  }
 
   const handleChangeTeamAdvisors = (event: SyntheticEvent<Element, Event>,
     newValue: MemberInformation[],
@@ -404,31 +431,45 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   //////////////////////////////// SUBSECTION ACTIONS /////////////////////////////////////////////////////////
   const handleChangeSubsectionName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('inside name')
+    if (event.target.value.length !== 0) {
+      setIncorrectSubsectionNameError(false);
+    }
     const temp: SubsectionInformation = {
       subsectionName: event.target.value,
       subsectionHtml: localSubsectionData?.subsectionHtml || '',
+      htmlEdited: false
     };
     setLocalSubsectionData(temp);
+  };
+
+  const handleSubsectionNameBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (event.target.value.length === 0) {
+      setIncorrectSubsectionNameError(true);
+    }
+    const temp: SubsectionInformation = {
+      subsectionName: event.target.value,
+      subsectionHtml: localSubsectionData?.subsectionHtml || '',
+      htmlEdited: false
+    };
     onApiInformationUpdate(temp);
   };
 
-
-  const handleChangeSubsectionHtml = (previousSelection: any, source: string, editor: any) => {  
-    console.log('editor.getHtml() is ', editor.getHTML());
-  
+  const handleSaveSubsectionHtml = () => {
+    const currentHtml = quillRef.current?.getEditor().root.innerHTML;
+    
     setLocalSubsectionData((prev) => {
-      if (prev?.subsectionHtml === editor.getHTML()) return prev; // prevent infinite loop
-      const updatedData: SubsectionInformation = {
-        subsectionName: prev?.subsectionName || '',
-        subsectionHtml: editor.getHTML(),
-      };
+        if (prev?.subsectionHtml === currentHtml) return prev; // Avoid unnecessary updates
+        
+        const updatedData: SubsectionInformation = {
+          subsectionName: prev?.subsectionName || '',
+          subsectionHtml: currentHtml || '',
+          htmlEdited: true
+        };
 
-      onApiInformationUpdate(updatedData); // Call your API update function
+        onApiInformationUpdate(updatedData);
 
-      return updatedData; // Return the updated data
-    })
-
+        return updatedData;
+    });
   };
 
   const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -459,7 +500,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <TextField 
               fullWidth 
               value={localUserData?.email[0] || ''} 
-              onChange={(e) => handleChangeUserPrimaryEmail(e)} 
+              onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, 0)} 
               onBlur={() => handleEmailBlur(localUserData?.email[0] ?? '', 0)}
               error={emailErrors[0]}
               className='input-box'
@@ -474,7 +515,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   key={index} 
                   fullWidth 
                   value={email} 
-                  onChange={(e) => handleChangeUserOtherEmails(e as React.ChangeEvent<HTMLInputElement>, index)} 
+                  onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, index + 1)} 
                   className='email-textfield input-box'
                   onBlur={() => handleEmailBlur(email, index + 1)} 
                   error={emailErrors[index + 1] || undefined}
@@ -487,7 +528,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             ))}
             
               <Button className='add-email-button' onClick={handleOpenNewEmailTextField}>
-                <Add />
+                <Add className='button-icon' />
                   <Typography className='add-other'>
                     Add other email
                   </Typography>
@@ -631,7 +672,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       : page === ModalPages.SELECT_USER ? (
         <div className='selector-centering'>
           <Typography variant='h5'>Select a user account:</Typography>
-          <FormControl fullWidth>
+          <FormControl className='select-autocomplete'>
             <Autocomplete
               options={usersData.sort((a, b) => (a.name > b.name ? 1 : -1))}
               getOptionLabel={(option) => option.name}
@@ -684,7 +725,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           <Typography variant='h4'>Edit Team Information</Typography>
           <div className='input-info-section'>
             <Typography>Team Name*:</Typography>
-            <TextField fullWidth value={localTeamData?.teamName} onChange={handleChangeTeamName} className='input-box'/>
+            <TextField 
+              fullWidth 
+              value={localTeamData?.teamName} 
+              onChange={handleChangeTeamName} 
+              onBlur={handleTeamNameBlur}
+              className='input-box'
+              error={incorrectTeamNameError}
+              helperText={incorrectTeamNameError ? 'Team name is required' : ''}
+            />
           </div>
           <div className='input-info-section'>
             <Typography>Team Members*:</Typography>
@@ -760,9 +809,10 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       : page == ModalPages.SELECT_TEAM ? (
         <div className='selector-centering'>
           <Typography variant='h5'>Select a team:</Typography>
-          <FormControl fullWidth>
-            <Select  
-              renderValue={() => <Typography>{localTeamData?.teamName}</Typography>}
+          <FormControl className='select-autocomplete'>
+            <Select
+              displayEmpty
+              renderValue={() => <Typography>{localTeamData?.teamName || 'Select a team'}</Typography>}
               value={localTeamData?.teamName}
               onChange={(e) => {
                 const team = teamsData.find((team) => team.teamName === e.target.value);
@@ -777,7 +827,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   });
                 }
               }}              
-              >
+            >
               {teamsData.sort((a, b) => a.teamName > b.teamName ? 0 : -1).map((team) => (
                 <MenuItem key={team.teamName} value={team.teamName}>
                   {team.teamName}
@@ -788,28 +838,60 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
         </div>
       )
 
-
-      // maybe have html string stored, display it dynamically as dangerouslysetinnerhtml
-
       : page == ModalPages.EDIT_SUBSECTION ?
         <div>
           <Typography variant='h4'>Edit Subsection Information</Typography>
           <div className='input-info-section'>
             <Typography>Subsection Name*:</Typography>
-            <TextField fullWidth value={localSubsectionData?.subsectionName} onChange={handleChangeSubsectionName} className='input-box'/>
+            <TextField 
+              fullWidth 
+              value={localSubsectionData?.subsectionName} 
+              onChange={handleChangeSubsectionName} 
+              onBlur={handleSubsectionNameBlur}
+              className='input-box'
+              error={incorrectSubsectionNameError}
+              helperText={incorrectSubsectionNameError ? 'Subsection name is required' : ''}
+            />
           </div>
           <div className='input-info-section'>
             <Typography>Subsection Content*:</Typography>
-            {/* <TextField fullWidth value={localSubsectionData?.subsectionHtml} onChange={handleChangeSubsectionHtml} className='input-box'/> */}
-            <ReactQuill value={localSubsectionData?.subsectionHtml} onBlur={handleChangeSubsectionHtml} modules={{toolbar: toolbarOptions}}/>
+            <ReactQuill 
+              value={localSubsectionData?.subsectionHtml} 
+              modules={{toolbar: toolbarOptions}}
+              ref={quillRef}
+            />
+            <button onClick={handleSaveSubsectionHtml}>Save</button>
+          </div>
+          <div className='input-info-section'>
+            <Typography>Assign to Module:</Typography>
+            <FormControl fullWidth className='input-box'>
+              <Select  
+                // fullWidth
+                // renderValue={() => <Typography>{localModuleData?.moduleName}</Typography>}
+                // value={localModuleData?.moduleName}
+                onChange={(e) => {
+                  const module = modulesData.find((module) => module.moduleName === e.target.value);
+                  console.log('e is ', e)
+                  console.log('module is ', module)
+                  // TODO: add in ability to send this to api
+                }}              
+                >
+                {modulesData.sort((a, b) => a.moduleName > b.moduleName ? 0 : -1).map((module) => (
+                  <MenuItem key={module.moduleName} value={module.moduleName}>
+                    {module.moduleName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </div>
         </div>
       : page == ModalPages.SELECT_SUBSECTION ?
         <div className='selector-centering'>
           <Typography variant='h5'>Select a subsection:</Typography>
-          <FormControl fullWidth>
+          <FormControl className='select-autocomplete'>
             <Select  
-              renderValue={() => <Typography>{localSubsectionData?.subsectionName}</Typography>}
+              displayEmpty
+              renderValue={() => <Typography>{localSubsectionData?.subsectionName || 'Select a subsection'}</Typography>}
               value={localSubsectionData?.subsectionName}
               onChange={(e) => {
                 const subsection = subsectionsData.find((subsection) => subsection.subsectionName === e.target.value);
@@ -819,13 +901,14 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                 } else {
                   setLocalSubsectionData(subsectionsData?.find((subsection) => subsection.subsectionName === subsectionSelected) || {
                     subsectionName: '',
-                    subsectionHtml: ''
+                    subsectionHtml: '',
+                    htmlEdited: false
                   });
                 }
               }}  
               MenuProps={{
                 anchorOrigin: {
-                  vertical: 'top',
+                  vertical: 'bottom',
                   horizontal: 'right',
                 },
                 transformOrigin: {
@@ -909,7 +992,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   </Box>
                   <label htmlFor='upload-module-image' >
                     <Button color="primary" component="span">
-                      <AddPhotoAlternate />
+                      <AddPhotoAlternate className='button-icon'/>
                       <Typography>
                         change selection
                       </Typography>
@@ -920,7 +1003,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               : (
                 <label htmlFor='upload-module-image' >
                   <Button color="primary" component="span">
-                    <AddPhotoAlternate />
+                    <AddPhotoAlternate className='button-icon'/>
                     <Typography>
                       upload photo
                     </Typography>
@@ -933,7 +1016,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       : page == ModalPages.SELECT_MODULE ? (
         <div className='selector-centering'>
           <Typography variant='h5'>Select a module:</Typography>
-          <FormControl fullWidth>
+          <FormControl className='select-autocomplete'>
             <Select  
               renderValue={() => <Typography>{localModuleData?.moduleName}</Typography>}
               value={localModuleData?.moduleName}
@@ -976,6 +1059,10 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Name:</Typography>
               <Typography className='indent'>{localUserData?.name}</Typography>
+            </div>
+            <div className='confirm-section'>
+              <Typography variant="h6" className='italics'>GTID:</Typography>
+              <Typography className='indent'>{localUserData?.gtID}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Primary email:</Typography>
@@ -1036,7 +1123,11 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Subsection Preview:</Typography>
-              <div className='preview-section' dangerouslySetInnerHTML={{__html: localSubsectionData?.subsectionHtml || ''}}/>
+              <div className='quill'>
+                <div className='ql-snow'>
+                  <div className='ql-editor preview-section' dangerouslySetInnerHTML={{__html: localSubsectionData?.subsectionHtml || ''}}/>
+                </div>
+              </div>
             </div>
           </div>
         </div>

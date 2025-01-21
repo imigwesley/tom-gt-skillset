@@ -1,5 +1,6 @@
 @import '../../Themes/TOMThemeVariables.scss';
 
+
 .input-info-container {
     height: 90%;
     width: 100%;
@@ -74,6 +75,14 @@
     padding-left: 15px;
 }
 
-.ql-editor {
-    min-height: 200px;
+.button-icon {
+    color: gray;
+}
+
+// .ql-editor {
+//     min-height: 150px;
+// }
+
+.select-autocomplete {
+    width: 60%;
 }

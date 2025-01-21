@@ -77,10 +77,10 @@ const AdminPage = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
     // console.log(apiDataToSend)
-    console.log('validating user: ', apiDataToSend.user)
-    console.log('validating team: ', apiDataToSend.team)
-    console.log('validating module: ', apiDataToSend.module)
-    console.log('validating image ', imageFile);
+    // console.log('validating user: ', apiDataToSend.user)
+    // console.log('validating team: ', apiDataToSend.team)
+    // console.log('validating module: ', apiDataToSend.module)
+    // console.log('validating image ', imageFile);
 
     return (
       ( // user is valid
@@ -109,12 +109,13 @@ const AdminPage = () => {
       apiDataToSend.subsection
       && apiDataToSend.subsection.subsectionName !== ''
       && apiDataToSend.subsection.subsectionHtml !== ''
+      && (activeStep === 1 ? apiDataToSend.subsection.htmlEdited : true)
     )
   ) // or () or () 
   }
 
   const handleOpenModal = (entity: Operations) => {
-    console.log(entity);
+    // console.log(entity);
     setCurrentOperation(entity);
     setIsModalOpen(true);
   }
@@ -159,8 +160,8 @@ const AdminPage = () => {
       // clicking 'next'
       // if (isneedingvalidation and isnotvalid) setErr
       // else if ((isneedingvalidation and isvalid) or (not needing validation)) move forward
-      console.log('is data valid?? ', isDataValid())
-      console.log('current page is ', stepSets[currentOperation][activeStep])
+      // console.log('is data valid?? ', isDataValid())
+      // console.log('current page is ', stepSets[currentOperation][activeStep])
       const infoInputPages = [ModalPages.EDIT_MODULE, 
         ModalPages.EDIT_SUBSECTION, 
         ModalPages.EDIT_TEAM, 
@@ -170,13 +171,16 @@ const AdminPage = () => {
         ModalPages.SELECT_TEAM, 
         ModalPages.SELECT_USER
       ];
+      console.log('wesleeeee')
+      console.log(activeStep)
+
 
       if (infoInputPages.includes(stepSets[currentOperation][activeStep]) && !isDataValid()) {
         // if current step is something where information has to be input and information is invalid, throw err
-        console.log('error')
+        // console.log('error')
         setInvalidapiDataToSend(true);
       } else {
-        console.log('no error')
+        // console.log('no error')
         setInvalidapiDataToSend(false);
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
@@ -185,10 +189,16 @@ const AdminPage = () => {
   
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    setapiDataToSend({
+      user: undefined,
+      module: undefined,
+      subsection: undefined,
+      team: undefined
+    });
   };
 
   const handleReset = () => {
-    console.log('reset')
+    // console.log('reset')
     setActiveStep(0);
     setapiDataToSend({
       user: undefined,
@@ -219,7 +229,7 @@ const AdminPage = () => {
   }
 
   const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
-    console.log('info is ', info)
+    console.log('changed inside admin.tsx', info)
     if (isMemberInformation(info)) {
       let temp = {...apiDataToSend};
       temp.user = info;
@@ -241,12 +251,12 @@ const AdminPage = () => {
   }
 
   const handleImageProvided = (file: File) => {
-    console.log('file is ', file);
+    // console.log('file is ', file);
     setImageFile(file);
   }
 
   useEffect(() => {
-    console.log('apiDataToSend changed', apiDataToSend);
+    // console.log('apiDataToSend changed', apiDataToSend);
   }, [apiDataToSend])
 
   useEffect(() => {
@@ -407,7 +417,6 @@ const AdminPage = () => {
                 <div className='modal-footer'>
                   <Button
                     className='cancel-button'
-                    variant='outlined'
                     onClick={handleCloseModal}
                     sx={{ mr: 1 }}
                   >
@@ -415,14 +424,14 @@ const AdminPage = () => {
                   </Button>
                   <div style={{flexGrow: '1'}} />
                   <Button
-                    color="inherit"
-                    disabled={activeStep === 0}
+                    // disabled={activeStep === 0}
                     onClick={handleBack}
-                    sx={{ mr: 1 }}
+                    sx={{ mr: 1, display: activeStep === 0 ? 'none': '' }}
+                    className='proceed-button'
                   >
                     Back
                   </Button>
-                  <Button onClick={handleNext}>
+                  <Button onClick={handleNext} className='proceed-button'>
                     {activeStep === stepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
                   </Button>
                 </div>
