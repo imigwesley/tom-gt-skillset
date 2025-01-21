@@ -1,6 +1,6 @@
 import './App.scss';
 import './index.css';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './Pages/Home/Home';
 import AboutPage from './Pages/About/About';
 import MembersPage from './Pages/Members/Members';
@@ -13,6 +13,19 @@ import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
 import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
 
+const Layout = ({ children }: { children: React.ReactNode }) => {
+  const location = useLocation();
+  const hideNavbarPaths = ['/login']; // Add paths where Navbar should not appear
+
+  return (
+    <>
+      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
+      <div className="main-body">{children}</div>
+      <div className="footer" />
+    </>
+  );
+};
+
 
 const App = () => {
 
@@ -21,8 +34,7 @@ const App = () => {
       <div>
         <ThemeProvider theme={tomTheme}>
           <BrowserRouter>
-            <Navbar/>
-            <div className='main-body'>
+            <Layout>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -33,8 +45,7 @@ const App = () => {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/admin" element={<AdminPage />} />
               </Routes>
-            </div>
-            <div className='footer' />
+            </Layout>
           </BrowserRouter>
         </ThemeProvider>
       </div>
