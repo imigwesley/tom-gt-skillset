@@ -12,7 +12,6 @@ import Navbar from './Components/Navbar/Navbar';
 import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
 import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
-import React from 'react';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
