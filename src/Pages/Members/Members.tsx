@@ -91,13 +91,13 @@ const MembersPage = () => {
     return (
       <div className='members-container'>
         <div className='sorting-section'>
-          <Typography>
+          <Typography variant='h5'>
             Sort by:
           </Typography>
           <ButtonGroup>
-            <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} variant={sortType === SORT_TYPE.ROLE ? 'contained' : 'outlined'}>Role</Button>
-            <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} variant={sortType === SORT_TYPE.TEAM ? 'contained' : 'outlined'}>Team</Button>
-            <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} variant={sortType === SORT_TYPE.ALPHABETICALLY ? 'contained' : 'outlined'}>Alphabetically</Button>
+            <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple={sortType === SORT_TYPE.ROLE} className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
+            <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button>
+            <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple={sortType === SORT_TYPE.ALPHABETICALLY} className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
           </ButtonGroup>
         </div>
         <div>

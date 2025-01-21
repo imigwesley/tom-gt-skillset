@@ -86,6 +86,7 @@ const Navbar = () => {
           }}
           transitionDuration={10}
         >
+          <MenuItem onClick={() => handlePageClick('home')}>Home</MenuItem>
           <MenuItem onClick={() => handlePageClick('about')}>About</MenuItem>
           <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem>
           <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>

@@ -1,4 +1,4 @@
-import { LinearProgress, Typography } from '@mui/material';
+import { Divider, LinearProgress, Typography } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -65,8 +65,8 @@ const TrainingModulesPage = () => {
           </div>
         :
           <div className='module-page-container'>
-              <div className='subsection-links-container'>
-                <Typography variant='h4'>Subsections</Typography>
+              <div className='background-card'>
+                <Typography variant='h4'>{moduleName}</Typography>
                 {subsections.map((subsection) => {
                   return (
                     <div onClick={() => handleSubsectionClick(subsection)}>
@@ -79,12 +79,9 @@ const TrainingModulesPage = () => {
                   );
                 })}
               </div>
-              <div className='module-container'>
-                <Typography variant='h2'>{moduleName}</Typography> {/* {htmlContent.subsectionName} or something like that*/}
-                {/* <div>paragraph here. include lorem ipsum and videos and stuff.</div>
-                <div>
-                  training module page: {moduleName}
-                </div> */}
+              <div className='module-container background-card'>
+                <Typography variant='h3'>{currSubsection}</Typography>
+                <Divider variant='middle' />
                 <div className='quill'>
                   <div className='ql-snow'>
                     <div className='ql-editor' dangerouslySetInnerHTML={{__html: subsectionHtml || ''}}/>

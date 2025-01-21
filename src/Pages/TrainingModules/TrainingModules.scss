@@ -1,13 +1,16 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .module-page-container {
     display: flex;
     flex-direction: row;
-    padding: 1% 5% 0% 5%;
-    gap: 100px;
+    padding: 1% 1% 0% 1%;
+    gap: 50px;
 
-    .subsection-links-container {
+    .background-card {
         width: fit-content;
-        margin-top: 5%;
-        background-color: white;
+        height: fit-content;
+        margin-top: 2%;
+        background-color: $accent-white;
         padding: 15px;
         border-radius: 9px;
         box-shadow: 0px 0px 5px gainsboro;
@@ -16,7 +19,7 @@
     .module-container {
         display: flex;
         flex-direction: column;
-        
+        flex: 1;
     
     
         .header {

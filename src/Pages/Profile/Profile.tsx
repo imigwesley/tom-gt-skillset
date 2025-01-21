@@ -1,4 +1,5 @@
 import { Typography } from "@mui/material";
+import './Profile.scss';
 
 const ProfilePage = () => {
 
@@ -19,40 +20,47 @@ const ProfilePage = () => {
 
     return (
       <div className='profile-container'>
-        <div>
-          <Typography variant='h2'>Your Profile</Typography>
-          <Typography variant="h5">Name:</Typography>
-          <Typography>{user.name}</Typography>
-          <Typography variant="h5">Primary Email:</Typography>
-          <Typography>{user.email[0]}</Typography>
+        <Typography variant='h2' className="header">Your Profile</Typography>
+
+        <div className="background-card">
+          <Typography variant="h5" className="info-name">Name:</Typography>
+          <Typography className="info">{user.name}</Typography>
+
+          <Typography variant="h5"  className="info-name">Primary Email:</Typography>
+          <Typography className="info">{user.email[0]}</Typography>
+
           {user.email.length > 1 &&
             <div>
-              <Typography variant="h5">Other emails</Typography>
+              <Typography variant="h5" className="info-name">Other emails</Typography>
                 {user.email.map((_email, index) => {
                   if (index > 0) {
                     return (
-                      <Typography>{user.email[index]}</Typography>
+                      <Typography className="info">{user.email[index]}</Typography>
                     )
                   }
                 })}
             </div>
           }
           
-          <Typography variant="h5">Team:</Typography>
-          <Typography>{user.teamMembership}</Typography>
-          <Typography variant="h5">Advising:</Typography>
-          <Typography>{user.teamsAdvising.length > 1 ? user.teamsAdvising : 'No teams advising'}</Typography>
-          <Typography variant="h5">Role:</Typography>
-          <Typography>{user.role}</Typography>
-          <Typography variant="h5">Section Progress:</Typography>
+          <Typography variant="h5" className="info-name">Team:</Typography>
+          <Typography className="info">{user.teamMembership}</Typography>
+
+          <Typography variant="h5" className="info-name">Advising:</Typography>
+          <Typography className="info">{user.teamsAdvising.length > 1 ? user.teamsAdvising : 'No teams advising'}</Typography>
+
+          <Typography variant="h5" className="info-name">Role:</Typography>
+          <Typography className="info">{user.role}</Typography>
+
+          <Typography variant="h5" className="info-name">Section Progress:</Typography>
           <div>
             {user.moduleProgress.map((module) => {
               return (
                 <div>
-                  <Typography>Module:</Typography>
-                  <Typography>{module.moduleName}</Typography>
-                  <Typography>Percent Complete:</Typography>
-                  <Typography>{module.percentComplete}</Typography>
+                  <Typography className="info-name">Module:</Typography>
+                  <Typography className="info">{module.moduleName}</Typography>
+
+                  <Typography className="info-name">Percent Complete:</Typography>
+                  <Typography className="info">{module.percentComplete}</Typography>
                 </div>
               )
             })}
