@@ -889,15 +889,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
         <div className='selector-centering'>
           <Typography variant='h5'>Select a subsection:</Typography>
           <FormControl className='select-autocomplete'>
-            <Select  
-              displayEmpty
-              renderValue={() => <Typography>{localSubsectionData?.subsectionName || 'Select a subsection'}</Typography>}
-              value={localSubsectionData?.subsectionName}
-              onChange={(e) => {
-                const subsection = subsectionsData.find((subsection) => subsection.subsectionName === e.target.value);
-                if (subsection) {
-                  setLocalSubsectionData(subsection);
-                  onApiInformationUpdate(subsection);
+            <Autocomplete
+              options={subsectionsData.sort((a, b) => (a.subsectionName > b.subsectionName ? 1 : -1))}
+              getOptionLabel={(option) => option.subsectionName}
+              value={localSubsectionData}
+              onChange={(event, newValue) => {
+                // const subsection = subsectionsData.find((subsection) => subsection.subsectionName === e.target.value);
+                if (newValue) {
+                  setLocalSubsectionData(newValue);
+                  onApiInformationUpdate(newValue);
                 } else {
                   setLocalSubsectionData(subsectionsData?.find((subsection) => subsection.subsectionName === subsectionSelected) || {
                     subsectionName: '',
@@ -905,25 +905,20 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                     htmlEdited: false
                   });
                 }
-              }}  
-              MenuProps={{
-                anchorOrigin: {
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                },
-                transformOrigin: {
-                  vertical: 'top',
-                  horizontal: 'right',
-                },
-                style: {maxHeight: '300px'}
-              }}            
-              >
-              {subsectionsData.map((subsection) => (
-                <MenuItem key={subsection.subsectionName} value={subsection.subsectionName}>
-                  <ListItemText primary={subsection.subsectionName} />
-                </MenuItem>
-              ))}
-            </Select>
+              }}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  placeholder="Select/type subsection name"
+                  variant="outlined" 
+                />
+              )}
+              renderOption={(props, option) => (
+                <li {...props} key={1}>
+                  <Typography>{option.subsectionName}</Typography>
+                </li>
+              )}
+            />
           </FormControl>
         </div>
 
@@ -940,7 +935,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           </div>
           <div className='input-info-section'>
             <Typography>Module Subsections*:</Typography>
-            <Typography className='italics'>Subsections need to be created before added to a module</Typography>
+            <Typography className='italics'>Subsections must be created before being added to a module</Typography>
             <FormControl fullWidth className='input-box'>
               <Autocomplete
                 multiple
@@ -1018,7 +1013,8 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           <Typography variant='h5'>Select a module:</Typography>
           <FormControl className='select-autocomplete'>
             <Select  
-              renderValue={() => <Typography>{localModuleData?.moduleName}</Typography>}
+              displayEmpty
+              renderValue={() => <Typography>{localModuleData?.moduleName || 'Select a module'}</Typography>}
               value={localModuleData?.moduleName}
               onChange={(e) => {
                 const module = modulesData.find((module) => module.moduleName === e.target.value);
