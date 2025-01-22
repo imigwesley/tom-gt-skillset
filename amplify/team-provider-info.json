@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-tomgtskillset-dev-c9d26-authRole",
+      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-c9d26-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-c9d26-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-tomgtskillset-dev-c9d26-deployment",
+      "UnauthRoleName": "amplify-tomgtskillset-dev-c9d26-unauthRole",
+      "StackName": "amplify-tomgtskillset-dev-c9d26",
+      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-dev-c9d26/b9860680-d90f-11ef-ac41-0afff4e3bb65",
+      "AmplifyAppId": "d38jn3kqi07omy"
+    },
+    "categories": {
+      "auth": {
+        "tomgtskillset4f9476b0": {}
+      }
+    }
+  }
+}

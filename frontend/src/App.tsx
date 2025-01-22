@@ -14,11 +14,11 @@ import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
-import outputs from './amplify_outputs.json';
+import awsmobile from '../../src/aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 
 // Configure Amplify with the generated outputs
-Amplify.configure(outputs);
+Amplify.configure(awsmobile);
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
