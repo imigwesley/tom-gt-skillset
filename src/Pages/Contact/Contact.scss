@@ -1,0 +1,17 @@
+.contact-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .question-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60%;
+        margin: 10px 0px 10px 0px;
+
+        .input-section {
+            background-color: white;
+        }
+    }
+}

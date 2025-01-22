@@ -1,0 +1,52 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
+.home-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    margin: 2%;
+}
+
+.module-card-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.module-card {
+    width: 250px;
+    margin: 10px;
+    padding: 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    
+    &.not-assigned {
+        // box-shadow: 0px 4px 2px rgba(0, 0, 0, 0.2); // default
+        box-shadow: 4px 4px 0px 0px black;
+    }
+
+    &.assigned {
+        box-shadow: 0px 0px 0px 3px $tom-green; // assigned
+    }
+
+    &:hover {
+        // box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); // when hovering
+        box-shadow: 5px 5px 0px 0px #4D4D4D;
+    }
+}
+
+
+.module-image {
+    height: 200px;
+}
+
+.module-card-content {
+    gap: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
