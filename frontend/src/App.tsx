@@ -12,10 +12,17 @@ import Navbar from './Components/Navbar/Navbar';
 import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
 import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
+import { Authenticator } from '@aws-amplify/ui-react';
+import { Amplify } from 'aws-amplify';
+import outputs from './amplify_outputs.json';
+import '@aws-amplify/ui-react/styles.css';
+
+// Configure Amplify with the generated outputs
+Amplify.configure(outputs);
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login']; // Add paths where Navbar should not appear
+  const hideNavbarPaths = ['/login'];
 
   return (
     <>
@@ -26,31 +33,35 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-
 const App = () => {
-
   return (
     <div className="App">
-      <div>
-        <ThemeProvider theme={tomTheme}>
-          <BrowserRouter>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/modules/:moduleName" element={<TrainingModulesPage />} />
-                <Route path="/about" element={<AboutPage />} />
-                <Route path="/members" element={<MembersPage />} />
-                <Route path="/contact" element={<FeedbackPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/admin" element={<AdminPage />} />
-              </Routes>
-            </Layout>
-          </BrowserRouter>
-        </ThemeProvider>
-      </div>
+      <ThemeProvider theme={tomTheme}>
+        <BrowserRouter>
+          <Authenticator hideSignUp>
+            {({ signOut, user }) => (
+              <>
+                <h1>Hello {user?.username}</h1>
+                <button onClick={signOut}>Sign out</button>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/modules/:moduleName" element={<TrainingModulesPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/members" element={<MembersPage />} />
+                    <Route path="/contact" element={<FeedbackPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                  </Routes>
+                </Layout>
+              </>
+            )}
+          </Authenticator>
+        </BrowserRouter>
+      </ThemeProvider>
     </div>
   );
-}
+};
 
 export default App;

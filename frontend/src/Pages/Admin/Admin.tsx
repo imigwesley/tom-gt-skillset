@@ -171,7 +171,6 @@ const AdminPage = () => {
         ModalPages.SELECT_TEAM, 
         ModalPages.SELECT_USER
       ];
-      console.log('wesleeeee')
       console.log(activeStep)
 
 
