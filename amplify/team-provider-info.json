@@ -1,19 +1,20 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-tomgtskillset-dev-30c9d-authRole",
-      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-30c9d-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-30c9d-authRole",
+      "AuthRoleName": "amplify-tomgtskillset-dev-fd347-authRole",
+      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-fd347-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-fd347-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-tomgtskillset-dev-30c9d-deployment",
-      "UnauthRoleName": "amplify-tomgtskillset-dev-30c9d-unauthRole",
-      "StackName": "amplify-tomgtskillset-dev-30c9d",
-      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-dev-30c9d/5a3431e0-d917-11ef-81a2-125981b3c83d",
-      "AmplifyAppId": "ds5zfx1s70od1"
+      "DeploymentBucketName": "amplify-tomgtskillset-dev-fd347-deployment",
+      "UnauthRoleName": "amplify-tomgtskillset-dev-fd347-unauthRole",
+      "StackName": "amplify-tomgtskillset-dev-fd347",
+      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-dev-fd347/6a9b0d00-d91d-11ef-a879-1271428e233b",
+      "AmplifyAppId": "dd0d2urej3zr3"
     },
     "categories": {
       "auth": {
-        "tomgtskillseteb1a9210": {}
+        "tomgtskillset6df29f68": {},
+        "userPoolGroups": {}
       }
     }
   }
