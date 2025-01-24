@@ -3,14 +3,16 @@ import './Admin.scss';
 import { useEffect, useState } from 'react';
 import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
+import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation, PageProps } from '../../Types/types';
 import membersSample from '../../SampleData/MembersSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
+import { signUp } from 'aws-amplify/auth';
 
 
-const AdminPage = () => {
+
+const AdminPage = ({user}: PageProps) => {
 
   // enum for each api call on the page
   enum Operations {
@@ -85,13 +87,14 @@ const AdminPage = () => {
     return (
       ( // user is valid
       apiDataToSend.user
-      && apiDataToSend.user.name !== ''
-      && (apiDataToSend.user.email?.length !== 0 && apiDataToSend.user.email[0] !== '')
-      && apiDataToSend.user.email.some(email => emailRegex.test(email)) 
-      && apiDataToSend.user.gtID && apiDataToSend.user?.gtID.length === 9
-      && !isNaN(Number(apiDataToSend.user.gtID))
-      && apiDataToSend.user.teamMembership.length > 0
-      && apiDataToSend.user.role !== ''
+      && apiDataToSend.user.identifiers.name !== ''
+      && (apiDataToSend.user.identifiers.contactEmails?.length !== 0 && apiDataToSend.user.identifiers.contactEmails[0] !== '')
+      && apiDataToSend.user.identifiers.contactEmails.some(email => emailRegex.test(email)) 
+      && (apiDataToSend.user.identifiers.accountEmail && emailRegex.test(apiDataToSend.user.identifiers.accountEmail))
+      && apiDataToSend.user.identifiers.gtID && apiDataToSend.user?.identifiers.gtID.length === 9
+      && !isNaN(Number(apiDataToSend.user.identifiers.gtID))
+      && apiDataToSend.user.teams.teamMembership.length > 0
+      && apiDataToSend.user.roles.role !== ''
     )
     || ( // or if team is valid
       apiDataToSend.team
@@ -127,13 +130,116 @@ const AdminPage = () => {
     setCurrentOperation(Operations.NULL);
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeStep === stepSets[currentOperation].length - 1) {
       // submit button
       handleCloseModal();
       setIsWaitingOnApi(true);
+      console.log('data waiting for the api is: ', apiDataToSend)
 
-      // make api call
+      // Interact with dynamodb, cognito
+      switch (currentOperation) {
+
+        /***********
+        * USER API CALLS
+        ***********/
+        case Operations.ADD_USER:
+          console.log('add new user submit');
+          try {
+            const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
+            if (!acctEmail) throw new Error;
+            const createdUserId = await createUserInUserPool(acctEmail); // add props to this function
+            // create record in db with information from frontend
+          } catch (exception) {
+            console.log('exception!!', exception);
+          }
+          
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_USER:
+          console.log('edit user submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_USER:
+          console.log('delete user submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * TEAM API CALLS
+        ***********/
+        case Operations.ADD_TEAM:
+          console.log('add new team submit');
+          //const createdTeamId = await createTeamInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_TEAM:
+          console.log('edit team submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_TEAM:
+          console.log('delete team submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * SUBSECTION API CALLS
+        ***********/
+        case Operations.ADD_SUBSECTION:
+          console.log('add new subsection submit');
+          //const createdSubsectionId = await createSubsectionInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_SUBSECTION:
+          console.log('edit subsection submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_SUBSECTION:
+          console.log('delete subsection submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * MODULE API CALLS
+        ***********/
+        case Operations.ADD_MODULE:
+          console.log('add new module submit');
+          //const createdModuleId = await createModuleInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_MODULE:
+          console.log('edit module submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_MODULE:
+          console.log('delete module submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+          
+        default:
+          console.log('default')
+      }
       // if no image provided, call straight up
       // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update module info table 
 
@@ -212,7 +318,7 @@ const AdminPage = () => {
   // type guards
 
   function isMemberInformation(info: any): info is MemberInformation {
-    return (info as MemberInformation).gtID !== undefined;
+    return (info as MemberInformation).identifiers.gtID !== undefined;
   }
   
   function isModuleInformation(info: any): info is ModuleInformation {
@@ -246,7 +352,6 @@ const AdminPage = () => {
       temp.team = info;
       setapiDataToSend(temp);
     }
-    // console.log('apiDataToSend inside Admin.tsx is ', apiDataToSend)
   }
 
   const handleImageProvided = (file: File) => {
@@ -278,6 +383,20 @@ const AdminPage = () => {
 
     fetchData();
   }, [])
+
+  const createUserInUserPool = async (email: string) => {
+    const { isSignUpComplete, userId, nextStep } = await signUp({
+      username: email,
+      password: "temporaryPassword123!",
+      options: {
+        userAttributes: {
+          email: email,
+        },
+      }
+    });
+    console.log('userId: ', userId);
+    return userId;
+  }
 
 
     return (

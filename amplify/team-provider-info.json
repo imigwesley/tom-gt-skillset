@@ -15,6 +15,9 @@
       "auth": {
         "tomgtskillset6df29f68": {},
         "userPoolGroups": {}
+      },
+      "storage": {
+        "UserData": {}
       }
     }
   }

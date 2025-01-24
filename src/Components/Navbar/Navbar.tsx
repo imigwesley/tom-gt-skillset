@@ -3,8 +3,9 @@ import { Avatar, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import './Navbar.scss';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { NavbarProps } from '../../Types/types';
 
-const Navbar = () => {
+const Navbar = ({user, signOutFunction}: NavbarProps) => {
 
   const initials = 'WI';
   const isAdmin = true;
@@ -92,6 +93,7 @@ const Navbar = () => {
           <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
           {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
           <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem>
+          <MenuItem onClick={signOutFunction}>Sign Out</MenuItem>
         </Menu>
     </div>
   );

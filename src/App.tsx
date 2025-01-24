@@ -16,6 +16,7 @@ import { Amplify } from 'aws-amplify';
 import awsmobile from './aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
+import { LayoutProps } from './Types/types';
 
 // Configure Amplify with the generated outputs
 Amplify.configure(awsmobile);
@@ -66,13 +67,13 @@ const formFields = {
   },
 };
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children, signOutFunction, user }: LayoutProps) => {
   const location = useLocation();
   const hideNavbarPaths = ['/login'];
 
   return (
     <>
-      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
+      {!hideNavbarPaths.includes(location.pathname) && <Navbar user={user} signOutFunction={signOutFunction} />}
       <div className="main-body">{children}</div>
       <div className="footer" />
     </>
@@ -87,17 +88,15 @@ const App = () => {
           <Authenticator components={components} formFields={formFields} hideSignUp>
             {({ signOut, user }) => (
               <>
-                <h1>Hello {user?.username}</h1>
-                <button onClick={signOut}>Sign out</button>
-                <Layout>
+                <Layout signOutFunction={signOut} user={user}>
                   <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/modules/:moduleName" element={<TrainingModulesPage />} />
+                    <Route path="/" element={<HomePage user={user} />} />
+                    <Route path="/modules/:moduleName" element={<TrainingModulesPage user={user} />} />
                     <Route path="/about" element={<AboutPage />} />
                     <Route path="/members" element={<MembersPage />} />
                     <Route path="/contact" element={<FeedbackPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/admin" element={<AdminPage />} />
+                    <Route path="/profile" element={<ProfilePage user={user} />} />
+                    <Route path="/admin" element={<AdminPage user={user} />} />
                   </Routes>
                 </Layout>
               </>

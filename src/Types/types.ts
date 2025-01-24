@@ -1,3 +1,5 @@
+import { AuthUser } from "@aws-amplify/auth";
+import { AuthEventData } from "@aws-amplify/ui";
 import { Ref } from "react";
 
 export enum ModalPages {
@@ -48,13 +50,21 @@ export interface SubsectionInformation {
 }
 
 export interface MemberInformation {
-    gtID: string,
-    name: string,
-    email: string[],
-    teamMembership: string[],
-    teamsAdvising: string[],
-    role: string,
-    isExec: boolean,
+    identifiers: {
+        userID: string,
+        accountEmail: string,
+        name: string,
+        gtID: string,
+        contactEmails: string[]
+    },
+    roles: {
+        role: string,
+        isAdmin: boolean
+    },
+    teams: {
+        teamMembership: string[],
+        teamsAdvising: string[]
+    },
     moduleProgress: ModuleProgress[]
 }
 
@@ -99,4 +109,43 @@ export interface ApiSendInformation {
 
 export interface NameGTidMap {
     [key: string]: string
+}
+
+export interface PageProps {
+    user: AuthUser | undefined
+}
+
+export interface NavbarProps {
+    signOutFunction: ((data?: AuthEventData | undefined) => void) | undefined,
+    user: AuthUser | undefined
+}
+
+export interface LayoutProps {
+    children: React.ReactNode,
+    signOutFunction: ((data?: AuthEventData | undefined) => void) | undefined,
+    user: AuthUser | undefined
+}
+
+
+export interface ByRole {
+    members: MemberInformation[],
+    officers: MemberInformation[]
+}
+
+export interface ByTeam {
+    team: string,
+    members: MemberInformation[],
+    advisors: MemberInformation[]
+}
+
+export interface Alphabetically {
+    letter: string,
+    members: MemberInformation[]
+}
+
+export interface MemberCardProps {
+    member: MemberInformation,
+    isEven: boolean,
+    isFirst: boolean,
+    isLast: boolean
 }

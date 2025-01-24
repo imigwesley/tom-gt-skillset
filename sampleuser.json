@@ -1,0 +1,28 @@
+{
+    "identifiers": {
+        "userID": "29486129469kdjfb",
+        "accountEmail": "wimig3@gatech.edu",
+        "name": "Wesley Imig",
+        "gtID": "903656085",
+        "contactEmails": ["wesley@gatech.edu", "wimig3@gmail.com"]
+    },
+    "roles": {
+        "role": "president",
+        "isAdmin": true
+    },
+    "teams": {
+        "teamMembership": ["Design"],
+        "teamsAdvising": ["Marketing"]
+    },
+    "moduleProgress": [
+        { 
+            "moduleName": "Kangaroos", 
+            "percentComplete": 59.6,
+            "isAssigned": true,
+            "subsectionsComplete": [
+                "sharpen knife",
+                "theory of grilling"
+            ]
+        }
+    ]
+}

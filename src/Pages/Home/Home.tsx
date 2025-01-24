@@ -6,28 +6,34 @@ import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/Li
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
 import Module from 'module';
-import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress } from '../../Types/types';
+import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress, PageProps } from '../../Types/types';
 
-const HomePage = () => {
+const HomePage = ({user}: PageProps) => {
 
   const navigate = useNavigate();
 
   const [personalInfo, setPersonalInfo] = useState<MemberInformation>({
-      gtID: '',
+    identifiers: {
+      userID: '',
+      accountEmail: '',
       name: '',
-      email: ['', ''],
-      teamMembership: [''],
-      teamsAdvising: ['', ''],
-      role: '',
-      isExec: false,
-      moduleProgress: [
-        { 
-            moduleName: '', 
-            percentComplete: 0,
-            isAssigned: false,
-            subsectionsComplete: ['', '', '']
-        }
-      ]
+      gtID: '',
+      contactEmails: ['']
+    },
+    roles: {
+        role: '',
+        isAdmin: false
+    },
+    teams: {
+        teamMembership: [''],
+        teamsAdvising: ['']
+    },
+    moduleProgress: [{
+        moduleName: '',
+        percentComplete: 0.0,
+        isAssigned: false,
+        subsectionsComplete: []
+    }]
   });
 
   const [modules, setModules] = useState<ModuleInformation[]>([
@@ -105,7 +111,7 @@ const HomePage = () => {
         <div>
           <div className='header'>
             <Typography variant='h4' align='center'>
-              Hello, {personalProgress.name.substring(0, personalProgress.name.indexOf(' '))}! What would you like to learn today?
+              Hello, {user?.username}! What would you like to learn today?
             </Typography>
           </div>
           <div className='module-card-container'>

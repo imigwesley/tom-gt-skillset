@@ -1,9 +1,10 @@
 import { Typography } from "@mui/material";
 import './Profile.scss';
+import { PageProps } from '../../Types/types';
 
-const ProfilePage = () => {
+const ProfilePage = ({user}: PageProps) => {
 
-  const user = {
+  const placeholderuser = {
     name: 'Matthew Hall',
     email: ['matthew.hall@gatech.edu', 'matthall@gmail.com'],
     teamMembership: 'Design',
@@ -24,18 +25,18 @@ const ProfilePage = () => {
 
         <div className="background-card">
           <Typography variant="h5" className="info-name">Name:</Typography>
-          <Typography className="info">{user.name}</Typography>
+          <Typography className="info">{placeholderuser.name}</Typography>
 
           <Typography variant="h5"  className="info-name">Primary Email:</Typography>
-          <Typography className="info">{user.email[0]}</Typography>
+          <Typography className="info">{placeholderuser.email[0]}</Typography>
 
-          {user.email.length > 1 &&
+          {placeholderuser.email.length > 1 &&
             <div>
               <Typography variant="h5" className="info-name">Other emails</Typography>
-                {user.email.map((_email, index) => {
+                {placeholderuser.email.map((_email, index) => {
                   if (index > 0) {
                     return (
-                      <Typography className="info">{user.email[index]}</Typography>
+                      <Typography className="info">{placeholderuser.email[index]}</Typography>
                     )
                   }
                 })}
@@ -43,17 +44,17 @@ const ProfilePage = () => {
           }
           
           <Typography variant="h5" className="info-name">Team:</Typography>
-          <Typography className="info">{user.teamMembership}</Typography>
+          <Typography className="info">{placeholderuser.teamMembership}</Typography>
 
           <Typography variant="h5" className="info-name">Advising:</Typography>
-          <Typography className="info">{user.teamsAdvising.length > 1 ? user.teamsAdvising : 'No teams advising'}</Typography>
+          <Typography className="info">{placeholderuser.teamsAdvising.length > 1 ? placeholderuser.teamsAdvising : 'No teams advising'}</Typography>
 
           <Typography variant="h5" className="info-name">Role:</Typography>
-          <Typography className="info">{user.role}</Typography>
+          <Typography className="info">{placeholderuser.role}</Typography>
 
           <Typography variant="h5" className="info-name">Section Progress:</Typography>
           <div>
-            {user.moduleProgress.map((module) => {
+            {placeholderuser.moduleProgress.map((module) => {
               return (
                 <div>
                   <Typography className="info-name">Module:</Typography>

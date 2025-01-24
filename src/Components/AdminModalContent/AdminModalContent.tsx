@@ -46,18 +46,26 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   // local data for editing in modal and sending to api
   const [localUserData, setLocalUserData] = useState<MemberInformation | null>({
-    name: '',
-    email: [''],
-    gtID: '',
-    teamMembership: [],
-    teamsAdvising: [],
-    role: '',
-    isExec: false,
+    identifiers: {
+      userID: '',
+      accountEmail: '',
+      name: '',
+      gtID: '',
+      contactEmails: ['']
+    },
+    roles: {
+        role: '',
+        isAdmin: false
+    },
+    teams: {
+        teamMembership: [''],
+        teamsAdvising: ['']
+    },
     moduleProgress: [{
-      moduleName: '',
-      percentComplete: 0.0,
-      isAssigned: false,
-      subsectionsComplete: []
+        moduleName: '',
+        percentComplete: 0.0,
+        isAssigned: false,
+        subsectionsComplete: []
     }]
   });
   const [localTeamData, setLocalTeamData] = useState<TeamInformation | null>({
@@ -83,18 +91,26 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       advisors: []
     }];
   const usersData: MemberInformation[] = passedApiInformation.users || [{
-    name: '',
-    email: [''],
-    gtID: '',
-    teamMembership: [],
-    teamsAdvising: [],
-    role: '',
-    isExec: false,
+    identifiers: {
+      userID: '',
+      accountEmail: '',
+      name: '',
+      gtID: '',
+      contactEmails: ['']
+    },
+    roles: {
+        role: '',
+        isAdmin: false
+    },
+    teams: {
+        teamMembership: [''],
+        teamsAdvising: ['']
+    },
     moduleProgress: [{
-      moduleName: '',
-      percentComplete: 0.0,
-      isAssigned: false,
-      subsectionsComplete: []
+        moduleName: '',
+        percentComplete: 0.0,
+        isAssigned: false,
+        subsectionsComplete: []
     }]
   }];
   const modulesData: ModuleInformation[] = passedApiInformation.modules || [{
@@ -112,7 +128,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     console.log('here too, ', passedApiInformation);
     if (passedApiInformation.users) {
       setUsersGTidMap(passedApiInformation?.users.reduce((acc: {[key: string]: string}, member) => {
-        acc[member.gtID] = member.name;
+        acc[member.identifiers.gtID] = member.identifiers.name;
         return acc;
       }, {}));
     } else {
@@ -131,14 +147,27 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     }
 
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: name,
-      email: localUserData?.email || [],
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
     };
     onApiInformationUpdate(temp);
   }
@@ -149,14 +178,27 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       setIncorrectUserNameError(false);
     }
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: _name,
-      email: localUserData?.email || [],
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
     };
     
     setLocalUserData(temp);
@@ -172,18 +214,31 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       });
     }
 
-    const newEmails = [...(localUserData?.email || [])];
+    const newEmails = [...(localUserData?.identifiers.contactEmails || [])];
     newEmails[index] = event.target.value;
 
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: newEmails,
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
     };
 
     setLocalUserData(temp);
@@ -198,36 +253,62 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
         return newErrors;
       });
     } else {
-      const newEmails = [...(localUserData?.email || [])];
+      const newEmails = [...(localUserData?.identifiers.contactEmails || [])];
       newEmails[index] = email;
       const temp: MemberInformation = {
-        gtID: localUserData?.gtID || '',
-        name: localUserData?.name || '',
-        email: newEmails,
-        teamMembership: localUserData?.teamMembership || [],
-        teamsAdvising: localUserData?.teamsAdvising || [],
-        role: localUserData?.role || '',
-        isExec: localUserData?.isExec || false,
-        moduleProgress: localUserData?.moduleProgress || [],
+        identifiers: {
+          userID: '',
+          accountEmail: '',
+          name: '',
+          gtID: '',
+          contactEmails: ['']
+        },
+        roles: {
+            role: '',
+            isAdmin: false
+        },
+        teams: {
+            teamMembership: [''],
+            teamsAdvising: ['']
+        },
+        moduleProgress: [{
+            moduleName: '',
+            percentComplete: 0.0,
+            isAssigned: false,
+            subsectionsComplete: []
+        }]
       };
       onApiInformationUpdate(temp);
     }    
   }
 
   const handleDeleteOtherEmail = (index: number) => {
-    let newEmails = [...(localUserData?.email || [])];
+    let newEmails = [...(localUserData?.identifiers.contactEmails || [])];
     console.log(newEmails);
     newEmails.splice(index + 1, 1);
 
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: newEmails,
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
     };
 
     setLocalUserData(temp);
@@ -236,16 +317,29 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleOpenNewEmailTextField = () => {
     setLocalUserData((prev) => {
-      const newEmails = [...(prev?.email || []), ''];
+      const newEmails = [...(prev?.identifiers.contactEmails || []), ''];
       const updatedUserData: MemberInformation = {
-        gtID: prev?.gtID || '',
-        name: prev?.name || '',
-        email: newEmails,
-        teamMembership: prev?.teamMembership || [],
-        teamsAdvising: prev?.teamsAdvising || [],
-        role: prev?.role || '',
-        isExec: prev?.isExec || false,
-        moduleProgress: prev?.moduleProgress || [],
+        identifiers: {
+          userID: '',
+          accountEmail: '',
+          name: '',
+          gtID: '',
+          contactEmails: ['']
+        },
+        roles: {
+            role: '',
+            isAdmin: false
+        },
+        teams: {
+            teamMembership: [''],
+            teamsAdvising: ['']
+        },
+        moduleProgress: [{
+            moduleName: '',
+            percentComplete: 0.0,
+            isAssigned: false,
+            subsectionsComplete: []
+        }]
       };
 
       onApiInformationUpdate(updatedUserData);
@@ -262,14 +356,27 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     } else {
       // allow to write
       const temp: MemberInformation = {
-        gtID: value,
-        name: localUserData?.name || '', // Default value if null
-        email: localUserData?.email || [],
-        teamMembership: localUserData?.teamMembership || [],
-        teamsAdvising: localUserData?.teamsAdvising || [],
-        role: localUserData?.role || '',
-        isExec: localUserData?.isExec || false,
-        moduleProgress: localUserData?.moduleProgress || [],
+        identifiers: {
+          userID: '',
+          accountEmail: '',
+          name: '',
+          gtID: '',
+          contactEmails: ['']
+        },
+        roles: {
+            role: '',
+            isAdmin: false
+        },
+        teams: {
+            teamMembership: [''],
+            teamsAdvising: ['']
+        },
+        moduleProgress: [{
+            moduleName: '',
+            percentComplete: 0.0,
+            isAssigned: false,
+            subsectionsComplete: []
+        }]
       };
       setLocalUserData(temp);
       if (value.length === 9) {
@@ -287,14 +394,27 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     } else {
       // valid, send info
       const temp: MemberInformation = {
-        gtID: event.target.value,
-        name: localUserData?.name || '', // Default value if null
-        email: localUserData?.email || [],
-        teamMembership: localUserData?.teamMembership || [],
-        teamsAdvising: localUserData?.teamsAdvising || [],
-        role: localUserData?.role || '',
-        isExec: localUserData?.isExec || false,
-        moduleProgress: localUserData?.moduleProgress || [],
+        identifiers: {
+          userID: '',
+          accountEmail: '',
+          name: '',
+          gtID: '',
+          contactEmails: ['']
+        },
+        roles: {
+            role: '',
+            isAdmin: false
+        },
+        teams: {
+            teamMembership: [''],
+            teamsAdvising: ['']
+        },
+        moduleProgress: [{
+            moduleName: '',
+            percentComplete: 0.0,
+            isAssigned: false,
+            subsectionsComplete: []
+        }]
       };
       onApiInformationUpdate(temp);
     } 
@@ -302,45 +422,84 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: localUserData?.email || [],
-      teamMembership: event.target.value,
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
-      };
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
+    };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
   }
 
   const handleChangeUserTeamsAdvising = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: localUserData?.email || [],
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: event.target.value,
-      role: localUserData?.role || '',
-      isExec: localUserData?.isExec || false,
-      moduleProgress: localUserData?.moduleProgress || [],
-      };
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
+    };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
   }
 
   const handleChangeUserRole = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      gtID: localUserData?.gtID || '',
-      name: localUserData?.name || '',
-      email: localUserData?.email || [],
-      teamMembership: localUserData?.teamMembership || [],
-      teamsAdvising: localUserData?.teamsAdvising || [],
-      role: event.target.value,
-      isExec: event.target.value !== 'Member',
-      moduleProgress: [], // role is required, so set this here
-      };
+      identifiers: {
+        userID: '',
+        accountEmail: '',
+        name: '',
+        gtID: '',
+        contactEmails: ['']
+      },
+      roles: {
+          role: '',
+          isAdmin: false
+      },
+      teams: {
+          teamMembership: [''],
+          teamsAdvising: ['']
+      },
+      moduleProgress: [{
+          moduleName: '',
+          percentComplete: 0.0,
+          isAssigned: false,
+          subsectionsComplete: []
+      }]
+    };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
   }
@@ -376,7 +535,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     reason: AutocompleteChangeReason) => {
     const temp: TeamInformation = {
       teamName: localTeamData?.teamName || '',
-      advisors: newValue.map((user) => user.gtID),
+      advisors: newValue.map((user) => user.identifiers.gtID),
       membership: localTeamData?.membership || [],
     };
     setLocalTeamData(temp);
@@ -389,7 +548,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     const temp: TeamInformation = {
       teamName: localTeamData?.teamName || '',
       advisors: localTeamData?.advisors || [],
-      membership: newValue.map((user) => user.gtID),
+      membership: newValue.map((user) => user.identifiers.gtID),
     };
     setLocalTeamData(temp);
     onApiInformationUpdate(temp);
@@ -487,9 +646,9 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <Typography>Name (first and last)*:</Typography>
             <TextField 
               fullWidth 
-              value={localUserData?.name} 
+              value={localUserData?.identifiers.name} 
               onChange={handleChangeUserName} 
-              onBlur={() => handleUserNameBlur(localUserData?.name ?? '')} 
+              onBlur={() => handleUserNameBlur(localUserData?.identifiers.name ?? '')} 
               error={incorrectUserNameError}
               helperText={incorrectUserNameError ? 'User name must be provided' : ''}
               className='input-box'
@@ -499,9 +658,9 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <Typography>Primary Email*:</Typography>
             <TextField 
               fullWidth 
-              value={localUserData?.email[0] || ''} 
+              value={localUserData?.identifiers.contactEmails[0] || ''} 
               onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, 0)} 
-              onBlur={() => handleEmailBlur(localUserData?.email[0] ?? '', 0)}
+              onBlur={() => handleEmailBlur(localUserData?.identifiers.contactEmails[0] ?? '', 0)}
               error={emailErrors[0]}
               className='input-box'
               helperText={emailErrors[0] ? 'Entry must be in email format' : ''}
@@ -509,7 +668,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           </div>
           <div className='input-info-section'>
             <Typography>Other Email(s):</Typography>
-            {localUserData?.email.slice(1).map((email, index) => (
+            {localUserData?.identifiers.contactEmails.slice(1).map((email, index) => (
               <div className='other-email-section'>
                 <TextField 
                   key={index} 
@@ -540,7 +699,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             </Typography>
             <TextField 
               fullWidth 
-              value={localUserData?.gtID} 
+              value={localUserData?.identifiers.gtID} 
               onChange={handleChangeUserGtid} 
               error={incorrectGTIDValueError} 
               helperText={incorrectGTIDValueError ? 'Entry must be 9 numbers long.' : ''} 
@@ -552,7 +711,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <Typography>Team Membership*:</Typography>
             <FormControl fullWidth required className='input-box'>
               <Select
-                value={localUserData?.teamMembership}
+                value={localUserData?.teams.teamMembership}
                 onChange={handleChangeUserTeamMembership}
                 multiple
                 displayEmpty
@@ -583,7 +742,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               >
                 {teamsData.map((team) => (
                   <MenuItem key={team.teamName} value={team.teamName}>
-                    <Checkbox checked={localUserData?.teamMembership.includes(team.teamName)} />
+                    <Checkbox checked={localUserData?.teams.teamMembership.includes(team.teamName)} />
                     <ListItemText primary={team.teamName} />
                   </MenuItem>
                 ))}
@@ -594,7 +753,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <Typography>Teams Advising:</Typography>
             <FormControl fullWidth className='input-box'>
               <Select
-                value={localUserData?.teamsAdvising}
+                value={localUserData?.teams.teamsAdvising}
                 onChange={handleChangeUserTeamsAdvising}
                 multiple
                 displayEmpty
@@ -625,7 +784,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               >
                 {teamsData.map((team) => (
                   <MenuItem key={team.teamName} value={team.teamName}>
-                    <Checkbox checked={localUserData?.teamsAdvising.includes(team.teamName)} />
+                    <Checkbox checked={localUserData?.teams.teamsAdvising.includes(team.teamName)} />
                     <ListItemText primary={team.teamName} />
                   </MenuItem>
                 ))}
@@ -636,7 +795,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             <Typography>Role*:</Typography>
             <FormControl fullWidth className='input-box'>
               <Select 
-                value={localUserData?.role} 
+                value={localUserData?.roles.role} 
                 onChange={handleChangeUserRole} 
                 displayEmpty
                 MenuProps={{
@@ -674,8 +833,8 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           <Typography variant='h5'>Select a user account:</Typography>
           <FormControl className='select-autocomplete'>
             <Autocomplete
-              options={usersData.sort((a, b) => (a.name > b.name ? 1 : -1))}
-              getOptionLabel={(option) => option.name}
+              options={usersData.sort((a, b) => (a.identifiers.name > b.identifiers.name ? 1 : -1))}
+              getOptionLabel={(option) => option.identifiers.name}
               value={localUserData}
               onChange={(event, newValue) => {
                 if (newValue) {
@@ -683,18 +842,26 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   onApiInformationUpdate(newValue);
                 } else {
                   setLocalUserData({
-                    name: '',
-                    email: [''],
-                    gtID: '',
-                    teamMembership: [],
-                    teamsAdvising: [],
-                    role: '',
-                    isExec: false,
+                    identifiers: {
+                      userID: '',
+                      accountEmail: '',
+                      name: '',
+                      gtID: '',
+                      contactEmails: ['']
+                    },
+                    roles: {
+                        role: '',
+                        isAdmin: false
+                    },
+                    teams: {
+                        teamMembership: [''],
+                        teamsAdvising: ['']
+                    },
                     moduleProgress: [{
-                      moduleName: '',
-                      percentComplete: 0.0,
-                      isAssigned: false,
-                      subsectionsComplete: []
+                        moduleName: '',
+                        percentComplete: 0.0,
+                        isAssigned: false,
+                        subsectionsComplete: []
                     }]
                   });
                 }
@@ -707,8 +874,8 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                 />
               )}
               renderOption={(props, option) => (
-                <li {...props} key={option.gtID}>
-                  <Typography>{option.name}</Typography>
+                <li {...props} key={option.identifiers.gtID}>
+                  <Typography>{option.identifiers.name}</Typography>
                 </li>
               )}
             />
@@ -741,17 +908,17 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               <Autocomplete
                 multiple
                 options={usersData}
-                value={usersData.filter((user) => localTeamData?.membership.includes(user.gtID))}
+                value={usersData.filter((user) => localTeamData?.membership.includes(user.identifiers.gtID))}
                 onChange={handleChangeTeamMembership}
                 disableCloseOnSelect
                 PaperComponent={(props) => <StyledPaper {...props} />}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => option.identifiers.name}
                 renderInput={(params) => (
                   <TextField {...params} variant="outlined" placeholder={localTeamData?.membership.length === 0 ? "None Selected" : ''} />
                 )}
                 renderOption={(props, option, { selected }) => (
-                  <li {...props} key={option.gtID}>
-                    <ListItemText primary={option.name} />
+                  <li {...props} key={option.identifiers.gtID}>
+                    <ListItemText primary={option.identifiers.name} />
                   </li>
                 )}
                 renderTags={(selected) =>
@@ -762,7 +929,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((user) => (
-                        <Chip key={user.gtID} label={usersGTidMap[user.gtID] || user.gtID} />
+                        <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
                       ))}
                     </Box>
                   )
@@ -776,17 +943,17 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               <Autocomplete
                 multiple
                 options={usersData}
-                value={usersData.filter((user) => localTeamData?.advisors.includes(user.gtID))}
+                value={usersData.filter((user) => localTeamData?.advisors.includes(user.identifiers.name))}
                 onChange={handleChangeTeamAdvisors}
                 disableCloseOnSelect
                 PaperComponent={(props) => <StyledPaper {...props} />}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => option.identifiers.name}
                 renderInput={(params) => (
                   <TextField {...params} variant="outlined" placeholder={localTeamData?.advisors.length === 0 ? "None Selected" : ''} />
                 )}
                 renderOption={(props, option, { selected }) => (
-                  <li {...props} key={option.gtID}>
-                    <ListItemText primary={option.name} />
+                  <li {...props} key={option.identifiers.name}>
+                    <ListItemText primary={option.identifiers.name} />
                   </li>
                 )}
                 renderTags={(selected) =>
@@ -797,7 +964,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   ) : (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((user) => (
-                        <Chip key={user.gtID} label={usersGTidMap[user.gtID] || user.gtID} />
+                        <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
                       ))}
                     </Box>
                   )
@@ -1054,24 +1221,24 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
           <div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Name:</Typography>
-              <Typography className='indent'>{localUserData?.name}</Typography>
+              <Typography className='indent'>{localUserData?.identifiers.name}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>GTID:</Typography>
-              <Typography className='indent'>{localUserData?.gtID}</Typography>
+              <Typography className='indent'>{localUserData?.identifiers.gtID}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Primary email:</Typography>
-              <Typography className='indent'>{localUserData?.email[0]}</Typography>
+              <Typography className='indent'>{localUserData?.identifiers.contactEmails[0]}</Typography>
             </div>
 
-            {(localUserData?.email && localUserData?.email.length > 1) &&
+            {(localUserData?.identifiers.contactEmails && localUserData?.identifiers.contactEmails.length > 1) &&
               <div className='confirm-section'>
                 <Typography variant="h6" className='italics'>Other emails:</Typography>
-                  {localUserData?.email.map((_email, index) => {
+                  {localUserData?.identifiers.contactEmails.map((_email, index) => {
                     if (index > 0) {
                       return (
-                        <Typography className='indent' key={index}>{localUserData?.email[index]}</Typography>
+                        <Typography className='indent' key={index}>{localUserData?.identifiers.contactEmails[index]}</Typography>
                       )
                     }
                   })}
@@ -1079,15 +1246,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             }
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Team:</Typography>
-              <Typography className='indent'>{localUserData?.teamMembership}</Typography>
+              <Typography className='indent'>{localUserData?.teams.teamMembership}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Teams advising:</Typography>
-              <Typography className='indent'>{(localUserData?.teamsAdvising && localUserData?.teamsAdvising.length > 1) ? localUserData?.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
+              <Typography className='indent'>{(localUserData?.teams.teamsAdvising && localUserData?.teams.teamsAdvising.length > 1) ? localUserData?.teams.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Role:</Typography>
-              <Typography className='indent'>{localUserData?.role}</Typography>
+              <Typography className='indent'>{localUserData?.roles.role}</Typography>
             </div>
           </div>
         </div>

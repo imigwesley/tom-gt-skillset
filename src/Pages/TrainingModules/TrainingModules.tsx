@@ -7,9 +7,9 @@ import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import membersSample from '../../SampleData/MembersSample';
-import { ModuleProgress, ModuleInformation } from '../../Types/types';
+import { ModuleProgress, ModuleInformation, PageProps } from '../../Types/types';
 
-const TrainingModulesPage = () => {
+const TrainingModulesPage = ({user}: PageProps) => {
 
   const { moduleName } = useParams();
   const [module, setModule] = useState<ModuleInformation>({
