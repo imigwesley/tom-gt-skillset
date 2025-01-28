@@ -2,7 +2,6 @@ import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl,
 import './AdminModalContent.scss';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import modulesSample from '../../SampleData/ModulesSample';
-import membersSample from '../../SampleData/MembersSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import Checkbox from '@mui/material/Checkbox';
@@ -125,7 +124,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   }];
 
   useEffect(() => {
-    console.log('here too, ', passedApiInformation);
+    // console.log('here too, ', passedApiInformation);
     if (passedApiInformation.users) {
       setUsersGTidMap(passedApiInformation?.users.reduce((acc: {[key: string]: string}, member) => {
         acc[member.identifiers.gtID] = member.identifiers.name;

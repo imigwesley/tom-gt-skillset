@@ -6,11 +6,12 @@ import './TrainingModules.scss';
 import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import modulesSample from '../../SampleData/ModulesSample';
-import membersSample from '../../SampleData/MembersSample';
 import { ModuleProgress, ModuleInformation, PageProps } from '../../Types/types';
+import { getSingleUserData } from '../../utils/userApi';
 
-const TrainingModulesPage = ({user}: PageProps) => {
+const TrainingModulesPage = ({loggedInUser}: PageProps) => {
 
+  const currUser = getSingleUserData(loggedInUser?.userId);
   const { moduleName } = useParams();
   const [module, setModule] = useState<ModuleInformation>({
     moduleName: '',
@@ -41,7 +42,7 @@ const TrainingModulesPage = ({user}: PageProps) => {
         const curr = module.subsections[0];
         setCurrSubsection(curr);
         setSubsectionHtml(subSectionsSample.find((subsection) => subsection.subsectionName === curr)?.subsectionHtml || '');
-        setMemberProgress(membersSample[0].moduleProgress);
+        setMemberProgress(currUser.moduleProgress);
         setIsLoading(false);
       }, 300)
     };
@@ -67,9 +68,9 @@ const TrainingModulesPage = ({user}: PageProps) => {
           <div className='module-page-container'>
               <div className='background-card'>
                 <Typography variant='h4'>{moduleName}</Typography>
-                {subsections.map((subsection) => {
+                {subsections.map((subsection, index) => {
                   return (
-                    <div onClick={() => handleSubsectionClick(subsection)}>
+                    <div key={index} onClick={() => handleSubsectionClick(subsection)}>
                       <SubsectionLink 
                         isCurrent={currSubsection === subsection} 
                         isCompleted={memberProgress.find((curr) => curr.moduleName === moduleName)?.subsectionsComplete.includes(subsection) ? true : false} 

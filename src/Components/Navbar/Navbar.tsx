@@ -4,11 +4,13 @@ import './Navbar.scss';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NavbarProps } from '../../Types/types';
+import { getSingleUserData } from '../../utils/userApi';
 
-const Navbar = ({user, signOutFunction}: NavbarProps) => {
+const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
+  const user = getSingleUserData(loggedInUser.userId);
 
-  const initials = 'WI';
-  const isAdmin = true;
+  const initials = user?.identifiers.name.split(" ").map((n)=>n[0]).join('');
+  const isAdmin = user?.roles.isAdmin;
 
   const navigate = useNavigate();
 

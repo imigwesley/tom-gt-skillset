@@ -18,6 +18,15 @@
       },
       "storage": {
         "UserData": {}
+      },
+      "function": {
+        "getUserDataFunction": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-fd347-deployment",
+          "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
+        }
+      },
+      "api": {
+        "userApi": {}
       }
     }
   }

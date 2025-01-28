@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import './Members.scss';
-import { Avatar, Button, ButtonGroup, Typography } from '@mui/material';
-import members from '../../SampleData/MembersSample';
+import { Button, ButtonGroup, Typography } from '@mui/material';
 import MemberInfoCard from '../../Components/MemberInfoCard/MemberInfoCard';
-import { Alphabetically, ByRole, ByTeam } from '../../Types/types';
+import { Alphabetically, ByRole, ByTeam, MemberInformation } from '../../Types/types';
+import { getAllUsersData } from '../../utils/userApi';
 
 const MembersPage = () => {
   enum SORT_TYPE {
@@ -14,7 +14,7 @@ const MembersPage = () => {
 
   // TODO: replace these with api calls
   const [teams, setTeams] = useState(['CAD', 'Engineering', 'Design', 'Operations', 'Marketing'])
-  const allMembers = members;
+  const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
 
   const [membersByRole, setMembersByRole] = useState<ByRole>({'officers': [], 'members': []});
   const [membersByTeam, setMembersByTeam] = useState<ByTeam[]>([{'team': '', 'members': [], 'advisors': []}]);
@@ -22,10 +22,12 @@ const MembersPage = () => {
   const [sortType, setSortType] = useState(SORT_TYPE.ROLE);
 
   useEffect(() => {
-    // group members by role
+    const tempAllUsers = getAllUsersData();
+    setAllUsers(tempAllUsers);
+
     const tempByRole = {
-      'officers': allMembers.filter((member) => member.roles.isAdmin === true),
-      'members': allMembers.filter((member) => member.roles.isAdmin === false).sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1),
+      'officers': tempAllUsers?.filter((member) => member.roles.isAdmin === true) || [],
+      'members': tempAllUsers?.filter((member) => member.roles.isAdmin === false).sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1) || [],
     };
     setMembersByRole(tempByRole);
 
@@ -35,8 +37,8 @@ const MembersPage = () => {
       tempByTeam.push(
         {
           'team': team,
-          'members': allMembers.filter((member) => member.teams.teamMembership.includes(team)),
-          'advisors': allMembers.filter((member) => member.teams.teamsAdvising.includes(team))
+          'members': tempAllUsers?.filter((member) => member.teams.teamMembership.includes(team)) || [],
+          'advisors': tempAllUsers?.filter((member) => member.teams.teamsAdvising.includes(team)) || []
         }
       );
     });
@@ -48,13 +50,13 @@ const MembersPage = () => {
     alphabet.forEach((letter) => {
       const tempArr = {
         'letter': letter,
-        'members': allMembers.filter((member) => member.identifiers.name[0].toLowerCase() === letter)
+        'members': tempAllUsers?.filter((member) => member.identifiers.name[0].toLowerCase() === letter) || []
       }
       if (tempArr.members.length > 0) {tempAlphabetically.push(tempArr);}
     });
     setMembersAlphabetically(tempAlphabetically);
 
-
+    console.log('finished sorting')
     console.log(membersByRole);
     console.log(membersByTeam);
     console.log(membersAlphabetically);
@@ -84,7 +86,7 @@ const MembersPage = () => {
             <div>
               {membersByRole.officers.map((member, index) => {
                 return (
-                  <MemberInfoCard key={index} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
+                  <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
                 )
               })}
             </div>
@@ -92,7 +94,7 @@ const MembersPage = () => {
             <div>
               {membersByRole.members.map((member, index) => {
                 return (
-                  <MemberInfoCard key={index} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
+                  <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
                 )
               })}
             </div>
@@ -107,7 +109,7 @@ const MembersPage = () => {
                   <div style={{borderRadius: '5px'}} id='wesley'>
                     {team.members.map((member, index) => {
                       return (
-                        <MemberInfoCard key={index} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === team.members.length - 1}/>
+                        <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === team.members.length - 1}/>
                       )
                     })}
                   </div>
@@ -120,12 +122,12 @@ const MembersPage = () => {
             <div className='lettergroups-container'>
               {membersAlphabetically.map((letterGroup, index) => {
                 return (
-                  <div key={index}>
+                  <div key={letterGroup.letter}>
                     <Typography variant='h3'>{letterGroup.letter.toUpperCase()}</Typography>
                     <div>
                       {letterGroup.members.map((member, index) => {
                         return (
-                          <MemberInfoCard key={index} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === letterGroup.members.length - 1}/>
+                          <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === letterGroup.members.length - 1}/>
                         )
                       })}
                     </div>
@@ -136,8 +138,6 @@ const MembersPage = () => {
           </div>
           }
         </div>
-        
-        
       </div>
     );
   };

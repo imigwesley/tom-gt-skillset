@@ -1,6 +1,6 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
-import { Ref } from "react";
+import { ReactNode } from "react";
 
 export enum ModalPages {
     NULL,
@@ -112,20 +112,13 @@ export interface NameGTidMap {
 }
 
 export interface PageProps {
-    user: AuthUser | undefined
+    loggedInUser: AuthUser | undefined
 }
 
 export interface NavbarProps {
     signOutFunction: ((data?: AuthEventData | undefined) => void) | undefined,
-    user: AuthUser | undefined
+    loggedInUser: AuthUser
 }
-
-export interface LayoutProps {
-    children: React.ReactNode,
-    signOutFunction: ((data?: AuthEventData | undefined) => void) | undefined,
-    user: AuthUser | undefined
-}
-
 
 export interface ByRole {
     members: MemberInformation[],
@@ -148,4 +141,9 @@ export interface MemberCardProps {
     isEven: boolean,
     isFirst: boolean,
     isLast: boolean
+}
+
+export interface UserProviderProps {
+    children: ReactNode,
+    authUser: AuthUser | undefined
 }

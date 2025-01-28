@@ -4,15 +4,16 @@ import { useEffect, useState } from 'react';
 import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
 import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation, PageProps } from '../../Types/types';
-import membersSample from '../../SampleData/MembersSample';
+// import membersSample from '../../SampleData/MembersSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { signUp } from 'aws-amplify/auth';
+import { getAllUsersData } from '../../utils/userApi';
 
 
 
-const AdminPage = ({user}: PageProps) => {
+const AdminPage = () => {
 
   // enum for each api call on the page
   enum Operations {
@@ -30,8 +31,6 @@ const AdminPage = ({user}: PageProps) => {
     EDIT_MODULE,
     DELETE_MODULE
   };
-
-  // enum for each page within the operation
 
   // mapping of which pages are needed to do each operation
   const stepSets: Record<Operations, ModalPages[]> = {
@@ -74,6 +73,7 @@ const AdminPage = ({user}: PageProps) => {
     team: undefined
   });
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
+  const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
 
   const isDataValid = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
@@ -365,20 +365,21 @@ const AdminPage = ({user}: PageProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setTimeout(() => {
-        const _users = membersSample;
-        const _teams = teamsSample;
-        const _modules = modulesSample;
-        const _subsections = subSectionsSample;
+      const tempAllUsers = getAllUsersData();
+      setAllUsers(tempAllUsers);
 
-        let temp: ApiReceiveInformation = {
-          users: _users,
-          teams: _teams,
-          modules: _modules,
-          subsections: _subsections
-        }
-        setApiDataReceived(temp);
-      }, 300);
+      const _users = tempAllUsers;
+      const _teams = teamsSample;
+      const _modules = modulesSample;
+      const _subsections = subSectionsSample;
+
+      let temp: ApiReceiveInformation = {
+        users: _users,
+        teams: _teams,
+        modules: _modules,
+        subsections: _subsections
+      }
+      setApiDataReceived(temp);
     };
 
     fetchData();
