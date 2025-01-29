@@ -118,7 +118,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
           <div className='module-card-container'>
             {personalProgress.modules.map((module, index) => {
               return (
-                <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
+                <Card className={`module-card ${module.isAssigned ? 'assigned' : ''}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
                   <CardMedia
                     className='module-image'
                     image={module.imageURL}

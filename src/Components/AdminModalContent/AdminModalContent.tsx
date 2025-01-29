@@ -50,15 +50,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: ['']
+      contactEmails: []
     },
     roles: {
         role: '',
         isAdmin: false
     },
     teams: {
-        teamMembership: [''],
-        teamsAdvising: ['']
+        teamMembership: [],
+        teamsAdvising: []
     },
     moduleProgress: [{
         moduleName: '',
@@ -95,15 +95,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: ['']
+      contactEmails: []
     },
     roles: {
         role: '',
         isAdmin: false
     },
     teams: {
-        teamMembership: [''],
-        teamsAdvising: ['']
+        teamMembership: [],
+        teamsAdvising: []
     },
     moduleProgress: [{
         moduleName: '',
@@ -144,29 +144,23 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     if (name === '') {
       setIncorrectUserNameError(true);
     }
-
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: localUserData?.identifiers.accountEmail || '',
+        name: name,
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: localUserData?.identifiers.contactEmails || []
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
     onApiInformationUpdate(temp);
   }
@@ -178,26 +172,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     }
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: localUserData?.identifiers.accountEmail || '',
+        name: _name,
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: localUserData?.identifiers.contactEmails || []
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
     
     setLocalUserData(temp);
@@ -218,26 +207,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: newEmails[0],
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: newEmails
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
 
     setLocalUserData(temp);
@@ -256,26 +240,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       newEmails[index] = email;
       const temp: MemberInformation = {
         identifiers: {
-          userID: '',
-          accountEmail: '',
-          name: '',
-          gtID: '',
-          contactEmails: ['']
+          userID: localUserData?.identifiers.userID || '',
+          accountEmail: newEmails[0],
+          name: localUserData?.identifiers.name || '',
+          gtID: localUserData?.identifiers.gtID || '',
+          contactEmails: newEmails
         },
         roles: {
-            role: '',
-            isAdmin: false
+            role: localUserData?.roles.role || '',
+            isAdmin: localUserData?.roles.isAdmin || false
         },
         teams: {
-            teamMembership: [''],
-            teamsAdvising: ['']
+            teamMembership: localUserData?.teams.teamMembership || [],
+            teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: [{
-            moduleName: '',
-            percentComplete: 0.0,
-            isAssigned: false,
-            subsectionsComplete: []
-        }]
+        moduleProgress: localUserData?.moduleProgress || []
       };
       onApiInformationUpdate(temp);
     }    
@@ -288,26 +267,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: newEmails[0],
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: newEmails
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
 
     setLocalUserData(temp);
@@ -317,32 +291,27 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   const handleOpenNewEmailTextField = () => {
     setLocalUserData((prev) => {
       const newEmails = [...(prev?.identifiers.contactEmails || []), ''];
-      const updatedUserData: MemberInformation = {
+      const temp: MemberInformation = {
         identifiers: {
-          userID: '',
-          accountEmail: '',
-          name: '',
-          gtID: '',
-          contactEmails: ['']
+          userID: localUserData?.identifiers.userID || '',
+          accountEmail: newEmails[0],
+          name: localUserData?.identifiers.name || '',
+          gtID: localUserData?.identifiers.gtID || '',
+          contactEmails: newEmails
         },
         roles: {
-            role: '',
-            isAdmin: false
+            role: localUserData?.roles.role || '',
+            isAdmin: localUserData?.roles.isAdmin || false
         },
         teams: {
-            teamMembership: [''],
-            teamsAdvising: ['']
+            teamMembership: localUserData?.teams.teamMembership || [],
+            teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: [{
-            moduleName: '',
-            percentComplete: 0.0,
-            isAssigned: false,
-            subsectionsComplete: []
-        }]
+        moduleProgress: localUserData?.moduleProgress || []
       };
 
-      onApiInformationUpdate(updatedUserData);
-      return updatedUserData;
+      onApiInformationUpdate(temp);
+      return temp;
     });
   };
 
@@ -356,26 +325,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       // allow to write
       const temp: MemberInformation = {
         identifiers: {
-          userID: '',
-          accountEmail: '',
-          name: '',
-          gtID: '',
-          contactEmails: ['']
+          userID: localUserData?.identifiers.userID || '',
+          accountEmail: localUserData?.identifiers.accountEmail || '',
+          name: localUserData?.identifiers.name || '',
+          gtID: event.target.value,
+          contactEmails: localUserData?.identifiers.contactEmails || []
         },
         roles: {
-            role: '',
-            isAdmin: false
+            role: localUserData?.roles.role || '',
+            isAdmin: localUserData?.roles.isAdmin || false
         },
         teams: {
-            teamMembership: [''],
-            teamsAdvising: ['']
+            teamMembership: localUserData?.teams.teamMembership || [],
+            teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: [{
-            moduleName: '',
-            percentComplete: 0.0,
-            isAssigned: false,
-            subsectionsComplete: []
-        }]
+        moduleProgress: localUserData?.moduleProgress || []
       };
       setLocalUserData(temp);
       if (value.length === 9) {
@@ -394,26 +358,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       // valid, send info
       const temp: MemberInformation = {
         identifiers: {
-          userID: '',
-          accountEmail: '',
-          name: '',
-          gtID: '',
-          contactEmails: ['']
+          userID: localUserData?.identifiers.userID || '',
+          accountEmail: localUserData?.identifiers.accountEmail || '',
+          name: localUserData?.identifiers.name || '',
+          gtID: event.target.value,
+          contactEmails: localUserData?.identifiers.contactEmails || []
         },
         roles: {
-            role: '',
-            isAdmin: false
+            role: localUserData?.roles.role || '',
+            isAdmin: localUserData?.roles.isAdmin || false
         },
         teams: {
-            teamMembership: [''],
-            teamsAdvising: ['']
+            teamMembership: localUserData?.teams.teamMembership || [],
+            teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: [{
-            moduleName: '',
-            percentComplete: 0.0,
-            isAssigned: false,
-            subsectionsComplete: []
-        }]
+        moduleProgress: localUserData?.moduleProgress || []
       };
       onApiInformationUpdate(temp);
     } 
@@ -422,26 +381,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: localUserData?.identifiers.accountEmail || '',
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: localUserData?.identifiers.contactEmails || []
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: event.target.value,
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -450,26 +404,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   const handleChangeUserTeamsAdvising = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: localUserData?.identifiers.accountEmail || '',
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: localUserData?.identifiers.contactEmails || []
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: event.target.value
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -478,26 +427,21 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   const handleChangeUserRole = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
       identifiers: {
-        userID: '',
-        accountEmail: '',
-        name: '',
-        gtID: '',
-        contactEmails: ['']
+        userID: localUserData?.identifiers.userID || '',
+        accountEmail: localUserData?.identifiers.accountEmail || '',
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        contactEmails: localUserData?.identifiers.contactEmails || []
       },
       roles: {
-          role: '',
-          isAdmin: false
+          role: event.target.value,
+          isAdmin: event.target.value !== 'Member'
       },
       teams: {
-          teamMembership: [''],
-          teamsAdvising: ['']
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: [{
-          moduleName: '',
-          percentComplete: 0.0,
-          isAssigned: false,
-          subsectionsComplete: []
-      }]
+      moduleProgress: localUserData?.moduleProgress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -846,15 +790,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                       accountEmail: '',
                       name: '',
                       gtID: '',
-                      contactEmails: ['']
+                      contactEmails: []
                     },
                     roles: {
                         role: '',
                         isAdmin: false
                     },
                     teams: {
-                        teamMembership: [''],
-                        teamsAdvising: ['']
+                        teamMembership: [],
+                        teamsAdvising: []
                     },
                     moduleProgress: [{
                         moduleName: '',

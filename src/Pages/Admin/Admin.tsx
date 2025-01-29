@@ -1,57 +1,15 @@
 import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, Divider, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import './Admin.scss';
 import { useEffect, useState } from 'react';
-import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation, PageProps } from '../../Types/types';
-// import membersSample from '../../SampleData/MembersSample';
+import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, Operations, StepSets, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
 import teamsSample from '../../SampleData/TeamsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { signUp } from 'aws-amplify/auth';
-import { getAllUsersData } from '../../utils/userApi';
-
-
+import { getAllUsersData, createSingleUserData, updateSingleUserData } from '../../utils/userApi';
 
 const AdminPage = () => {
-
-  // enum for each api call on the page
-  enum Operations {
-    NULL,
-    ADD_USER,
-    EDIT_USER,
-    DELETE_USER,
-    ADD_TEAM,
-    EDIT_TEAM,
-    DELETE_TEAM,
-    ADD_SUBSECTION,
-    EDIT_SUBSECTION,
-    DELETE_SUBSECTION,
-    ADD_MODULE,
-    EDIT_MODULE,
-    DELETE_MODULE
-  };
-
-  // mapping of which pages are needed to do each operation
-  const stepSets: Record<Operations, ModalPages[]> = {
-    [Operations.NULL]: [ModalPages.NULL],
-    [Operations.ADD_USER]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
-    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
-    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE_USER],
-  
-    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
-    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
-    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE_TEAM],
-  
-    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
-    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
-    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE_SUBSECTION],
-  
-    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
-    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
-    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE_MODULE],
-  };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [currentOperation, setCurrentOperation] = useState<Operations>(Operations.NULL);
@@ -79,7 +37,7 @@ const AdminPage = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
     // console.log(apiDataToSend)
-    // console.log('validating user: ', apiDataToSend.user)
+    console.log('validating user: ', apiDataToSend.user)
     // console.log('validating team: ', apiDataToSend.team)
     // console.log('validating module: ', apiDataToSend.module)
     // console.log('validating image ', imageFile);
@@ -131,7 +89,7 @@ const AdminPage = () => {
   }
 
   const handleNext = async () => {
-    if (activeStep === stepSets[currentOperation].length - 1) {
+    if (activeStep === StepSets[currentOperation].length - 1) {
       // submit button
       handleCloseModal();
       setIsWaitingOnApi(true);
@@ -147,8 +105,20 @@ const AdminPage = () => {
           console.log('add new user submit');
           try {
             const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
-            if (!acctEmail) throw new Error;
-            const createdUserId = await createUserInUserPool(acctEmail); // add props to this function
+            if (!acctEmail || !apiDataToSend.user) throw new Error;
+            const createdUserId = await createUserInUserPool(acctEmail);
+            // const createdUserId = 'test';
+            console.log('to send', apiDataToSend)
+            const correctedUser = {
+              ...apiDataToSend.user, 
+              identifiers: {
+                ...apiDataToSend?.user?.identifiers,
+                userID: createdUserId,
+                accountEmail: acctEmail
+              }
+            };
+            console.log('corrected is',correctedUser);
+            const response = await createSingleUserData(apiDataToSend?.user);
             // create record in db with information from frontend
           } catch (exception) {
             console.log('exception!!', exception);
@@ -160,6 +130,7 @@ const AdminPage = () => {
         case Operations.EDIT_USER:
           console.log('edit user submit');
           // edit record in db with information from frontend
+          console.log('to send', apiDataToSend)
           // based on db response, show/hide info spinner
 
           break;
@@ -267,7 +238,7 @@ const AdminPage = () => {
       // if (isneedingvalidation and isnotvalid) setErr
       // else if ((isneedingvalidation and isvalid) or (not needing validation)) move forward
       // console.log('is data valid?? ', isDataValid())
-      // console.log('current page is ', stepSets[currentOperation][activeStep])
+      // console.log('current page is ', StepSets[currentOperation][activeStep])
       const infoInputPages = [ModalPages.EDIT_MODULE, 
         ModalPages.EDIT_SUBSECTION, 
         ModalPages.EDIT_TEAM, 
@@ -277,10 +248,10 @@ const AdminPage = () => {
         ModalPages.SELECT_TEAM, 
         ModalPages.SELECT_USER
       ];
-      console.log(activeStep)
+      console.log('active step is: ', activeStep);
 
 
-      if (infoInputPages.includes(stepSets[currentOperation][activeStep]) && !isDataValid()) {
+      if (infoInputPages.includes(StepSets[currentOperation][activeStep]) && !isDataValid()) {
         // if current step is something where information has to be input and information is invalid, throw err
         // console.log('error')
         setInvalidapiDataToSend(true);
@@ -522,7 +493,7 @@ const AdminPage = () => {
         >
           <Box className={'modal'}>
             <Stepper activeStep={activeStep} className='modal-stepper'>
-              {stepSets[currentOperation].map((label) => (
+              {StepSets[currentOperation].map((label) => (
                 <Step key={label}>
                   <StepLabel/>
                 </Step>
@@ -530,7 +501,7 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <AdminModalContent page={stepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
+                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
                 </div>
                 {invalidapiDataToSend && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>
@@ -551,7 +522,7 @@ const AdminPage = () => {
                     Back
                   </Button>
                   <Button onClick={handleNext} className='proceed-button'>
-                    {activeStep === stepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
+                    {activeStep === StepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
                   </Button>
                 </div>
 

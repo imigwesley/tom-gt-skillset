@@ -8,7 +8,7 @@ const membersSample = [
       "contactEmails": ["wesley.imiggatec", "wimig@gmail.com", "imig.wa03@gmail.com"]
     },
     "roles": {
-      "role": "president",
+      "role": "President",
       "isAdmin": true
     },
     "teams": {
@@ -33,7 +33,7 @@ const membersSample = [
       "contactEmails": ["sarah.lee@gatech.edu", "slee12@gmail.com"]
     },
     "roles": {
-      "role": "vice president",
+      "role": "Vice President",
       "isAdmin": true
     },
     "teams": {
@@ -58,7 +58,7 @@ const membersSample = [
       "contactEmails": ["john.doe@gatech.edu", "johndoe123@gmail.com"]
     },
     "roles": {
-      "role": "treasurer",
+      "role": "Treasurer",
       "isAdmin": true
     },
     "teams": {
@@ -83,7 +83,7 @@ const membersSample = [
       "contactEmails": ["emily.clark@gatech.edu", "emclark456@gmail.com"]
     },
     "roles": {
-      "role": "secretary",
+      "role": "Secretary",
       "isAdmin": true
     },
     "teams": {
@@ -108,7 +108,7 @@ const membersSample = [
       "contactEmails": ["jake.miller@gatech.edu", "jakemill678@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -133,7 +133,7 @@ const membersSample = [
       "contactEmails": ["jessica.green@gatech.edu", "greenjessica@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -158,7 +158,7 @@ const membersSample = [
       "contactEmails": ["david.kim@gatech.edu", "davidk789@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -183,7 +183,7 @@ const membersSample = [
       "contactEmails": ["laura.adams@gatech.edu", "ladams234@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -208,7 +208,7 @@ const membersSample = [
       "contactEmails": ["michael.scott@gatech.edu", "mscott999@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -233,7 +233,7 @@ const membersSample = [
       "contactEmails": ["olivia.white@gatech.edu", "owhite123@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -258,7 +258,7 @@ const membersSample = [
       "contactEmails": ["ethan.brown@gatech.edu", "ebrown444@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -283,7 +283,7 @@ const membersSample = [
       "contactEmails": ["jacob.morris@gatech.edu", "jmorris111@gmail.com"]
     },
     "roles": {
-      "role": "member",
+      "role": "Member",
       "isAdmin": false
     },
     "teams": {
@@ -308,7 +308,7 @@ const membersSample = [
         "contactEmails": ["sophie.davis@gatech.edu", "sophie.d@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -333,7 +333,7 @@ const membersSample = [
         "contactEmails": ["chris.johnson@gatech.edu", "chrisjohndoe@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -358,7 +358,7 @@ const membersSample = [
         "contactEmails": ["brianna.smith@gatech.edu", "briannasmith93@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -383,7 +383,7 @@ const membersSample = [
         "contactEmails": ["kelly.williams@gatech.edu", "kellywilliams@yahoo.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -408,7 +408,7 @@ const membersSample = [
         "contactEmails": ["william.martinez@gatech.edu", "wmartinez789@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -433,7 +433,7 @@ const membersSample = [
         "contactEmails": ["natalie.jones@gatech.edu", "nataliejones333@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -458,7 +458,7 @@ const membersSample = [
         "contactEmails": ["samuel.wilson@gatech.edu", "samuelw@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -483,7 +483,7 @@ const membersSample = [
         "contactEmails": ["lauren.lee@gatech.edu", "laurenlee6789@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -508,7 +508,7 @@ const membersSample = [
         "contactEmails": ["jackson.martinez@gatech.edu", "jacksonm10@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -533,7 +533,7 @@ const membersSample = [
         "contactEmails": ["hannah.martinez@gatech.edu", "hannahm@xyz.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -558,7 +558,7 @@ const membersSample = [
         "contactEmails": ["chloe.smith@gatech.edu", "chloesmith999@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -583,7 +583,7 @@ const membersSample = [
         "contactEmails": ["james.brown@gatech.edu", "jamesbrown12@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {
@@ -608,7 +608,7 @@ const membersSample = [
         "contactEmails": ["isabelle.white@gatech.edu", "isabwhite@gmail.com"]
       },
       "roles": {
-        "role": "member",
+        "role": "Member",
         "isAdmin": false
       },
       "teams": {

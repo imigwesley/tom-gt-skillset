@@ -1,5 +1,6 @@
-import { get } from 'aws-amplify/api';
+import { get, post, put } from 'aws-amplify/api';
 import membersSample from "../SampleData/MembersSample";
+import { MemberInformation } from '../Types/types';
 
 
 export function getAllUsersData() {
@@ -62,3 +63,38 @@ export function getSingleUserData(givenId: string | undefined) {
     return placeholder;
 };
 
+export async function createSingleUserData(userData: MemberInformation) {
+    try {
+        const restOperation = post({
+            apiName: 'userApi',
+            path: '/userApi/',
+            options: {
+                body: JSON.stringify(userData),
+                headers: { 'Content-Type': 'application/json' }
+            }
+        });
+        const response = await restOperation.response;
+        console.log('Single user: ', response);
+        return response;
+    } catch (e) {
+        console.log('create single user call failed: ', e);
+    }
+}
+
+export async function updateSingleUserData(userData: MemberInformation) {
+    try {
+        const restOperation = put({
+            apiName: 'userApi',
+            path: `/userApi/${userData.identifiers.userID}`,
+            options: {
+                body: JSON.stringify(userData),
+                headers: { 'Content-Type': 'application/json' }
+            }
+        });
+        const response = await restOperation.response;
+        console.log('Single user: ', response);
+        return response;
+    } catch (e) {
+        console.log('update single user call failed: ', e);
+    }
+}

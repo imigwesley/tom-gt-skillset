@@ -26,6 +26,7 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
 
 
 
+
   useEffect(() => {
     const fetchData = async () => {
       // Simulating API calls
@@ -80,6 +81,7 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
                   );
                 })}
               </div>
+              
               <div className='module-container background-card'>
                 <Typography variant='h3'>{currSubsection}</Typography>
                 <Divider variant='middle' />

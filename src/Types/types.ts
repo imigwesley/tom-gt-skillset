@@ -20,7 +20,41 @@ export enum ModalPages {
     CONFIRM_DELETE_MODULE,
     CONFIRM_DELETE_SUBSECTION,
     CONFIRM_DELETE_TEAM,
-    
+};
+
+export enum Operations {
+    NULL,
+    ADD_USER,
+    EDIT_USER,
+    DELETE_USER,
+    ADD_TEAM,
+    EDIT_TEAM,
+    DELETE_TEAM,
+    ADD_SUBSECTION,
+    EDIT_SUBSECTION,
+    DELETE_SUBSECTION,
+    ADD_MODULE,
+    EDIT_MODULE,
+    DELETE_MODULE
+};
+
+export const StepSets: Record<Operations, ModalPages[]> = {
+    [Operations.NULL]: [ModalPages.NULL],
+    [Operations.ADD_USER]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
+    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
+    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE_USER],
+  
+    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
+    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
+    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE_TEAM],
+  
+    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
+    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
+    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE_SUBSECTION],
+  
+    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
+    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
+    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE_MODULE],
 };
 
 export interface ModuleProgress {
