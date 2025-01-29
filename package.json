@@ -15,7 +15,7 @@
     "@types/node": "^16.18.108",
     "@types/react": "^18.3.7",
     "@types/react-dom": "^18.3.0",
-    "aws-amplify": "^6.6.2",
+    "aws-amplify": "^6.12.1",
     "axios": "^1.7.7",
     "clsx": "^2.1.1",
     "mui": "^0.0.1",

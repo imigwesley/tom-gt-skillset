@@ -11,11 +11,12 @@ import Navbar from './Components/Navbar/Navbar';
 import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
 import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
-import { Authenticator, useAuthenticator, useTheme, Button, Heading, Text, View, Image } from '@aws-amplify/ui-react';
+import { Authenticator, useAuthenticator, useTheme, Button, Heading, View, Image } from '@aws-amplify/ui-react';
 import { Amplify } from 'aws-amplify';
 import awsmobile from './aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
+
 
 // Configure Amplify with the generated outputs
 Amplify.configure(awsmobile);
@@ -53,60 +54,62 @@ const components = {
   },
 };
 
-// Custom form fields for Authenticator (email and password only for sign-in)
 const formFields = {
   signIn: {
     username: {
-      placeholder: 'Enter your email', // Only email required for sign-in
+      placeholder: 'Enter your email',
     },
     password: {
-      label: 'Password:', // Password field
+      label: 'Password:',
       placeholder: 'Enter your password',
     },
   },
 };
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const App = () => {
+
+  return (
+    <div className="App">
+       <ThemeProvider theme={tomTheme}>
+         <BrowserRouter>
+            <Authenticator components={components} formFields={formFields} hideSignUp>
+              {({ signOut, user }) => (
+                <AppContent
+                  signOut={signOut}
+                  loggedUser={user}
+                />
+              )}
+            </Authenticator>
+          </BrowserRouter>
+       </ThemeProvider>
+     </div>
+  );
+};
+
+const AppContent = ({ signOut, loggedUser }: any) => {
   const location = useLocation();
-  const hideNavbarPaths = ['/login'];
+  const hideNavbarPaths = ["/login"];
 
   return (
     <>
-      {!hideNavbarPaths.includes(location.pathname) && <Navbar />}
-      <div className="main-body">{children}</div>
+      {!hideNavbarPaths.includes(location.pathname) && (
+        <Navbar signOutFunction={signOut} loggedInUser={loggedUser} />
+      )}
+      <div className="main-body">
+        <Routes>
+          <Route path="/" element={<HomePage loggedInUser={loggedUser} />} />
+          <Route path="/modules/:moduleName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/members" element={<MembersPage />} />
+          <Route path="/contact" element={<FeedbackPage loggedInUser={loggedUser} />} />
+          <Route path="/profile" element={<ProfilePage loggedInUser={loggedUser} />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </div>
       <div className="footer" />
     </>
   );
 };
 
-const App = () => {
-  return (
-    <div className="App">
-      <ThemeProvider theme={tomTheme}>
-        <BrowserRouter>
-          <Authenticator components={components} formFields={formFields} hideSignUp>
-            {({ signOut, user }) => (
-              <>
-                <h1>Hello {user?.username}</h1>
-                <button onClick={signOut}>Sign out</button>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/modules/:moduleName" element={<TrainingModulesPage />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/members" element={<MembersPage />} />
-                    <Route path="/contact" element={<FeedbackPage />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/admin" element={<AdminPage />} />
-                  </Routes>
-                </Layout>
-              </>
-            )}
-          </Authenticator>
-        </BrowserRouter>
-      </ThemeProvider>
-    </div>
-  );
-};
 
 export default App;

@@ -4,30 +4,36 @@ import { Card, CardContent, CardMedia, LinearProgress, Typography } from "@mui/m
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
 import modulesSample from '../../SampleData/ModulesSample';
-import membersSample from '../../SampleData/MembersSample';
-import Module from 'module';
-import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress } from '../../Types/types';
+import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress, PageProps } from '../../Types/types';
+import { getSingleUserData } from '../../utils/userApi';
 
-const HomePage = () => {
+
+const HomePage = ({loggedInUser}: PageProps) => {
 
   const navigate = useNavigate();
 
-  const [personalInfo, setPersonalInfo] = useState<MemberInformation>({
-      gtID: '',
+  const [currUser, setCurrUser] = useState<MemberInformation>({
+    identifiers: {
+      userID: '',
+      accountEmail: '',
       name: '',
-      email: ['', ''],
-      teamMembership: [''],
-      teamsAdvising: ['', ''],
-      role: '',
-      isExec: false,
-      moduleProgress: [
-        { 
-            moduleName: '', 
-            percentComplete: 0,
-            isAssigned: false,
-            subsectionsComplete: ['', '', '']
-        }
-      ]
+      gtID: '',
+      contactEmails: ['']
+    },
+    roles: {
+        role: '',
+        isAdmin: false
+    },
+    teams: {
+        teamMembership: [''],
+        teamsAdvising: ['']
+    },
+    moduleProgress: [{
+        moduleName: '',
+        percentComplete: 0.0,
+        isAssigned: false,
+        subsectionsComplete: []
+    }]
   });
 
   const [modules, setModules] = useState<ModuleInformation[]>([
@@ -57,37 +63,38 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Simulating API calls
-      setTimeout(() => {
-        setModules(modulesSample);
-        setPersonalInfo(membersSample[0]);
+      const tempCurrUser = getSingleUserData(loggedInUser?.userId);
+      const modules = modulesSample;
 
-        const combinedModules = modules.map((module: ModuleInformation) => {
-        const matchingProgressModule = personalInfo.moduleProgress.find((m: ModuleProgress) => m.moduleName === module.moduleName);
-          return {
-            ...module,
-            progress: matchingProgressModule ? matchingProgressModule.percentComplete : 0,
-            isAssigned: matchingProgressModule ? matchingProgressModule.isAssigned : false
-          }
-        })
-        console.log('combined 1', combinedModules);
-    
-        combinedModules.sort((a, b) => {
-          return Number(b.isAssigned) - Number(a.isAssigned);
-        })
-        console.log('combined 2', combinedModules);
-    
-        setPersonalProgress({
-          name: (personalInfo as any).name,
-          modules: combinedModules
-        });
-        setIsLoading(false);
-      }, 300);
+      setModules(modulesSample);
+      setCurrUser(tempCurrUser);
+
+      // find modules where user has progress, which user is assigned to
+      const combinedModules = modules.map((module: ModuleInformation) => {
+      const matchingProgressModule = tempCurrUser.moduleProgress.find((m: ModuleProgress) => m.moduleName === module.moduleName);
+        return {
+          ...module,
+          progress: matchingProgressModule ? matchingProgressModule.percentComplete : 0,
+          isAssigned: matchingProgressModule ? matchingProgressModule.isAssigned : false
+        }
+      })
+      // console.log('combined 1', combinedModules);
+
+      combinedModules.sort((a, b) => {
+        return Number(b.isAssigned) - Number(a.isAssigned);
+      })
+      // console.log('combined 2', combinedModules);
+
+      setPersonalProgress({
+        name: (tempCurrUser as any).name,
+        modules: combinedModules
+      });
+      setIsLoading(false);
     };
 
     setIsLoading(true);
     fetchData();
-  }, [modules, personalInfo]);
+  }, []);
   
 
   const handleCardClick = (moduleName: string) => {
@@ -105,13 +112,13 @@ const HomePage = () => {
         <div>
           <div className='header'>
             <Typography variant='h4' align='center'>
-              Hello, {personalProgress.name.substring(0, personalProgress.name.indexOf(' '))}! What would you like to learn today?
+              Hello, {currUser.identifiers.name}! What would you like to learn today?
             </Typography>
           </div>
           <div className='module-card-container'>
             {personalProgress.modules.map((module, index) => {
               return (
-                <Card className={`module-card ${module.isAssigned ? 'assigned' : 'notAssigned'}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
+                <Card className={`module-card ${module.isAssigned ? 'assigned' : ''}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
                   <CardMedia
                     className='module-image'
                     image={module.imageURL}

@@ -1,56 +1,15 @@
 import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, Divider, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import './Admin.scss';
 import { useEffect, useState } from 'react';
-import modalHtml from '../../Components/AdminModalContent/AdminModalContent';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
-import membersSample from '../../SampleData/MembersSample';
+import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, Operations, StepSets, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
 import teamsSample from '../../SampleData/TeamsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
-
+import { signUp } from 'aws-amplify/auth';
+import { getAllUsersData, createSingleUserData, updateSingleUserData } from '../../utils/userApi';
 
 const AdminPage = () => {
-
-  // enum for each api call on the page
-  enum Operations {
-    NULL,
-    ADD_USER,
-    EDIT_USER,
-    DELETE_USER,
-    ADD_TEAM,
-    EDIT_TEAM,
-    DELETE_TEAM,
-    ADD_SUBSECTION,
-    EDIT_SUBSECTION,
-    DELETE_SUBSECTION,
-    ADD_MODULE,
-    EDIT_MODULE,
-    DELETE_MODULE
-  };
-
-  // enum for each page within the operation
-
-  // mapping of which pages are needed to do each operation
-  const stepSets: Record<Operations, ModalPages[]> = {
-    [Operations.NULL]: [ModalPages.NULL],
-    [Operations.ADD_USER]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
-    [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
-    [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE_USER],
-  
-    [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
-    [Operations.EDIT_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],
-    [Operations.DELETE_TEAM]: [ModalPages.SELECT_TEAM, ModalPages.CONFIRM_DELETE_TEAM],
-  
-    [Operations.ADD_SUBSECTION]: [ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
-    [Operations.EDIT_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.EDIT_SUBSECTION, ModalPages.CONFIRM_SAVE_SUBSECTION],
-    [Operations.DELETE_SUBSECTION]: [ModalPages.SELECT_SUBSECTION, ModalPages.CONFIRM_DELETE_SUBSECTION],
-  
-    [Operations.ADD_MODULE]: [ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
-    [Operations.EDIT_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.EDIT_MODULE, ModalPages.CONFIRM_SAVE_MODULE],
-    [Operations.DELETE_MODULE]: [ModalPages.SELECT_MODULE, ModalPages.CONFIRM_DELETE_MODULE],
-  };
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [currentOperation, setCurrentOperation] = useState<Operations>(Operations.NULL);
@@ -72,12 +31,13 @@ const AdminPage = () => {
     team: undefined
   });
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
+  const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
 
   const isDataValid = () => {
     const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
     // console.log(apiDataToSend)
-    // console.log('validating user: ', apiDataToSend.user)
+    console.log('validating user: ', apiDataToSend.user)
     // console.log('validating team: ', apiDataToSend.team)
     // console.log('validating module: ', apiDataToSend.module)
     // console.log('validating image ', imageFile);
@@ -85,13 +45,14 @@ const AdminPage = () => {
     return (
       ( // user is valid
       apiDataToSend.user
-      && apiDataToSend.user.name !== ''
-      && (apiDataToSend.user.email?.length !== 0 && apiDataToSend.user.email[0] !== '')
-      && apiDataToSend.user.email.some(email => emailRegex.test(email)) 
-      && apiDataToSend.user.gtID && apiDataToSend.user?.gtID.length === 9
-      && !isNaN(Number(apiDataToSend.user.gtID))
-      && apiDataToSend.user.teamMembership.length > 0
-      && apiDataToSend.user.role !== ''
+      && apiDataToSend.user.identifiers.name !== ''
+      && (apiDataToSend.user.identifiers.contactEmails?.length !== 0 && apiDataToSend.user.identifiers.contactEmails[0] !== '')
+      && apiDataToSend.user.identifiers.contactEmails.some(email => emailRegex.test(email)) 
+      && (apiDataToSend.user.identifiers.accountEmail && emailRegex.test(apiDataToSend.user.identifiers.accountEmail))
+      && apiDataToSend.user.identifiers.gtID && apiDataToSend.user?.identifiers.gtID.length === 9
+      && !isNaN(Number(apiDataToSend.user.identifiers.gtID))
+      && apiDataToSend.user.teams.teamMembership.length > 0
+      && apiDataToSend.user.roles.role !== ''
     )
     || ( // or if team is valid
       apiDataToSend.team
@@ -127,13 +88,129 @@ const AdminPage = () => {
     setCurrentOperation(Operations.NULL);
   }
 
-  const handleNext = () => {
-    if (activeStep === stepSets[currentOperation].length - 1) {
+  const handleNext = async () => {
+    if (activeStep === StepSets[currentOperation].length - 1) {
       // submit button
       handleCloseModal();
       setIsWaitingOnApi(true);
+      console.log('data waiting for the api is: ', apiDataToSend)
 
-      // make api call
+      // Interact with dynamodb, cognito
+      switch (currentOperation) {
+
+        /***********
+        * USER API CALLS
+        ***********/
+        case Operations.ADD_USER:
+          console.log('add new user submit');
+          try {
+            const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
+            if (!acctEmail || !apiDataToSend.user) throw new Error;
+            const createdUserId = await createUserInUserPool(acctEmail);
+            // const createdUserId = 'test';
+            console.log('to send', apiDataToSend)
+            const correctedUser = {
+              ...apiDataToSend.user, 
+              identifiers: {
+                ...apiDataToSend?.user?.identifiers,
+                userID: createdUserId,
+                accountEmail: acctEmail
+              }
+            };
+            console.log('corrected is',correctedUser);
+            const response = await createSingleUserData(apiDataToSend?.user);
+            // create record in db with information from frontend
+          } catch (exception) {
+            console.log('exception!!', exception);
+          }
+          
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_USER:
+          console.log('edit user submit');
+          // edit record in db with information from frontend
+          console.log('to send', apiDataToSend)
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_USER:
+          console.log('delete user submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * TEAM API CALLS
+        ***********/
+        case Operations.ADD_TEAM:
+          console.log('add new team submit');
+          //const createdTeamId = await createTeamInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_TEAM:
+          console.log('edit team submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_TEAM:
+          console.log('delete team submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * SUBSECTION API CALLS
+        ***********/
+        case Operations.ADD_SUBSECTION:
+          console.log('add new subsection submit');
+          //const createdSubsectionId = await createSubsectionInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_SUBSECTION:
+          console.log('edit subsection submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_SUBSECTION:
+          console.log('delete subsection submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+        /***********
+        * MODULE API CALLS
+        ***********/
+        case Operations.ADD_MODULE:
+          console.log('add new module submit');
+          //const createdModuleId = await createModuleInDB(); // add props to this function
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.EDIT_MODULE:
+          console.log('edit module submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+        case Operations.DELETE_MODULE:
+          console.log('delete module submit');
+          // edit record in db with information from frontend
+          // based on db response, show/hide info spinner
+
+          break;
+
+          
+        default:
+          console.log('default')
+      }
       // if no image provided, call straight up
       // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update module info table 
 
@@ -161,7 +238,7 @@ const AdminPage = () => {
       // if (isneedingvalidation and isnotvalid) setErr
       // else if ((isneedingvalidation and isvalid) or (not needing validation)) move forward
       // console.log('is data valid?? ', isDataValid())
-      // console.log('current page is ', stepSets[currentOperation][activeStep])
+      // console.log('current page is ', StepSets[currentOperation][activeStep])
       const infoInputPages = [ModalPages.EDIT_MODULE, 
         ModalPages.EDIT_SUBSECTION, 
         ModalPages.EDIT_TEAM, 
@@ -171,10 +248,10 @@ const AdminPage = () => {
         ModalPages.SELECT_TEAM, 
         ModalPages.SELECT_USER
       ];
-      console.log(activeStep)
+      console.log('active step is: ', activeStep);
 
 
-      if (infoInputPages.includes(stepSets[currentOperation][activeStep]) && !isDataValid()) {
+      if (infoInputPages.includes(StepSets[currentOperation][activeStep]) && !isDataValid()) {
         // if current step is something where information has to be input and information is invalid, throw err
         // console.log('error')
         setInvalidapiDataToSend(true);
@@ -212,7 +289,7 @@ const AdminPage = () => {
   // type guards
 
   function isMemberInformation(info: any): info is MemberInformation {
-    return (info as MemberInformation).gtID !== undefined;
+    return (info as MemberInformation).identifiers.gtID !== undefined;
   }
   
   function isModuleInformation(info: any): info is ModuleInformation {
@@ -246,7 +323,6 @@ const AdminPage = () => {
       temp.team = info;
       setapiDataToSend(temp);
     }
-    // console.log('apiDataToSend inside Admin.tsx is ', apiDataToSend)
   }
 
   const handleImageProvided = (file: File) => {
@@ -260,24 +336,39 @@ const AdminPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setTimeout(() => {
-        const _users = membersSample;
-        const _teams = teamsSample;
-        const _modules = modulesSample;
-        const _subsections = subSectionsSample;
+      const tempAllUsers = getAllUsersData();
+      setAllUsers(tempAllUsers);
 
-        let temp: ApiReceiveInformation = {
-          users: _users,
-          teams: _teams,
-          modules: _modules,
-          subsections: _subsections
-        }
-        setApiDataReceived(temp);
-      }, 300);
+      const _users = tempAllUsers;
+      const _teams = teamsSample;
+      const _modules = modulesSample;
+      const _subsections = subSectionsSample;
+
+      let temp: ApiReceiveInformation = {
+        users: _users,
+        teams: _teams,
+        modules: _modules,
+        subsections: _subsections
+      }
+      setApiDataReceived(temp);
     };
 
     fetchData();
   }, [])
+
+  const createUserInUserPool = async (email: string) => {
+    const { isSignUpComplete, userId, nextStep } = await signUp({
+      username: email,
+      password: "temporaryPassword123!",
+      options: {
+        userAttributes: {
+          email: email,
+        },
+      }
+    });
+    console.log('userId: ', userId);
+    return userId;
+  }
 
 
     return (
@@ -402,7 +493,7 @@ const AdminPage = () => {
         >
           <Box className={'modal'}>
             <Stepper activeStep={activeStep} className='modal-stepper'>
-              {stepSets[currentOperation].map((label) => (
+              {StepSets[currentOperation].map((label) => (
                 <Step key={label}>
                   <StepLabel/>
                 </Step>
@@ -410,7 +501,7 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <AdminModalContent page={stepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
+                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
                 </div>
                 {invalidapiDataToSend && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>
@@ -431,7 +522,7 @@ const AdminPage = () => {
                     Back
                   </Button>
                   <Button onClick={handleNext} className='proceed-button'>
-                    {activeStep === stepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
+                    {activeStep === StepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
                   </Button>
                 </div>
 
