@@ -69,8 +69,8 @@ export async function createSingleUserData(userData: MemberInformation) {
             apiName: 'userApi',
             path: '/userApi/',
             options: {
-                body: JSON.stringify(userData),
-                headers: { 'Content-Type': 'application/json' }
+                body: JSON.stringify({...userData, userId: userData.identifiers.userID}),
+                headers: { 'content-type': 'application/json' }
             }
         });
         const response = await restOperation.response;
