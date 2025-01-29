@@ -1,10 +1,8 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "tomgtskillset6df29f68_identitypool_6df29f68",
-    "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "tomgts6df29f68",
-    "userPoolName": "tomgtskillset6df29f68_userpool_6df29f68",
+    "resourceNameTruncated": "tomgtsf97c16ad",
+    "userPoolName": "tomgtskillsetf97c16ad_userpool_f97c16ad",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -14,8 +12,8 @@
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
-    "emailVerificationSubject": "Your verification code",
-    "emailVerificationMessage": "Your verification code is {####}",
+    "emailVerificationSubject": "Welcome to Skillset! Please verify your email address:",
+    "emailVerificationMessage": "Your verification code is: {####}",
     "defaultPasswordPolicy": false,
     "passwordPolicyMinLength": 8,
     "passwordPolicyCharacters": [],
@@ -31,32 +29,22 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "tomgts6df29f68_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "tomgtsf97c16ad_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "6df29f68",
-    "resourceName": "tomgtskillset6df29f68",
-    "authSelections": "identityPoolAndUserPool",
-    "useDefault": "default",
+    "sharedId": "f97c16ad",
+    "resourceName": "tomgtskillsetf97c16adf97c16ad",
+    "authSelections": "userPoolOnly",
+    "useDefault": "manual",
     "usernameAttributes": [
       "email"
     ],
+    "userPoolGroups": false,
+    "adminQueries": false,
+    "triggers": {},
+    "hostedUI": false,
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true,
-    "authRoleArn": {
-      "Fn::GetAtt": [
-        "AuthRole",
-        "Arn"
-      ]
-    },
-    "unauthRoleArn": {
-      "Fn::GetAtt": [
-        "UnauthRole",
-        "Arn"
-      ]
-    },
-    "breakCircularDependency": true,
-    "dependsOn": []
+    "useEnabledMfas": true
   }
 }

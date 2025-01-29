@@ -69,7 +69,7 @@ export async function createSingleUserData(userData: MemberInformation) {
             apiName: 'userApi',
             path: '/userApi/',
             options: {
-                body: JSON.stringify({...userData, userId: userData.identifiers.userID}),
+                body: JSON.stringify({...userData, userId: userData.identifiers.gtID}),
                 headers: { 'content-type': 'application/json' }
             }
         });

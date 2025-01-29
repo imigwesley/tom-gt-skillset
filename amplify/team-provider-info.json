@@ -12,9 +12,6 @@
       "AmplifyAppId": "dd0d2urej3zr3"
     },
     "categories": {
-      "auth": {
-        "tomgtskillset6df29f68": {}
-      },
       "storage": {
         "UserData": {}
       },
@@ -22,10 +19,45 @@
         "getUserDataFunction": {
           "deploymentBucketName": "amplify-tomgtskillset-dev-fd347-deployment",
           "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
-        }
+        },
+        "UserData": {}
       },
       "api": {
         "userApi": {}
+      },
+      "auth": {
+        "tomgtskillsetf97c16adf97c16ad": {}
+      }
+    }
+  },
+  "test": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-tomgtskillset-test-4a009-authRole",
+      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-test-4a009-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-test-4a009-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-tomgtskillset-test-4a009-deployment",
+      "UnauthRoleName": "amplify-tomgtskillset-test-4a009-unauthRole",
+      "StackName": "amplify-tomgtskillset-test-4a009",
+      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-test-4a009/af072ca0-de8e-11ef-90f8-125981b3c83d",
+      "AmplifyAppId": "d178nlgj4objjm"
+    },
+    "categories": {
+      "auth": {
+        "tomgtskillsetf97c16adf97c16ad": {}
+      },
+      "function": {
+        "getUserDataFunction": {
+          "deploymentBucketName": "amplify-tomgtskillset-test-4a009-deployment",
+          "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
+        },
+        "UserData": {}
+      },
+      "api": {
+        "userApi": {}
+      },
+      "storage": {
+        "UserData": {}
       }
     }
   }
