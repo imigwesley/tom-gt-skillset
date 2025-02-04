@@ -7,12 +7,12 @@ import { getSingleUserData } from "../../utils/userApi";
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
   const [currUser, setCurrUser] = useState<MemberInformation>({
+    userID: '',
     identifiers: {
-      userID: '',
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: ['']
+      otherEmails: ['']
     },
     roles: {
       role: '',
@@ -31,8 +31,12 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
   });
 
   useEffect(() => {
-    const tempCurrUser = getSingleUserData(loggedInUser?.userId);
-    setCurrUser(tempCurrUser);
+    const fetchData = async () => {
+      const singleUserResponse = await getSingleUserData(loggedInUser?.username);
+      const tempCurrUser: MemberInformation = singleUserResponse[0];
+      setCurrUser(tempCurrUser);
+    }
+    fetchData();
   }, [])
 
   return (
@@ -44,15 +48,15 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography className="info">{currUser.identifiers.name}</Typography>
 
         <Typography variant="h5"  className="info-name">Primary Email:</Typography>
-        <Typography className="info">{currUser.identifiers.contactEmails[0]}</Typography>
+        <Typography className="info">{currUser.identifiers.otherEmails[0]}</Typography>
 
-        {currUser.identifiers.contactEmails.length > 1 &&
+        {currUser.identifiers.otherEmails.length > 1 &&
           <div>
             <Typography variant="h5" className="info-name">Other emails</Typography>
-              {currUser.identifiers.contactEmails.map((_email, index) => {
+              {currUser.identifiers.otherEmails.map((_email, index) => {
                 if (index > 0) {
                   return (
-                    <Typography className="info">{currUser.identifiers.contactEmails[index]}</Typography>
+                    <Typography className="info">{currUser.identifiers.otherEmails[index]}</Typography>
                   )
                 }
               })}

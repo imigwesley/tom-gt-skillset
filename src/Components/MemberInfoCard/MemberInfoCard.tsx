@@ -12,7 +12,7 @@ const MemberInfoCard = ({member, isEven, isFirst, isLast}: MemberCardProps) => {
           <Typography className='table-section'>{member.identifiers.name}</Typography>
           <Typography className='table-section'>{member.teams.teamMembership}</Typography>
           <Typography sx={{fontStyle: 'italic'}} className='table-section'>{member.roles.role}</Typography>
-          <Typography className='table-section-wide'>{member.identifiers.contactEmails[0]}</Typography>
+          <Typography className='table-section-wide'>{member.identifiers.otherEmails[0]}</Typography>
           <Typography className='table-section'>
             {member.teams.teamsAdvising.length > 0 &&
               'Advising: ' + member.teams.teamsAdvising.reduce((acc, team, index) => {return acc + (index > 0 ? ', ' : '') + team})

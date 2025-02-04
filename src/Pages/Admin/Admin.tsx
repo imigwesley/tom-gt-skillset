@@ -6,8 +6,9 @@ import { ApiSendInformation, APIResponse, MemberInformation, ModalPages, Operati
 import teamsSample from '../../SampleData/TeamsSample';
 import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
-import { signUp } from 'aws-amplify/auth';
-import { getAllUsersData, createSingleUserData, updateSingleUserData } from '../../utils/userApi';
+import { getAllUsersData, updateSingleUserData, deleteSingleUser } from '../../utils/userApi';
+import { isDataValid } from '../../utils/Utils';
+
 
 const AdminPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,47 +34,6 @@ const AdminPage = () => {
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
 
-  const isDataValid = () => {
-    const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
-
-    // console.log(apiDataToSend)
-    console.log('validating user: ', apiDataToSend.user)
-    // console.log('validating team: ', apiDataToSend.team)
-    // console.log('validating module: ', apiDataToSend.module)
-    // console.log('validating image ', imageFile);
-
-    return (
-      ( // user is valid
-      apiDataToSend.user
-      && apiDataToSend.user.identifiers.name !== ''
-      && (apiDataToSend.user.identifiers.contactEmails?.length !== 0 && apiDataToSend.user.identifiers.contactEmails[0] !== '')
-      && apiDataToSend.user.identifiers.contactEmails.some(email => emailRegex.test(email)) 
-      && (apiDataToSend.user.identifiers.accountEmail && emailRegex.test(apiDataToSend.user.identifiers.accountEmail))
-      && apiDataToSend.user.identifiers.gtID && apiDataToSend.user?.identifiers.gtID.length === 9
-      && !isNaN(Number(apiDataToSend.user.identifiers.gtID))
-      && apiDataToSend.user.teams.teamMembership.length > 0
-      && apiDataToSend.user.roles.role !== ''
-    )
-    || ( // or if team is valid
-      apiDataToSend.team
-      && apiDataToSend.team.teamName !== ''
-      && (apiDataToSend.team.membership?.length !== 0 && apiDataToSend.team.membership[0] !== '')
-      && (apiDataToSend.team.advisors?.length !== 0 && apiDataToSend.team.advisors[0] !== '')
-    )
-    || ( // or if module is valid (necessary info exists, image is uploaded)
-      apiDataToSend.module
-      && apiDataToSend.module.moduleName !== ''
-      && (apiDataToSend.module.subsections?.length !== 0 && apiDataToSend.module.subsections[0] !== '')
-      && imageFile
-    )
-    || ( // or if subsection is valid
-      apiDataToSend.subsection
-      && apiDataToSend.subsection.subsectionName !== ''
-      && apiDataToSend.subsection.subsectionHtml !== ''
-      && (activeStep === 1 ? apiDataToSend.subsection.htmlEdited : true)
-    )
-  ) // or () or () 
-  }
 
   const handleOpenModal = (entity: Operations) => {
     // console.log(entity);
@@ -101,42 +61,39 @@ const AdminPage = () => {
         /***********
         * USER API CALLS
         ***********/
-        case Operations.ADD_USER:
-          console.log('add new user submit');
-          try {
-            const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
-            if (!acctEmail || !apiDataToSend.user) throw new Error;
-            const createdUserId = await createUserInUserPool(acctEmail);
-            // const createdUserId = 'test';
-            console.log('to send', apiDataToSend)
-            const correctedUser = {
-              ...apiDataToSend.user, 
-              identifiers: {
-                ...apiDataToSend?.user?.identifiers,
-                userID: createdUserId,
-                accountEmail: acctEmail
-              }
-            };
-            console.log('corrected is',correctedUser);
-            const response = await createSingleUserData(apiDataToSend?.user);
-            // create record in db with information from frontend
-          } catch (exception) {
-            console.log('exception!!', exception);
-          }
-          
-          // based on db response, show/hide info spinner
-
-          break;
+        // case Operations.ADD_USER:
+        //   console.log('add new user submit');
+        //   try {
+        //     const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
+        //     if (!acctEmail || !apiDataToSend.user) throw new Error;
+        //     // const createdUserId = await createUserInUserPool(acctEmail);
+        //     const response = await updateSingleUserData(apiDataToSend?.user);
+        //   } catch (exception) {
+        //     console.log('exception!!', exception);
+        //   }
+        //   // based on db response, show/hide info spinner
+        //   break;
         case Operations.EDIT_USER:
           console.log('edit user submit');
           // edit record in db with information from frontend
-          console.log('to send', apiDataToSend)
+          try {
+            if (!apiDataToSend.user) throw new Error;
+            const response = await updateSingleUserData(apiDataToSend?.user);
+          } catch (exception) {
+            console.log('exception!!', exception);
+          }
           // based on db response, show/hide info spinner
 
           break;
         case Operations.DELETE_USER:
           console.log('delete user submit');
-          // edit record in db with information from frontend
+          try {
+            if (!apiDataToSend.user) throw new Error;
+            // remove from cognito user pool
+            const response = await deleteSingleUser(apiDataToSend?.user.identifiers.gtID);
+          } catch (exception) {
+            console.log('exception!!', exception);
+          }
           // based on db response, show/hide info spinner
 
           break;
@@ -251,7 +208,7 @@ const AdminPage = () => {
       console.log('active step is: ', activeStep);
 
 
-      if (infoInputPages.includes(StepSets[currentOperation][activeStep]) && !isDataValid()) {
+      if (infoInputPages.includes(StepSets[currentOperation][activeStep]) && !isDataValid(apiDataToSend, imageFile, activeStep)) {
         // if current step is something where information has to be input and information is invalid, throw err
         // console.log('error')
         setInvalidapiDataToSend(true);
@@ -285,9 +242,7 @@ const AdminPage = () => {
     setImageFile(undefined);
   }
 
-
   // type guards
-
   function isMemberInformation(info: any): info is MemberInformation {
     return (info as MemberInformation).identifiers.gtID !== undefined;
   }
@@ -336,7 +291,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const tempAllUsers = getAllUsersData();
+      const tempAllUsers = await getAllUsersData();
       setAllUsers(tempAllUsers);
 
       const _users = tempAllUsers;
@@ -354,36 +309,21 @@ const AdminPage = () => {
     };
 
     fetchData();
-  }, [])
-
-  const createUserInUserPool = async (email: string) => {
-    const { isSignUpComplete, userId, nextStep } = await signUp({
-      username: email,
-      password: "temporaryPassword123!",
-      options: {
-        userAttributes: {
-          email: email,
-        },
-      }
-    });
-    console.log('userId: ', userId);
-    return userId;
-  }
-
+  }, []);
 
     return (
       <div className='admin-container'>
         <div className='page-section'>
           <Typography variant='h4' className='section-header'>User Actions</Typography>
           <Paper className='calls-surface'>
-            <div className='call-section'>
+            {/* <div className='call-section'>
               <div>
                 <Typography variant='h6'>Add User</Typography>
                 <Typography variant='subtitle2' className='subtitle'>Adds user. Need to provide information.</Typography>
               </div>
               <Button variant='contained' onClick={() => handleOpenModal(Operations.ADD_USER)}>Add User</Button>
             </div>
-            <Divider variant='middle' />
+            <Divider variant='middle' /> */}
             <div className='call-section'>
               <div>
                 <Typography variant='h6'>Edit User</Typography>
@@ -501,7 +441,7 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided}/>
+                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided} userAdd={false}/>
                 </div>
                 {invalidapiDataToSend && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>

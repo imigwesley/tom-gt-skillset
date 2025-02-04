@@ -22,45 +22,47 @@ const MembersPage = () => {
   const [sortType, setSortType] = useState(SORT_TYPE.ROLE);
 
   useEffect(() => {
-    const tempAllUsers = getAllUsersData();
-    setAllUsers(tempAllUsers);
+    const fetchData = async () => {
+      const tempAllUsers = await getAllUsersData();
+      setAllUsers(tempAllUsers);
 
-    const tempByRole = {
-      'officers': tempAllUsers?.filter((member) => member.roles.isAdmin === true) || [],
-      'members': tempAllUsers?.filter((member) => member.roles.isAdmin === false).sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1) || [],
-    };
-    setMembersByRole(tempByRole);
-
-    // group members by team
-    let tempByTeam: ByTeam[] = [];
-    teams.forEach((team) => {
-      tempByTeam.push(
-        {
-          'team': team,
-          'members': tempAllUsers?.filter((member) => member.teams.teamMembership.includes(team)) || [],
-          'advisors': tempAllUsers?.filter((member) => member.teams.teamsAdvising.includes(team)) || []
+      const tempByRole = {
+        'officers': tempAllUsers?.filter((member) => member.roles.isAdmin === true) || [],
+        'members': tempAllUsers?.filter((member) => member.roles.isAdmin === false).sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1) || [],
+      };
+      setMembersByRole(tempByRole);
+  
+      // group members by team
+      let tempByTeam: ByTeam[] = [];
+      teams.forEach((team) => {
+        tempByTeam.push(
+          {
+            'team': team,
+            'members': tempAllUsers?.filter((member) => member.teams.teamMembership.includes(team)) || [],
+            'advisors': tempAllUsers?.filter((member) => member.teams.teamsAdvising.includes(team)) || []
+          }
+        );
+      });
+      setMembersByTeam(tempByTeam);
+  
+      // group alphabetically
+      let tempAlphabetically: Alphabetically[] = [];
+      const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+      alphabet.forEach((letter) => {
+        const tempArr = {
+          'letter': letter,
+          'members': tempAllUsers?.filter((member) => member.identifiers.name[0].toLowerCase() === letter) || []
         }
-      );
-    });
-    setMembersByTeam(tempByTeam);
-
-    // group alphabetically
-    let tempAlphabetically: Alphabetically[] = [];
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-    alphabet.forEach((letter) => {
-      const tempArr = {
-        'letter': letter,
-        'members': tempAllUsers?.filter((member) => member.identifiers.name[0].toLowerCase() === letter) || []
-      }
-      if (tempArr.members.length > 0) {tempAlphabetically.push(tempArr);}
-    });
-    setMembersAlphabetically(tempAlphabetically);
-
-    console.log('finished sorting')
-    console.log(membersByRole);
-    console.log(membersByTeam);
-    console.log(membersAlphabetically);
-
+        if (tempArr.members.length > 0) {tempAlphabetically.push(tempArr);}
+      });
+      setMembersAlphabetically(tempAlphabetically);
+  
+      console.log('finished sorting')
+      console.log(membersByRole);
+      console.log(membersByTeam);
+      console.log(membersAlphabetically);
+    }
+    fetchData();
   }, []);
 
   const handleSortClick = (type: SORT_TYPE) => {

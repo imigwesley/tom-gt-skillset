@@ -20,7 +20,7 @@ const toolbarOptions = [
 ];
 
 
-const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
+const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
   
   // user input errors
   const [incorrectUserNameError, setIncorrectUserNameError] = useState(false);
@@ -45,12 +45,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   // local data for editing in modal and sending to api
   const [localUserData, setLocalUserData] = useState<MemberInformation | null>({
+    userID: '',
     identifiers: {
-      userID: '',
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: []
+      otherEmails: []
     },
     roles: {
         role: '',
@@ -90,12 +90,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       advisors: []
     }];
   const usersData: MemberInformation[] = passedApiInformation.users || [{
+    userID: '',
     identifiers: {
-      userID: '',
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: []
+      otherEmails: []
     },
     roles: {
         role: '',
@@ -145,12 +145,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       setIncorrectUserNameError(true);
     }
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: name,
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: localUserData?.identifiers.contactEmails || []
+        otherEmails: localUserData?.identifiers.otherEmails || []
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -171,12 +171,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       setIncorrectUserNameError(false);
     }
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: _name,
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: localUserData?.identifiers.contactEmails || []
+        otherEmails: localUserData?.identifiers.otherEmails || []
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -202,16 +202,16 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
       });
     }
 
-    const newEmails = [...(localUserData?.identifiers.contactEmails || [])];
+    const newEmails = [...(localUserData?.identifiers.otherEmails || [])];
     newEmails[index] = event.target.value;
 
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: newEmails
+        otherEmails: newEmails
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -236,15 +236,15 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
         return newErrors;
       });
     } else {
-      const newEmails = [...(localUserData?.identifiers.contactEmails || [])];
+      const newEmails = [...(localUserData?.identifiers.otherEmails || [])];
       newEmails[index] = email;
       const temp: MemberInformation = {
+        userID: localUserData?.userID || '',
         identifiers: {
-          userID: localUserData?.identifiers.userID || '',
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
           gtID: localUserData?.identifiers.gtID || '',
-          contactEmails: newEmails
+          otherEmails: newEmails
         },
         roles: {
             role: localUserData?.roles.role || '',
@@ -261,17 +261,17 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
   }
 
   const handleDeleteOtherEmail = (index: number) => {
-    let newEmails = [...(localUserData?.identifiers.contactEmails || [])];
+    let newEmails = [...(localUserData?.identifiers.otherEmails || [])];
     console.log(newEmails);
     newEmails.splice(index + 1, 1);
 
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: newEmails
+        otherEmails: newEmails
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -290,14 +290,14 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleOpenNewEmailTextField = () => {
     setLocalUserData((prev) => {
-      const newEmails = [...(prev?.identifiers.contactEmails || []), ''];
+      const newEmails = [...(prev?.identifiers.otherEmails || []), ''];
       const temp: MemberInformation = {
+        userID: localUserData?.userID || '',
         identifiers: {
-          userID: localUserData?.identifiers.userID || '',
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
           gtID: localUserData?.identifiers.gtID || '',
-          contactEmails: newEmails
+          otherEmails: newEmails
         },
         roles: {
             role: localUserData?.roles.role || '',
@@ -324,12 +324,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     } else {
       // allow to write
       const temp: MemberInformation = {
+        userID: localUserData?.userID || '',
         identifiers: {
-          userID: localUserData?.identifiers.userID || '',
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
           gtID: event.target.value,
-          contactEmails: localUserData?.identifiers.contactEmails || []
+          otherEmails: localUserData?.identifiers.otherEmails || []
         },
         roles: {
             role: localUserData?.roles.role || '',
@@ -357,12 +357,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     } else {
       // valid, send info
       const temp: MemberInformation = {
+        userID: localUserData?.userID || '',
         identifiers: {
-          userID: localUserData?.identifiers.userID || '',
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
           gtID: event.target.value,
-          contactEmails: localUserData?.identifiers.contactEmails || []
+          otherEmails: localUserData?.identifiers.otherEmails || []
         },
         roles: {
             role: localUserData?.roles.role || '',
@@ -380,12 +380,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: localUserData?.identifiers.contactEmails || []
+        otherEmails: localUserData?.identifiers.otherEmails || []
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -403,12 +403,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleChangeUserTeamsAdvising = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: localUserData?.identifiers.contactEmails || []
+        otherEmails: localUserData?.identifiers.otherEmails || []
       },
       roles: {
           role: localUserData?.roles.role || '',
@@ -426,12 +426,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
 
   const handleChangeUserRole = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
+      userID: localUserData?.userID || '',
       identifiers: {
-        userID: localUserData?.identifiers.userID || '',
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
         gtID: localUserData?.identifiers.gtID || '',
-        contactEmails: localUserData?.identifiers.contactEmails || []
+        otherEmails: localUserData?.identifiers.otherEmails || []
       },
       roles: {
           role: event.target.value,
@@ -526,7 +526,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      onImageProvided(file); // TODO: will need to update the url based on what s3 says
+      onImageProvided?.(file); // TODO: will need to update the url based on what s3 says
     }
   };
 
@@ -584,7 +584,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
     <div className='input-info-container'>
       {page === ModalPages.EDIT_USER ?
         <div>
-          <Typography variant='h4'>Edit User Information</Typography>
+          <Typography variant='h4'>{userAdd? 'We noticed you\'re new to Skillset! Please provide some information about yourself:' : 'Edit User Information'}</Typography>
           <div className='input-info-section'>
             <Typography>Name (first and last)*:</Typography>
             <TextField 
@@ -597,21 +597,23 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
               className='input-box'
             />
           </div>
-          <div className='input-info-section'>
-            <Typography>Primary Email*:</Typography>
-            <TextField 
-              fullWidth 
-              value={localUserData?.identifiers.contactEmails[0] || ''} 
-              onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, 0)} 
-              onBlur={() => handleEmailBlur(localUserData?.identifiers.contactEmails[0] ?? '', 0)}
-              error={emailErrors[0]}
-              className='input-box'
-              helperText={emailErrors[0] ? 'Entry must be in email format' : ''}
-            />
-          </div>
+          {!userAdd &&
+            <div className='input-info-section'>
+              <Typography>Primary Email*:</Typography>
+              <TextField 
+                fullWidth 
+                value={localUserData?.identifiers.otherEmails[0] || ''} 
+                onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, 0)} 
+                onBlur={() => handleEmailBlur(localUserData?.identifiers.otherEmails[0] ?? '', 0)}
+                error={emailErrors[0]}
+                className='input-box'
+                helperText={emailErrors[0] ? 'Entry must be in email format' : ''}
+              />
+            </div>
+          }
           <div className='input-info-section'>
             <Typography>Other Email(s):</Typography>
-            {localUserData?.identifiers.contactEmails.slice(1).map((email, index) => (
+            {localUserData?.identifiers.otherEmails.slice(1).map((email, index) => (
               <div className='other-email-section'>
                 <TextField 
                   key={index} 
@@ -767,6 +769,7 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                 <MenuItem value='Vice President'>Vice President</MenuItem>
                 <MenuItem value='Treasurer'>Treasurer</MenuItem>
                 <MenuItem value='Social Chair'>Social Chair</MenuItem>
+                <MenuItem value='Webmaster'>Webmaster</MenuItem>
               </Select>
             </FormControl>
           </div>
@@ -785,12 +788,12 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
                   onApiInformationUpdate(newValue);
                 } else {
                   setLocalUserData({
+                    userID: '',
                     identifiers: {
-                      userID: '',
                       accountEmail: '',
                       name: '',
                       gtID: '',
-                      contactEmails: []
+                      otherEmails: []
                     },
                     roles: {
                         role: '',
@@ -1172,16 +1175,16 @@ const AdminModalContent = ({ page, passedApiInformation, onApiInformationUpdate,
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Primary email:</Typography>
-              <Typography className='indent'>{localUserData?.identifiers.contactEmails[0]}</Typography>
+              <Typography className='indent'>{localUserData?.identifiers.otherEmails[0]}</Typography>
             </div>
 
-            {(localUserData?.identifiers.contactEmails && localUserData?.identifiers.contactEmails.length > 1) &&
+            {(localUserData?.identifiers.otherEmails && localUserData?.identifiers.otherEmails.length > 1) &&
               <div className='confirm-section'>
                 <Typography variant="h6" className='italics'>Other emails:</Typography>
-                  {localUserData?.identifiers.contactEmails.map((_email, index) => {
+                  {localUserData?.identifiers.otherEmails.map((_email, index) => {
                     if (index > 0) {
                       return (
-                        <Typography className='indent' key={index}>{localUserData?.identifiers.contactEmails[index]}</Typography>
+                        <Typography className='indent' key={index}>{localUserData?.identifiers.otherEmails[index]}</Typography>
                       )
                     }
                   })}

@@ -9,12 +9,12 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
   const [firstFeedback, setFirstFeedback] = useState('');
   const [secondFeedback, setSecondFeedback] = useState('');
   const [currUser, setCurrUser] = useState<MemberInformation>({
+    userID: '',
     identifiers: {
-      userID: '',
       accountEmail: '',
       name: '',
       gtID: '',
-      contactEmails: ['']
+      otherEmails: ['']
     },
     roles: {
         role: '',
@@ -33,8 +33,12 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
   });
 
   useEffect(() => {
-    const tempCurrUser = getSingleUserData(loggedInUser?.userId);
-    setCurrUser(tempCurrUser);
+    const fetchData = async () => {
+      const singleUserResponse = await getSingleUserData(loggedInUser?.username);
+      const tempCurrUser: MemberInformation = singleUserResponse[0];
+      setCurrUser(tempCurrUser);
+    }
+    fetchData();
   }, [])
 
   const handleFirstInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

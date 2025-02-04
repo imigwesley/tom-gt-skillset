@@ -6,12 +6,10 @@ import './TrainingModules.scss';
 import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import modulesSample from '../../SampleData/ModulesSample';
-import { ModuleProgress, ModuleInformation, PageProps } from '../../Types/types';
+import { ModuleProgress, ModuleInformation, PageProps, MemberInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 
 const TrainingModulesPage = ({loggedInUser}: PageProps) => {
-
-  const currUser = getSingleUserData(loggedInUser?.userId);
   const { moduleName } = useParams();
   const [module, setModule] = useState<ModuleInformation>({
     moduleName: '',
@@ -29,23 +27,15 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Simulating API calls
-      //   axios.get(`https://your-api-endpoint.com/moduleHtml/${moduleName}`) // replace
-      //     .then((response) => {
-      //       setHtmlContent(response.data.htmlContent); // Assume API returns { htmlContent: '<div>...</div>' }
-      //     })
-      //     .catch((error) => {
-      //       console.error("Error fetching module HTML", error);
-      //   });
-      setTimeout(() => {
-        setModule(modulesSample[0]); // change to last completed one
-        setSubsections(module.subsections);
-        const curr = module.subsections[0];
-        setCurrSubsection(curr);
-        setSubsectionHtml(subSectionsSample.find((subsection) => subsection.subsectionName === curr)?.subsectionHtml || '');
-        setMemberProgress(currUser.moduleProgress);
-        setIsLoading(false);
-      }, 300)
+      const singleUserResponse = await getSingleUserData(loggedInUser?.username);
+      const tempCurrUser: MemberInformation = singleUserResponse[0];
+      setModule(modulesSample[0]); // change to last completed one
+      setSubsections(module.subsections);
+      const curr = module.subsections[0];
+      setCurrSubsection(curr);
+      setSubsectionHtml(subSectionsSample.find((subsection) => subsection.subsectionName === curr)?.subsectionHtml || '');
+      setMemberProgress(tempCurrUser.moduleProgress);
+      setIsLoading(false);
     };
 
     setIsLoading(true);
@@ -81,7 +71,7 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
                   );
                 })}
               </div>
-              
+
               <div className='module-container background-card'>
                 <Typography variant='h3'>{currSubsection}</Typography>
                 <Divider variant='middle' />
