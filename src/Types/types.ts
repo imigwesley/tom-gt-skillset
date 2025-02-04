@@ -67,8 +67,9 @@ export interface ModuleProgress {
 export interface AdminModalContentProps {
     page: ModalPages,
     passedApiInformation: ApiReceiveInformation,
-    onApiInformationUpdate: (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => void;
-    onImageProvided:(file: File) => void;
+    userAdd?: boolean,
+    onApiInformationUpdate: (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => void,
+    onImageProvided?:(file: File) => void;
 }
 
 export interface TeamInformation {
@@ -84,12 +85,12 @@ export interface SubsectionInformation {
 }
 
 export interface MemberInformation {
+    userID: string,
     identifiers: {
-        userID: string,
         accountEmail: string,
         name: string,
         gtID: string,
-        contactEmails: string[]
+        otherEmails: string[]
     },
     roles: {
         role: string,

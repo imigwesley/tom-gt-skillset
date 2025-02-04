@@ -4,7 +4,7 @@
         "accountEmail": "wimig3@gatech.edu",
         "name": "Wesley Imig",
         "gtID": "903656085",
-        "contactEmails": ["wesley@gatech.edu", "wimig3@gmail.com"]
+        "otherEmails": ["wesley@gatech.edu", "wimig3@gmail.com"]
     },
     "roles": {
         "role": "president",

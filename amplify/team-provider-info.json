@@ -40,7 +40,8 @@
       "UnauthRoleName": "amplify-tomgtskillset-test-4a009-unauthRole",
       "StackName": "amplify-tomgtskillset-test-4a009",
       "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-test-4a009/af072ca0-de8e-11ef-90f8-125981b3c83d",
-      "AmplifyAppId": "d178nlgj4objjm"
+      "AmplifyAppId": "d178nlgj4objjm",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-tomgtskillset-test-4a009-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {

@@ -1,6 +1,6 @@
 import './App.scss';
 import './index.css';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './Pages/Home/Home';
 import AboutPage from './Pages/About/About';
 import MembersPage from './Pages/Members/Members';
@@ -16,63 +16,108 @@ import { Amplify } from 'aws-amplify';
 import awsmobile from './aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
+import AdminModalContent from './Components/AdminModalContent/AdminModalContent';
+import { confirmSignUp, ConfirmSignUpInput, fetchAuthSession, signIn, signUp, SignUpInput, SignUpOutput } from 'aws-amplify/auth';
+import { placeholder } from '@babel/types';
+import { MemberInformation } from './Types/types';
+import { updateSingleUserData } from './utils/userApi';
+import { useEffect, useState } from 'react';
 
-
-// Configure Amplify with the generated outputs
 Amplify.configure(awsmobile);
 
-const components = {
-  Header() {
-    const { tokens } = useTheme();
-    return (
-      <View textAlign="center" padding={tokens.space.small}>
-        <p>Skillset</p>
-        <Image alt='Tom GT Logo' src='/tom-gt-logo.png' />
-      </View>
-    );
-  },
-
-  SignIn: {
+const App = () => {
+  const components = {
     Header() {
       const { tokens } = useTheme();
       return (
-        <Heading level={3} style={{textAlign: 'center', paddingTop: '19px'}}>
-          Sign in to Your Account
-        </Heading>
-      );
-    },
-    Footer() {
-      const { toForgotPassword } = useAuthenticator();
-      return (
-        <View textAlign="center">
-          <Button fontWeight="normal" onClick={toForgotPassword} size="small" variation="link">
-            Forgot Password?
-          </Button>
+        <View textAlign="center" padding={tokens.space.small}>
+          <p>Skillset</p>
+          <Image alt='Tom GT Logo' src='/tom-gt-logo.png' />
         </View>
       );
     },
-  },
-};
-
-const formFields = {
-  signIn: {
-    username: {
-      placeholder: 'Enter your email',
+  
+    SignIn: {
+      Header() {
+        const { tokens } = useTheme();
+        return (
+          <Heading level={3} style={{textAlign: 'center', paddingTop: '19px'}}>
+            Sign in to Your Account
+          </Heading>
+        );
+      },
+      Footer() {
+        const { toForgotPassword } = useAuthenticator();
+        return (
+          <View textAlign="center">
+            <Button fontWeight="normal" onClick={toForgotPassword} size="small" variation="link">
+              Forgot Password?
+            </Button>
+          </View>
+        );
+      },
     },
-    password: {
-      label: 'Password:',
-      placeholder: 'Enter your password',
+  
+    SignUp: {
+      Header() {
+        const { tokens } = useTheme();
+        return (
+          <Heading level={3} style={{textAlign: 'center', paddingTop: '19px'}}>
+            Create Your Skillset Account
+          </Heading>
+        );
+      }
+    }
+  };
+  
+  const formFields = {
+    signIn: {
+      username: {
+        placeholder: 'Enter your email',
+      },
+      password: {
+        label: 'Password:',
+        placeholder: 'Enter your password',
+      },
     },
-  },
-};
+    signUp: {
+      email: {
+        order:1
+      },
+      password: {
+        order: 2
+      },
+      confirm_password: {
+        order: 3
+      },
+    }
+  };
 
-const App = () => {
+  const services = {
+    async handleSignUp(input: SignUpInput) {
+      const { username, password, options } = input;
+      console.log('options are: ', options?.userAttributes);
+      const signUpResponse = await signUp({
+        username: options?.userAttributes.email as string,
+        password,
+      });
+      console.log('sign up response is: ', signUpResponse)
+      return signUpResponse;
+    },
+    // async handleConfirmSignUp(input: ConfirmSignUpInput) {
+    //   const signUpResponse = await confirmSignUp(input);
+      
+    //   const { toSignIn } = useAuthenticator();
+    //   toSignIn();
+    //   return signUpResponse;
+    // }
+  }
 
   return (
     <div className="App">
        <ThemeProvider theme={tomTheme}>
          <BrowserRouter>
-            <Authenticator components={components} formFields={formFields} hideSignUp>
+            <Authenticator components={components} formFields={formFields} services={services} initialState='signIn'>
               {({ signOut, user }) => (
                 <AppContent
                   signOut={signOut}
