@@ -104,13 +104,6 @@ const App = () => {
       console.log('sign up response is: ', signUpResponse)
       return signUpResponse;
     },
-    // async handleConfirmSignUp(input: ConfirmSignUpInput) {
-    //   const signUpResponse = await confirmSignUp(input);
-      
-    //   const { toSignIn } = useAuthenticator();
-    //   toSignIn();
-    //   return signUpResponse;
-    // }
   }
 
   return (

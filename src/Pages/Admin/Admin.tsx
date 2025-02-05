@@ -8,6 +8,8 @@ import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { getAllUsersData, updateSingleUserData, deleteSingleUser } from '../../utils/userApi';
 import { isDataValid } from '../../utils/Utils';
+import { uploadFile } from '../../utils/imagesApi';
+import { image } from '@aws-amplify/ui/dist/types/theme/tokens/components/image';
 
 
 const AdminPage = () => {
@@ -149,6 +151,8 @@ const AdminPage = () => {
           console.log('add new module submit');
           //const createdModuleId = await createModuleInDB(); // add props to this function
           // based on db response, show/hide info spinner
+          if (imageFile) uploadFile(imageFile);
+
 
           break;
         case Operations.EDIT_MODULE:
@@ -244,23 +248,24 @@ const AdminPage = () => {
 
   // type guards
   function isMemberInformation(info: any): info is MemberInformation {
-    return (info as MemberInformation).identifiers.gtID !== undefined;
+    return (info as MemberInformation)?.identifiers?.gtID !== undefined;
   }
   
   function isModuleInformation(info: any): info is ModuleInformation {
-    return (info as ModuleInformation).moduleName !== undefined;
+    return (info as ModuleInformation)?.moduleName !== undefined;
   }
   
   function isSubsectionInformation(info: any): info is SubsectionInformation {
-    return (info as SubsectionInformation).subsectionName !== undefined;
+    return (info as SubsectionInformation)?.subsectionName !== undefined;
   }
   
   function isTeamInformation(info: any): info is TeamInformation {
-    return (info as TeamInformation).teamName !== undefined;
+    return (info as TeamInformation)?.teamName !== undefined;
   }
 
   const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
     console.log('changed inside admin.tsx', info)
+    console.log('type is, ', typeof info);
     if (isMemberInformation(info)) {
       let temp = {...apiDataToSend};
       temp.user = info;
@@ -281,7 +286,7 @@ const AdminPage = () => {
   }
 
   const handleImageProvided = (file: File) => {
-    // console.log('file is ', file);
+    console.log('file is ', file);
     setImageFile(file);
   }
 

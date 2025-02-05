@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.scss';
-import { Alert, Box, Button, Card, CardContent, CardMedia, Dialog, LinearProgress, Step, StepLabel, Stepper, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, CardMedia, CircularProgress, Dialog, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
 import modulesSample from '../../SampleData/ModulesSample';
@@ -18,6 +18,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
   const [promptForUserRecordCreation, setPromptForUserRecordCreation] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [currUser, setCurrUser] = useState<MemberInformation>({
     userID: '',
     identifiers: {
@@ -75,7 +76,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
         }
       ]
   })
-  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     console.log('isLoading changed', isLoading);
   }, [isLoading])
@@ -92,7 +93,6 @@ const HomePage = ({loggedInUser}: PageProps) => {
         setPromptForUserRecordCreation(!tempCurrUser);
       } catch (e) {
         // no user record found. Create new user record in DB
-        console.log('must be new user. need to create user record...')
         tempCurrUser = {
           userID: '',
           identifiers: {
@@ -157,8 +157,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
 
     setIsLoading(true);
     fetchData();
-  }, []);
-  
+  }, []);  
 
   const handleCardClick = (moduleName: string) => {
     console.log(moduleName);
@@ -182,6 +181,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
         if (!apiDataToSend.user) throw new Error;
         console.log('right before, it is:',apiDataToSend.user)
         const response = await updateSingleUserData(apiDataToSend?.user);
+        setCurrUser(apiDataToSend?.user);
       } catch (exception) {
         console.log('exception!!', exception);
       }
@@ -243,6 +243,10 @@ const HomePage = ({loggedInUser}: PageProps) => {
       temp.user = info;
       temp.user.identifiers.accountEmail = loggedInUser?.signInDetails?.loginId;
       temp.user.userID = loggedInUser?.username;
+      temp.user.roles = {
+        isAdmin: false,
+        role: 'Member'
+      }
       setApiDataToSend(temp);
     } else {
       console.warn('invalid member information')
@@ -256,8 +260,8 @@ const HomePage = ({loggedInUser}: PageProps) => {
   return (
     <div className='home-page-container'>
       {isLoading ? 
-        <div style={{padding:'200px', width:'300px', backgroundColor: 'red'}}>
-          <LinearProgress />
+        <div style={{padding:'200px', width:'300px'}}>
+          <CircularProgress />
         </div>
       :
         <div>
