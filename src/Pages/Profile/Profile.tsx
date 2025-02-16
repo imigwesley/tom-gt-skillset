@@ -7,7 +7,7 @@ import { getSingleUserData } from "../../utils/userApi";
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
   const [currUser, setCurrUser] = useState<MemberInformation>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -48,11 +48,11 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography className="info">{currUser.identifiers.name}</Typography>
 
         <Typography variant="h5"  className="info-name">Primary Email:</Typography>
-        <Typography className="info">{currUser.identifiers.otherEmails[0]}</Typography>
+        <Typography className="info">{currUser.identifiers.accountEmail}</Typography>
 
         {currUser.identifiers.otherEmails.length > 1 &&
           <div>
-            <Typography variant="h5" className="info-name">Other emails</Typography>
+            <Typography variant="h5" className="info-name">Other emails:</Typography>
               {currUser.identifiers.otherEmails.map((_email, index) => {
                 if (index > 0) {
                   return (

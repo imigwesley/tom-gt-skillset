@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import './Members.scss';
-import { Button, ButtonGroup, Typography } from '@mui/material';
+import { Button, ButtonGroup, CircularProgress, Typography } from '@mui/material';
 import MemberInfoCard from '../../Components/MemberInfoCard/MemberInfoCard';
 import { Alphabetically, ByRole, ByTeam, MemberInformation } from '../../Types/types';
 import { getAllUsersData } from '../../utils/userApi';
@@ -15,6 +15,7 @@ const MembersPage = () => {
   // TODO: replace these with api calls
   const [teams, setTeams] = useState(['CAD', 'Engineering', 'Design', 'Operations', 'Marketing'])
   const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
+  const [isLoading, setIsLoading] = useState(true)
 
   const [membersByRole, setMembersByRole] = useState<ByRole>({'officers': [], 'members': []});
   const [membersByTeam, setMembersByTeam] = useState<ByTeam[]>([{'team': '', 'members': [], 'advisors': []}]);
@@ -61,7 +62,9 @@ const MembersPage = () => {
       console.log(membersByRole);
       console.log(membersByTeam);
       console.log(membersAlphabetically);
+      setIsLoading(false);
     }
+    setIsLoading(true);
     fetchData();
   }, []);
 
@@ -70,66 +73,54 @@ const MembersPage = () => {
   }
 
     return (
-      <div className='members-container'>
-        <div className='sorting-section'>
-          <Typography variant='h5'>
-            Sort by:
-          </Typography>
-          <ButtonGroup>
-            <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple={sortType === SORT_TYPE.ROLE} className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
-            <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button>
-            <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple={sortType === SORT_TYPE.ALPHABETICALLY} className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
-          </ButtonGroup>
-        </div>
-        <div>
-          {sortType === SORT_TYPE.ROLE ?
-          <div>
-            <Typography variant='h3'>Officers</Typography>
-            <div>
-              {membersByRole.officers.map((member, index) => {
-                return (
-                  <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
-                )
-              })}
-            </div>
-            <Typography variant='h3'>Members</Typography>
-            <div>
-              {membersByRole.members.map((member, index) => {
-                return (
-                  <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
-                )
-              })}
-            </div>
+      <div>
+        { isLoading ? 
+          <div style={{padding:'200px', width:'300px', margin: 'auto'}}>
+            <CircularProgress />
           </div>
-          :
-          sortType === SORT_TYPE.TEAM ?
-          <div>
-            {membersByTeam.map((team) => {
-              return (
-                <div>
-                  <Typography variant='h3'>{team.team}</Typography>
-                  <div style={{borderRadius: '5px'}} id='wesley'>
-                    {team.members.map((member, index) => {
-                      return (
-                        <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === team.members.length - 1}/>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
+        :
+        <div className='members-container'>
+          <div className='sorting-section'>
+            <Typography variant='h5'>
+              Sort by:
+            </Typography>
+            <ButtonGroup>
+              <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple={sortType === SORT_TYPE.ROLE} className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
+              <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button>
+              <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple={sortType === SORT_TYPE.ALPHABETICALLY} className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
+            </ButtonGroup>
           </div>
-          :
           <div>
-            <div className='lettergroups-container'>
-              {membersAlphabetically.map((letterGroup, index) => {
+            {sortType === SORT_TYPE.ROLE ?
+            <div>
+              <Typography variant='h3'>Officers</Typography>
+              <div>
+                {membersByRole.officers.map((member, index) => {
+                  return (
+                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
+                  )
+                })}
+              </div>
+              <Typography variant='h3'>Members</Typography>
+              <div>
+                {membersByRole.members.map((member, index) => {
+                  return (
+                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
+                  )
+                })}
+              </div>
+            </div>
+            :
+            sortType === SORT_TYPE.TEAM ?
+            <div>
+              {membersByTeam.map((team) => {
                 return (
-                  <div key={letterGroup.letter}>
-                    <Typography variant='h3'>{letterGroup.letter.toUpperCase()}</Typography>
-                    <div>
-                      {letterGroup.members.map((member, index) => {
+                  <div>
+                    <Typography variant='h3'>{team.team}</Typography>
+                    <div style={{borderRadius: '5px'}} id='wesley'>
+                      {team.members.map((member, index) => {
                         return (
-                          <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === letterGroup.members.length - 1}/>
+                          <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === team.members.length - 1}/>
                         )
                       })}
                     </div>
@@ -137,9 +128,28 @@ const MembersPage = () => {
                 )
               })}
             </div>
+            :
+            <div>
+              <div className='lettergroups-container'>
+                {membersAlphabetically.map((letterGroup, index) => {
+                  return (
+                    <div key={letterGroup.letter}>
+                      <Typography variant='h3'>{letterGroup.letter.toUpperCase()}</Typography>
+                      <div>
+                        {letterGroup.members.map((member, index) => {
+                          return (
+                            <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === letterGroup.members.length - 1}/>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            }
           </div>
-          }
-        </div>
+        </div>}
       </div>
     );
   };

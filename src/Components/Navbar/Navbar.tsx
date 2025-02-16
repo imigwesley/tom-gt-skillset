@@ -2,7 +2,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Avatar, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import './Navbar.scss';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MemberInformation, NavbarProps } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 
@@ -12,6 +12,7 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorEl);
@@ -39,7 +40,11 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
     handleClose();
     switch (page) {
       case 'home':
-        navigate('/');
+        if (location.pathname === '/') {
+          window.location.reload();
+        } else {
+          navigate('/');
+        }
         break;
       case 'about':
         navigate('/about');
@@ -78,7 +83,11 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           <MenuIcon className='icon clickable'/>
         </IconButton>
         <div className='profile-section clickable' onClick={() => handlePageClick('profile')}>
-        <Avatar>{initials}</Avatar> 
+          <Avatar>
+            <div style={{paddingTop: '3px'}}>
+              {initials}
+            </div>
+          </Avatar> 
            <Typography>
               Profile
            </Typography> 

@@ -1,0 +1,16 @@
+{
+  "resourceName": "skillsets3",
+  "policyUUID": "14efd79d",
+  "bucketName": "imagesbucket",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}

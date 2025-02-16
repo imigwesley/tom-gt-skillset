@@ -58,7 +58,8 @@
         "userApi": {}
       },
       "storage": {
-        "UserData": {}
+        "UserData": {},
+        "skillsets3": {}
       }
     }
   }

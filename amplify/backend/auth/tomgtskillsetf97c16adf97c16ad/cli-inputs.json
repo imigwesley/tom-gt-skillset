@@ -2,7 +2,7 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "tomgtskillsetf97c16adf97c16ad_identitypool_c1829224",
-    "allowUnauthenticatedIdentities": false,
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "tomgtsf97c16ad",
     "userPoolName": "tomgtskillsetf97c16ad_userpool_f97c16ad",
     "autoVerifiedAttributes": [

@@ -17,11 +17,7 @@ import awsmobile from './aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
 import AdminModalContent from './Components/AdminModalContent/AdminModalContent';
-import { confirmSignUp, ConfirmSignUpInput, fetchAuthSession, signIn, signUp, SignUpInput, SignUpOutput } from 'aws-amplify/auth';
-import { placeholder } from '@babel/types';
-import { MemberInformation } from './Types/types';
-import { updateSingleUserData } from './utils/userApi';
-import { useEffect, useState } from 'react';
+import { signUp, SignUpInput } from 'aws-amplify/auth';
 
 Amplify.configure(awsmobile);
 
@@ -104,13 +100,6 @@ const App = () => {
       console.log('sign up response is: ', signUpResponse)
       return signUpResponse;
     },
-    // async handleConfirmSignUp(input: ConfirmSignUpInput) {
-    //   const signUpResponse = await confirmSignUp(input);
-      
-    //   const { toSignIn } = useAuthenticator();
-    //   toSignIn();
-    //   return signUpResponse;
-    // }
   }
 
   return (

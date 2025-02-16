@@ -2,6 +2,15 @@ import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
 import { ReactNode } from "react";
 
+export enum UserRoles {
+    MEMBER,
+    PRESIDENT,
+    VICE_PRESIDENT,
+    TREASURER,
+    SOCIAL_CHAIR,
+    WEBMASTER
+}
+
 export enum ModalPages {
     NULL,
     EDIT_USER,
@@ -85,7 +94,7 @@ export interface SubsectionInformation {
 }
 
 export interface MemberInformation {
-    userID: string,
+    userId: string,
     identifiers: {
         accountEmail: string,
         name: string,

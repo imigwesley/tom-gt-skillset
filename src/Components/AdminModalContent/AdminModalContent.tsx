@@ -5,7 +5,7 @@ import modulesSample from '../../SampleData/ModulesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import Checkbox from '@mui/material/Checkbox';
-import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPages, ModuleInformation, NameGTidMap, SubsectionInformation, TeamInformation } from '../../Types/types';
+import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPages, ModuleInformation, NameGTidMap, SubsectionInformation, TeamInformation, UserRoles } from '../../Types/types';
 import { Add, AddPhotoAlternate, DeleteOutline } from '@mui/icons-material';
 import { validateEmailString } from '../../utils/Utils';
 import ReactQuill from 'react-quill';
@@ -45,7 +45,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   // local data for editing in modal and sending to api
   const [localUserData, setLocalUserData] = useState<MemberInformation | null>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -90,7 +90,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       advisors: []
     }];
   const usersData: MemberInformation[] = passedApiInformation.users || [{
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -141,11 +141,11 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
   /////////////////////////////////////////// USER ACTIONS //////////////////////////////////////////////
   const handleUserNameBlur = (name: string) => {
     console.log('name on blur is', name);
-    if (name === '') {
+    if (name === '' || !/\s/.test(name)) {
       setIncorrectUserNameError(true);
     }
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: name,
@@ -171,7 +171,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       setIncorrectUserNameError(false);
     }
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: _name,
@@ -206,7 +206,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     newEmails[index] = event.target.value;
 
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
@@ -239,7 +239,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       const newEmails = [...(localUserData?.identifiers.otherEmails || [])];
       newEmails[index] = email;
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
@@ -266,7 +266,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     newEmails.splice(index + 1, 1);
 
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
@@ -292,7 +292,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     setLocalUserData((prev) => {
       const newEmails = [...(prev?.identifiers.otherEmails || []), ''];
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
@@ -324,7 +324,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     } else {
       // allow to write
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
@@ -357,7 +357,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     } else {
       // valid, send info
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
@@ -380,7 +380,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -403,7 +403,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserTeamsAdvising = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -426,7 +426,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserRole = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -443,6 +443,8 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       },
       moduleProgress: localUserData?.moduleProgress || []
     };
+    console.log('handling change user role. temp is: ', temp);
+    console.log('here, localUserData is: ', localUserData)
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
   }
@@ -593,7 +595,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               onChange={handleChangeUserName} 
               onBlur={() => handleUserNameBlur(localUserData?.identifiers.name ?? '')} 
               error={incorrectUserNameError}
-              helperText={incorrectUserNameError ? 'User name must be provided' : ''}
+              helperText={incorrectUserNameError ? 'First and last name must be provided' : ''}
               className='input-box'
             />
           </div>
@@ -602,7 +604,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               <Typography>Primary Email*:</Typography>
               <TextField 
                 fullWidth 
-                value={localUserData?.identifiers.otherEmails[0] || ''} 
+                value={localUserData?.identifiers.accountEmail || ''} 
                 onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, 0)} 
                 onBlur={() => handleEmailBlur(localUserData?.identifiers.otherEmails[0] ?? '', 0)}
                 error={emailErrors[0]}
@@ -736,6 +738,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               </Select>
             </FormControl>
           </div>
+          {!userAdd && 
           <div className='input-info-section'>
             <Typography>Role*:</Typography>
             <FormControl fullWidth className='input-box'>
@@ -763,7 +766,12 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                     {selected}
                   </Typography>
                 )}
-                >
+              >
+                {/* {UserRoles.map((role) => {
+                  return (
+                    <MenuItem value={role}>{role}</MenuItem>
+                  )
+                })} */}
                 <MenuItem value='Member'>Member</MenuItem>
                 <MenuItem value='President'>President</MenuItem>
                 <MenuItem value='Vice President'>Vice President</MenuItem>
@@ -772,7 +780,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                 <MenuItem value='Webmaster'>Webmaster</MenuItem>
               </Select>
             </FormControl>
-          </div>
+          </div>}
         </div>
       : page === ModalPages.SELECT_USER ? (
         <div className='selector-centering'>
@@ -788,7 +796,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                   onApiInformationUpdate(newValue);
                 } else {
                   setLocalUserData({
-                    userID: '',
+                    userId: '',
                     identifiers: {
                       accountEmail: '',
                       name: '',
@@ -1175,7 +1183,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Primary email:</Typography>
-              <Typography className='indent'>{localUserData?.identifiers.otherEmails[0]}</Typography>
+              <Typography className='indent'>{localUserData?.identifiers?.accountEmail}</Typography>
             </div>
 
             {(localUserData?.identifiers.otherEmails && localUserData?.identifiers.otherEmails.length > 1) &&
@@ -1196,7 +1204,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Teams advising:</Typography>
-              <Typography className='indent'>{(localUserData?.teams.teamsAdvising && localUserData?.teams.teamsAdvising.length > 1) ? localUserData?.teams.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
+              <Typography className='indent'>{(localUserData?.teams.teamsAdvising && localUserData?.teams.teamsAdvising.length > 0) ? localUserData?.teams.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Role:</Typography>

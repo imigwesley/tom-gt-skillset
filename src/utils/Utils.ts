@@ -13,27 +13,15 @@ export const isDataValid = (data: ApiSendInformation, imageFile: File | undefine
   const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
   // console.log(apiDataToSend)
-  console.log('validating user: ', data.user)
+  // console.log('validating user: ', data.user)
   // console.log('validating team: ', data.team)
   // console.log('validating module: ', data.module)
   // console.log('validating image ', imageFile);
-  console.log('one', data.user)
-  console.log('two', data.user?.identifiers.name !== '')
-  console.log('here it is', data?.user?.identifiers.otherEmails.length == 0)
-  console.log(
-    "three",
-    (data?.user?.identifiers.otherEmails.length == 0 || data?.user?.identifiers.otherEmails?.some(email => emailRegex.test(email)))
-  );
-  console.log('four', (data.user?.identifiers.accountEmail && emailRegex.test(data.user.identifiers.accountEmail)))
-  console.log('five', data.user?.identifiers.gtID && data.user?.identifiers.gtID.length === 9)
-  console.log('six', !isNaN(Number(data.user?.identifiers.gtID)))
-  // console.log('seven', data.user?.teams?.teamMembership?.length > 0)
-  console.log('eight', data.user?.roles.role !== '')
 
   return (
     ( // user is valid
       data.user
-    && data.user.identifiers.name !== ''
+    && (data.user.identifiers.name !== '' && /\s/.test(data.user.identifiers.name))
     && (data?.user?.identifiers.otherEmails.length == 0 || data.user.identifiers.otherEmails?.some(email => emailRegex.test(email)))
     && (data.user.identifiers.accountEmail && emailRegex.test(data.user.identifiers.accountEmail))
     && data.user.identifiers.gtID && data.user?.identifiers.gtID.length === 9
