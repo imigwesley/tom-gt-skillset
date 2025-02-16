@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
 import modulesSample from '../../SampleData/ModulesSample';
 import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress, PageProps, StepSets, Operations, ModalPages, ApiReceiveInformation, ApiSendInformation, SubsectionInformation, TeamInformation } from '../../Types/types';
-import { getSingleUserData, updateSingleUserData } from '../../utils/userApi';
+import { createSingleUserData, getSingleUserData } from '../../utils/userApi';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
 import { isDataValid } from '../../utils/Utils';
 import teamsSample from '../../SampleData/TeamsSample';
@@ -20,7 +20,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
   const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currUser, setCurrUser] = useState<MemberInformation>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -94,7 +94,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
       } catch (e) {
         // no user record found. Create new user record in DB
         tempCurrUser = {
-          userID: '',
+          userId: '',
           identifiers: {
             accountEmail: '',
             name: '',
@@ -180,7 +180,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
         // const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
         if (!apiDataToSend.user) throw new Error;
         console.log('right before, it is:',apiDataToSend.user)
-        const response = await updateSingleUserData(apiDataToSend?.user);
+        const response = await createSingleUserData(apiDataToSend?.user);
         setCurrUser(apiDataToSend?.user);
       } catch (exception) {
         console.log('exception!!', exception);
@@ -242,7 +242,7 @@ const HomePage = ({loggedInUser}: PageProps) => {
       let temp = {...apiDataToSend};
       temp.user = info;
       temp.user.identifiers.accountEmail = loggedInUser?.signInDetails?.loginId;
-      temp.user.userID = loggedInUser?.username;
+      temp.user.userId = loggedInUser?.username;
       temp.user.roles = {
         isAdmin: false,
         role: 'Member'

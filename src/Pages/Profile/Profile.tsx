@@ -7,7 +7,7 @@ import { getSingleUserData } from "../../utils/userApi";
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
   const [currUser, setCurrUser] = useState<MemberInformation>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',

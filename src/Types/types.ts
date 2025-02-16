@@ -94,7 +94,7 @@ export interface SubsectionInformation {
 }
 
 export interface MemberInformation {
-    userID: string,
+    userId: string,
     identifiers: {
         accountEmail: string,
         name: string,

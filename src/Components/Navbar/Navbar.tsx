@@ -83,7 +83,11 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           <MenuIcon className='icon clickable'/>
         </IconButton>
         <div className='profile-section clickable' onClick={() => handlePageClick('profile')}>
-        <Avatar>{initials}</Avatar> 
+          <Avatar>
+            <div style={{paddingTop: '3px'}}>
+              {initials}
+            </div>
+          </Avatar> 
            <Typography>
               Profile
            </Typography> 

@@ -75,11 +75,11 @@ export async function deleteSingleUser (givenId: string | undefined) {
     }
 };
 
-export async function updateSingleUserData(userData: MemberInformation) {
+export async function createSingleUserData(userData: MemberInformation) {
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
-            userId: userData.userID,
+            userId: userData.userId,
             identifiers: userData.identifiers,
             roles: userData.roles,
             teams: userData.teams,
@@ -111,36 +111,37 @@ export async function updateSingleUserData(userData: MemberInformation) {
 
 
 
-// export async function updateSingleUserData(userData: MemberInformation) {
-//     try {
-//         const authToken = await getAuthToken();
-//         const fixedBody = {
-//             userId: userData.identifiers.gtID,
-//             identifiers: userData.identifiers,
-//             roles: userData.roles,
-//             teams: userData.teams,
-//             moduleProgress: userData.moduleProgress.map((progress) => ({
-//               subsectionsCpmplete: progress.subsectionsComplete,
-//               moduleName: progress.moduleName,
-//               isAssigned: progress.isAssigned,
-//               percentComplete: progress.percentComplete
-//             })),
-//         };    
-//         const restOperation = put({
-//             apiName: 'userApi',
-//             path: `/userData/${fixedBody.userId}`,
-//             options: {
-//                 body: fixedBody,
-//                 headers: {
-//                     'content-type': 'application/json',
-//                     Authorization: authToken
-//                 }
-//             }
-//         });
-//         const response = await restOperation.response;
-//         console.log('Updated single user: ', response);
-//         return response;
-//     } catch (e) {
-//         console.log('update single user call failed: ', e);
-//     }
-// }
+export async function updateSingleUserData(userData: MemberInformation) {
+    console.log('user data here is', userData);
+    try {
+        const authToken = await getAuthToken();
+        const fixedBody = {
+            userId: userData.userId,
+            identifiers: userData.identifiers,
+            roles: userData.roles,
+            teams: userData.teams,
+            moduleProgress: userData.moduleProgress.map((progress) => ({
+              subsectionsCpmplete: progress.subsectionsComplete,
+              moduleName: progress.moduleName,
+              isAssigned: progress.isAssigned,
+              percentComplete: progress.percentComplete
+            })),
+        };        
+        const restOperation = put({
+            apiName: 'userApi',
+            path: '/userData/',
+            options: {
+                body: fixedBody,
+                headers: { 
+                    'content-type': 'application/json',
+                    Authorization: authToken
+                }
+            }
+        });
+        const response = await restOperation.response;
+        console.log('Created single user: ', response);
+        return response;
+    } catch (e) {
+        console.log('create single user call failed: ', e);
+    }
+}

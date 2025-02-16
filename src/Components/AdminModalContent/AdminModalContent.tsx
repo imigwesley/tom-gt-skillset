@@ -45,7 +45,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   // local data for editing in modal and sending to api
   const [localUserData, setLocalUserData] = useState<MemberInformation | null>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -90,7 +90,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       advisors: []
     }];
   const usersData: MemberInformation[] = passedApiInformation.users || [{
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
@@ -145,7 +145,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       setIncorrectUserNameError(true);
     }
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: name,
@@ -171,7 +171,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       setIncorrectUserNameError(false);
     }
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: _name,
@@ -206,7 +206,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     newEmails[index] = event.target.value;
 
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
@@ -239,7 +239,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       const newEmails = [...(localUserData?.identifiers.otherEmails || [])];
       newEmails[index] = email;
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
@@ -266,7 +266,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     newEmails.splice(index + 1, 1);
 
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: newEmails[0],
         name: localUserData?.identifiers.name || '',
@@ -292,7 +292,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     setLocalUserData((prev) => {
       const newEmails = [...(prev?.identifiers.otherEmails || []), ''];
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: newEmails[0],
           name: localUserData?.identifiers.name || '',
@@ -324,7 +324,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     } else {
       // allow to write
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
@@ -357,7 +357,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     } else {
       // valid, send info
       const temp: MemberInformation = {
-        userID: localUserData?.userID || '',
+        userId: localUserData?.userId || '',
         identifiers: {
           accountEmail: localUserData?.identifiers.accountEmail || '',
           name: localUserData?.identifiers.name || '',
@@ -380,7 +380,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserTeamMembership = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -403,7 +403,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserTeamsAdvising = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -426,7 +426,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
 
   const handleChangeUserRole = (event: { target: { value: any; }; }) => {
     const temp: MemberInformation = {
-      userID: localUserData?.userID || '',
+      userId: localUserData?.userId || '',
       identifiers: {
         accountEmail: localUserData?.identifiers.accountEmail || '',
         name: localUserData?.identifiers.name || '',
@@ -443,6 +443,8 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
       },
       moduleProgress: localUserData?.moduleProgress || []
     };
+    console.log('handling change user role. temp is: ', temp);
+    console.log('here, localUserData is: ', localUserData)
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
   }
@@ -794,7 +796,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                   onApiInformationUpdate(newValue);
                 } else {
                   setLocalUserData({
-                    userID: '',
+                    userId: '',
                     identifiers: {
                       accountEmail: '',
                       name: '',

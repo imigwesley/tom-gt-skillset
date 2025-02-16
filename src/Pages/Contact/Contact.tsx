@@ -9,7 +9,7 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
   const [firstFeedback, setFirstFeedback] = useState('');
   const [secondFeedback, setSecondFeedback] = useState('');
   const [currUser, setCurrUser] = useState<MemberInformation>({
-    userID: '',
+    userId: '',
     identifiers: {
       accountEmail: '',
       name: '',
