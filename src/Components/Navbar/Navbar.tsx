@@ -84,9 +84,9 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
         </IconButton>
         <div className='profile-section clickable' onClick={() => handlePageClick('profile')}>
           <Avatar>
-            <div style={{paddingTop: '3px'}}>
+            <>
               {initials}
-            </div>
+            </>
           </Avatar> 
            <Typography>
               Profile
