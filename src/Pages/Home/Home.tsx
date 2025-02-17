@@ -11,7 +11,7 @@ import { isDataValid } from '../../utils/Utils';
 import teamsSample from '../../SampleData/TeamsSample';
 
 
-const HomePage = ({loggedInUser}: PageProps) => {
+const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
   const navigate = useNavigate();
 
@@ -81,7 +81,6 @@ const HomePage = ({loggedInUser}: PageProps) => {
     console.log('isLoading changed', isLoading);
   }, [isLoading])
   
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,12 +140,10 @@ const HomePage = ({loggedInUser}: PageProps) => {
           isAssigned: matchingProgressModule ? matchingProgressModule.isAssigned : false
         }
       })
-      // console.log('combined 1', combinedModules);
 
       combinedModules.sort((a, b) => {
         return Number(b.isAssigned) - Number(a.isAssigned);
       })
-      // console.log('combined 2', combinedModules);
 
       setPersonalProgress({
         name: tempCurrUser?.identifiers?.name,
@@ -166,45 +163,27 @@ const HomePage = ({loggedInUser}: PageProps) => {
 
   const handleCloseModal = () => {
     setPromptForUserRecordCreation(false);
+    if (onUserCreation) onUserCreation();
     // setInvalidUserData(false);
   }
 
   const handleNext = async () => {
-    if (activeStep === StepSets[Operations.ADD_USER].length - 1) {
+    if (activeStep === 1) {
       // submit button
       handleCloseModal();
       // setIsWaitingOnApi(true);
       console.log('data waiting for the api is: ', apiDataToSend)
 
-      try {
-        // const acctEmail = apiDataToSend.user?.identifiers?.accountEmail;
-        if (!apiDataToSend.user) throw new Error;
-        console.log('right before, it is:',apiDataToSend.user)
-        const response = await createSingleUserData(apiDataToSend?.user);
-        setCurrUser(apiDataToSend?.user);
-      } catch (exception) {
-        console.log('exception!!', exception);
-      }
+      if (!apiDataToSend.user) throw new Error;
+      console.log('right before creation it is:',apiDataToSend.user)
+      const response = await createSingleUserData(apiDataToSend?.user);
+      setCurrUser(apiDataToSend?.user);
       // based on db response, show/hide info spinner
     } else {
-      const infoInputPages = [ModalPages.EDIT_MODULE, 
-        ModalPages.EDIT_SUBSECTION, 
-        ModalPages.EDIT_TEAM, 
-        ModalPages.EDIT_USER, 
-        // ModalPages.SELECT_MODULE,
-        ModalPages.SELECT_SUBSECTION, 
-        ModalPages.SELECT_TEAM, 
-        ModalPages.SELECT_USER
-      ];
-      console.log('active step is: ', activeStep);
-
-
-      if (infoInputPages.includes(StepSets[Operations.ADD_USER][activeStep]) && !isDataValid(apiDataToSend, undefined, activeStep)) {
-        // if current step is something where information has to be input and information is invalid, throw err
-        console.log('error')
+      // next button
+      if (!isDataValid(apiDataToSend, undefined, activeStep)) {
         setInvalidapiDataToSend(true);
       } else {
-        // console.log('no error')
         setInvalidapiDataToSend(false);
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
@@ -220,17 +199,6 @@ const HomePage = ({loggedInUser}: PageProps) => {
       team: undefined
     });
   };
-
-  const handleReset = () => {
-    // console.log('reset')
-    setActiveStep(0);
-    setApiDataToSend({
-      user: undefined,
-      module: undefined,
-      subsection: undefined,
-      team: undefined
-    });
-  }
 
   function isMemberInformation(info: any): info is MemberInformation {
     return (info as MemberInformation).identifiers.gtID !== undefined;

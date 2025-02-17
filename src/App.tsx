@@ -16,8 +16,8 @@ import { Amplify } from 'aws-amplify';
 import awsmobile from './aws-exports';
 import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
-import AdminModalContent from './Components/AdminModalContent/AdminModalContent';
 import { signUp, SignUpInput } from 'aws-amplify/auth';
+import { useEffect, useState } from 'react';
 
 Amplify.configure(awsmobile);
 
@@ -27,7 +27,6 @@ const App = () => {
       const { tokens } = useTheme();
       return (
         <View textAlign="center" padding={tokens.space.small}>
-          <p>Skillset</p>
           <Image alt='Tom GT Logo' src='/tom-gt-logo.png' />
         </View>
       );
@@ -100,7 +99,9 @@ const App = () => {
       console.log('sign up response is: ', signUpResponse)
       return signUpResponse;
     },
-  }
+  };
+
+  // const location = useLocation();
 
   return (
     <div className="App">
@@ -122,16 +123,21 @@ const App = () => {
 
 const AppContent = ({ signOut, loggedUser }: any) => {
   const location = useLocation();
-  const hideNavbarPaths = ["/login"];
+  const [navKey, setNavKey] = useState(0);
+
+  // for rerendering navbar when user is created
+  const rerenderNav = () => {
+    setNavKey(navKey + 1);
+  }
 
   return (
     <>
-      {!hideNavbarPaths.includes(location.pathname) && (
-        <Navbar signOutFunction={signOut} loggedInUser={loggedUser} />
+      {(location.pathname !== '/login') && (
+        <Navbar signOutFunction={signOut} loggedInUser={loggedUser} key={navKey}/>
       )}
       <div className="main-body">
         <Routes>
-          <Route path="/" element={<HomePage loggedInUser={loggedUser} />} />
+          <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderNav}/>} />
           <Route path="/modules/:moduleName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/members" element={<MembersPage />} />
