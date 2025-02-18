@@ -109,8 +109,15 @@ const AdminPage = () => {
           console.log('cognito delete user response is', cognitoResponse);
 
           // delete record in dynamo table
-          // response = await deleteSingleUser(apiDataToSend?.user.userId);
-          // console.log('response from deletion is', response);
+          const dynamoResponse = await deleteSingleUser(apiDataToSend?.user.userId);
+          console.log('response from deletion is', response);
+
+          if (cognitoResponse) {
+            // update to check for dynamo response also
+            setResponseType({isSuccess: true, message: 'Successfully edited user.'});
+          } else {
+            setResponseType({isSuccess: false, message: 'Failed to edit user. Please try again.'});
+          }
 
         break;
 
