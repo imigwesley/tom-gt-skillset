@@ -1,5 +1,10 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
+    "cognitoApi": {
+      "ApiId": "string",
+      "ApiName": "string",
+      "RootUrl": "string"
+    },
     "userApi": {
       "ApiId": "string",
       "ApiName": "string",
@@ -19,6 +24,13 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "function": {
+    "deleteCognitoUser": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "getUserDataFunction": {
       "Arn": "string",
       "LambdaExecutionRole": "string",

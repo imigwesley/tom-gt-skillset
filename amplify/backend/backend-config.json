@@ -1,5 +1,19 @@
 {
   "api": {
+    "cognitoApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "deleteCognitoUser"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "userApi": {
       "dependsOn": [
         {
@@ -44,6 +58,12 @@
     }
   },
   "function": {
+    "deleteCognitoUser": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getUserDataFunction": {
       "build": true,
       "dependsOn": [
@@ -65,6 +85,30 @@
     }
   },
   "parameters": {
+    "AMPLIFY_function_deleteCognitoUser_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteCognitoUser"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteCognitoUser_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteCognitoUser"
+        }
+      ]
+    },
+    "AMPLIFY_function_deleteCognitoUser_userPoolId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "deleteCognitoUser"
+        }
+      ]
+    },
     "AMPLIFY_function_getUserDataFunction_deploymentBucketName": {
       "usedBy": [
         {

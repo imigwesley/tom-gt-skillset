@@ -76,7 +76,7 @@ export interface ModuleProgress {
 export interface AdminModalContentProps {
     page: ModalPages,
     passedApiInformation: ApiReceiveInformation,
-    userAdd?: boolean,
+    isCreatingUser?: boolean,
     onApiInformationUpdate: (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => void,
     onImageProvided?:(file: File) => void;
 }
@@ -156,12 +156,13 @@ export interface NameGTidMap {
 }
 
 export interface PageProps {
-    loggedInUser: AuthUser | undefined
+    loggedInUser: AuthUser | undefined,
+    onUserCreation?: () => void | undefined
 }
 
 export interface NavbarProps {
     signOutFunction: ((data?: AuthEventData | undefined) => void) | undefined,
-    loggedInUser: AuthUser
+    loggedInUser: AuthUser | undefined
 }
 
 export interface ByRole {

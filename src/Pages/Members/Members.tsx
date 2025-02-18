@@ -86,7 +86,7 @@ const MembersPage = () => {
             </Typography>
             <ButtonGroup>
               <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple={sortType === SORT_TYPE.ROLE} className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
-              <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button>
+              {/* <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button> */}
               <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple={sortType === SORT_TYPE.ALPHABETICALLY} className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
             </ButtonGroup>
           </div>

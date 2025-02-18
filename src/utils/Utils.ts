@@ -26,7 +26,7 @@ export const isDataValid = (data: ApiSendInformation, imageFile: File | undefine
     && (data.user.identifiers.accountEmail && emailRegex.test(data.user.identifiers.accountEmail))
     && data.user.identifiers.gtID && data.user?.identifiers.gtID.length === 9
     && !isNaN(Number(data.user.identifiers.gtID))
-    && data.user.teams.teamMembership.length > 0
+    // && data.user.teams.teamMembership.length > 0
     && data.user.roles.role !== ''
   )
   || ( // or if team is valid

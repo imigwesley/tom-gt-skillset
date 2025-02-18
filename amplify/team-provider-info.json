@@ -84,10 +84,16 @@
           "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
           "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
         },
-        "UserData": {}
+        "UserData": {},
+        "deleteCognitoUser": {
+          "userPoolId": "us-east-1_0nC7xySgE",
+          "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
+          "s3Key": "amplify-builds/deleteCognitoUser-436158677868754a4c78-build.zip"
+        }
       },
       "api": {
-        "userApi": {}
+        "userApi": {},
+        "cognitoApi": {}
       },
       "storage": {
         "UserData": {},

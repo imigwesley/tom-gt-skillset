@@ -20,7 +20,7 @@ const toolbarOptions = [
 ];
 
 
-const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
+const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiInformationUpdate, onImageProvided }: AdminModalContentProps) => {
   
   // user input errors
   const [incorrectUserNameError, setIncorrectUserNameError] = useState(false);
@@ -263,7 +263,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
   const handleDeleteOtherEmail = (index: number) => {
     let newEmails = [...(localUserData?.identifiers.otherEmails || [])];
     console.log(newEmails);
-    newEmails.splice(index + 1, 1);
+    newEmails.splice(index, 1);
 
     const temp: MemberInformation = {
       userId: localUserData?.userId || '',
@@ -289,30 +289,55 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
   }
 
   const handleOpenNewEmailTextField = () => {
-    setLocalUserData((prev) => {
-      const newEmails = [...(prev?.identifiers.otherEmails || []), ''];
-      const temp: MemberInformation = {
-        userId: localUserData?.userId || '',
-        identifiers: {
-          accountEmail: newEmails[0],
-          name: localUserData?.identifiers.name || '',
-          gtID: localUserData?.identifiers.gtID || '',
-          otherEmails: newEmails
-        },
-        roles: {
-            role: localUserData?.roles.role || '',
-            isAdmin: localUserData?.roles.isAdmin || false
-        },
-        teams: {
-            teamMembership: localUserData?.teams.teamMembership || [],
-            teamsAdvising: localUserData?.teams.teamsAdvising || []
-        },
-        moduleProgress: localUserData?.moduleProgress || []
-      };
+    const newEmails = localUserData?.identifiers?.otherEmails ? [...(localUserData?.identifiers?.otherEmails), ''] : [];
+    console.log('new emails is', newEmails);
 
-      onApiInformationUpdate(temp);
-      return temp;
-    });
+    const temp: MemberInformation = {
+      userId: localUserData?.userId || '',
+      identifiers: {
+        accountEmail: newEmails[0],
+        name: localUserData?.identifiers.name || '',
+        gtID: localUserData?.identifiers.gtID || '',
+        otherEmails: newEmails
+      },
+      roles: {
+          role: localUserData?.roles.role || '',
+          isAdmin: localUserData?.roles.isAdmin || false
+      },
+      teams: {
+          teamMembership: localUserData?.teams.teamMembership || [],
+          teamsAdvising: localUserData?.teams.teamsAdvising || []
+      },
+      moduleProgress: localUserData?.moduleProgress || []
+    };
+    setLocalUserData(temp);
+    onApiInformationUpdate(temp);
+
+    // setLocalUserData((prev) => {
+    //   const newEmails = [...(prev?.identifiers.otherEmails || []), ''];
+    //   const temp: MemberInformation = {
+    //     userId: localUserData?.userId || '',
+    //     identifiers: {
+    //       accountEmail: newEmails[0],
+    //       name: localUserData?.identifiers.name || '',
+    //       gtID: localUserData?.identifiers.gtID || '',
+    //       otherEmails: newEmails
+    //     },
+    //     roles: {
+    //         role: localUserData?.roles.role || '',
+    //         isAdmin: localUserData?.roles.isAdmin || false
+    //     },
+    //     teams: {
+    //         teamMembership: localUserData?.teams.teamMembership || [],
+    //         teamsAdvising: localUserData?.teams.teamsAdvising || []
+    //     },
+    //     moduleProgress: localUserData?.moduleProgress || []
+    //   };
+
+    //   onApiInformationUpdate(temp);
+    //   return temp;
+    // });
+
   };
 
   const handleChangeUserGtid = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -586,7 +611,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
     <div className='input-info-container'>
       {page === ModalPages.EDIT_USER ?
         <div>
-          <Typography variant='h4'>{userAdd? 'We noticed you\'re new to Skillset! Please provide some information about yourself:' : 'Edit User Information'}</Typography>
+          <Typography variant='h4'>{isCreatingUser? 'We noticed you\'re new to Skillset! Please provide some information about yourself:' : 'Edit User Information'}</Typography>
           <div className='input-info-section'>
             <Typography>Name (first and last)*:</Typography>
             <TextField 
@@ -599,7 +624,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               className='input-box'
             />
           </div>
-          {!userAdd &&
+          {!isCreatingUser &&
             <div className='input-info-section'>
               <Typography>Primary Email*:</Typography>
               <TextField 
@@ -615,17 +640,17 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
           }
           <div className='input-info-section'>
             <Typography>Other Email(s):</Typography>
-            {localUserData?.identifiers.otherEmails.slice(1).map((email, index) => (
+            {localUserData?.identifiers.otherEmails.map((email, index) => (
               <div className='other-email-section'>
                 <TextField 
                   key={index} 
                   fullWidth 
                   value={email} 
-                  onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, index + 1)} 
+                  onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, index)} 
                   className='email-textfield input-box'
-                  onBlur={() => handleEmailBlur(email, index + 1)} 
-                  error={emailErrors[index + 1] || undefined}
-                  helperText={emailErrors[index + 1] ? 'Entry must be in email format' : ''}
+                  onBlur={() => handleEmailBlur(email, index)} 
+                  error={emailErrors[index] || undefined}
+                  helperText={emailErrors[index] ? 'Entry must be in email format' : ''}
                 />
                 <IconButton onClick={() => handleDeleteOtherEmail(index)} className='delete-icon'>
                   <DeleteOutline />
@@ -654,7 +679,7 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               className='input-box'
             />
           </div>
-          <div className='input-info-section'>
+          {/* <div className='input-info-section'>
             <Typography>Team Membership*:</Typography>
             <FormControl fullWidth required className='input-box'>
               <Select
@@ -737,8 +762,8 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                 ))}
               </Select>
             </FormControl>
-          </div>
-          {!userAdd && 
+          </div> */}
+          {!isCreatingUser && 
           <div className='input-info-section'>
             <Typography>Role*:</Typography>
             <FormControl fullWidth className='input-box'>
@@ -1181,10 +1206,6 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
               <Typography variant="h6" className='italics'>GTID:</Typography>
               <Typography className='indent'>{localUserData?.identifiers.gtID}</Typography>
             </div>
-            <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Primary email:</Typography>
-              <Typography className='indent'>{localUserData?.identifiers?.accountEmail}</Typography>
-            </div>
 
             {(localUserData?.identifiers.otherEmails && localUserData?.identifiers.otherEmails.length > 1) &&
               <div className='confirm-section'>
@@ -1198,17 +1219,17 @@ const AdminModalContent = ({ page, passedApiInformation, userAdd, onApiInformati
                   })}
               </div>
             }
-            <div className='confirm-section'>
+            {/* <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Team:</Typography>
               <Typography className='indent'>{localUserData?.teams.teamMembership}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Teams advising:</Typography>
               <Typography className='indent'>{(localUserData?.teams.teamsAdvising && localUserData?.teams.teamsAdvising.length > 0) ? localUserData?.teams.teamsAdvising.join(', ') : 'No teams advising'}</Typography>
-            </div>
+            </div> */}
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Role:</Typography>
-              <Typography className='indent'>{localUserData?.roles.role}</Typography>
+              <Typography className='indent'>{localUserData?.roles.role || 'Member'}</Typography>
             </div>
           </div>
         </div>
