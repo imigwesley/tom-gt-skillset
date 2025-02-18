@@ -76,7 +76,7 @@ export interface ModuleProgress {
 export interface AdminModalContentProps {
     page: ModalPages,
     passedApiInformation: ApiReceiveInformation,
-    userAdd?: boolean,
+    isCreatingUser?: boolean,
     onApiInformationUpdate: (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => void,
     onImageProvided?:(file: File) => void;
 }

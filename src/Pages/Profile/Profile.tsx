@@ -63,11 +63,11 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
           </div>
         }
         
-        <Typography variant="h5" className="info-name">Team:</Typography>
+        {/* <Typography variant="h5" className="info-name">Team:</Typography>
         <Typography className="info">{currUser.teams.teamMembership}</Typography>
 
         <Typography variant="h5" className="info-name">Advising:</Typography>
-        <Typography className="info">{currUser.teams.teamsAdvising.length > 1 ? currUser.teams.teamsAdvising : 'No teams advising'}</Typography>
+        <Typography className="info">{currUser.teams.teamsAdvising.length > 1 ? currUser.teams.teamsAdvising : 'No teams advising'}</Typography> */}
 
         <Typography variant="h5" className="info-name">Role:</Typography>
         <Typography className="info">{currUser.roles.role}</Typography>

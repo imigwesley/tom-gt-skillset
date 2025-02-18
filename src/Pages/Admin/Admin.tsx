@@ -1,5 +1,6 @@
 import { Alert, Backdrop, Box, Button, CircularProgress, Dialog, Divider, Paper, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import './Admin.scss';
+import '../../Feedback.scss';
 import { useEffect, useState } from 'react';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
 import { ApiSendInformation, MemberInformation, ModalPages, Operations, StepSets, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
@@ -307,7 +308,7 @@ const AdminPage = () => {
           </Paper>
         </div>
 
-        <div className='page-section'>
+        {/* <div className='page-section'>
           <Typography variant='h4' className='section-header'>Team Actions</Typography>
           <Paper className='calls-surface'>
             <div className='call-section'>
@@ -334,7 +335,7 @@ const AdminPage = () => {
               <Button variant='contained' onClick={() => handleOpenModal(Operations.DELETE_TEAM)}>Delete Skillset Team</Button>
             </div>
           </Paper>
-        </div>
+        </div> */}
 
         <div className='page-section'>
           <Typography variant='h4' className='section-header'>Module Actions</Typography>
@@ -406,7 +407,7 @@ const AdminPage = () => {
             </Stepper>
               <div>
                 <div className='modal-content'>
-                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided} userAdd={false}/>
+                  <AdminModalContent page={StepSets[currentOperation][activeStep]} passedApiInformation={apiDataReceived} onApiInformationUpdate={handleApiInfoChange} onImageProvided={handleImageProvided} isCreatingUser={false}/>
                 </div>
                 {invalidapiDataToSend && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
                 <div className='modal-footer'>

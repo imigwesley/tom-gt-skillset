@@ -10,7 +10,7 @@ const MemberInfoCard = ({member, isEven, isFirst, isLast}: MemberCardProps) => {
       <Card square elevation={0} className={clsx(isEven ? 'light' : 'dark', isFirst ? 'first' : isLast ? 'last' : '')}>
         <CardContent className='member-card-content'>
           <Typography className='table-section'>{member.identifiers.name}</Typography>
-          <Typography className='table-section'>{member.teams.teamMembership}</Typography>
+          {/* <Typography className='table-section'>{member.teams.teamMembership}</Typography> */}
           <Typography sx={{fontStyle: 'italic'}} className='table-section'>{member.roles.role}</Typography>
           <Typography className='table-section-wide'>{member.identifiers.otherEmails[0]}</Typography>
           <Typography className='table-section'>
