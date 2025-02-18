@@ -11,6 +11,7 @@ import { getAllUsersData, updateSingleUserData, deleteSingleUser } from '../../u
 import { isDataValid } from '../../utils/Utils';
 import { uploadFile } from '../../utils/imagesApi';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
+import { deleteUserInCognito } from '../../utils/cognitoUtil';
 
 
 const AdminPage = () => {
@@ -104,8 +105,12 @@ const AdminPage = () => {
       case Operations.DELETE_USER:
           if (!apiDataToSend.user) throw new Error;
           // remove from cognito user pool
-          response = await deleteSingleUser(apiDataToSend?.user.identifiers.gtID);
-          console.log('response from deletion is', response);
+          const cognitoResponse = await deleteUserInCognito(apiDataToSend?.user.userId);
+          console.log('cognito delete user response is', cognitoResponse);
+
+          // delete record in dynamo table
+          // response = await deleteSingleUser(apiDataToSend?.user.userId);
+          // console.log('response from deletion is', response);
 
         break;
 

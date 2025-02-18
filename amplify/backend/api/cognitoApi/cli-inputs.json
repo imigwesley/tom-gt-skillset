@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/cognito": {
+      "name": "/cognito",
+      "lambdaFunction": "deleteCognitoUser",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}
