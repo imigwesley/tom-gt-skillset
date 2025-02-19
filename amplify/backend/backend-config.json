@@ -14,6 +14,20 @@
       "providerPlugin": "awscloudformation",
       "service": "API Gateway"
     },
+    "subsectionsApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getSubsections"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "userApi": {
       "dependsOn": [
         {
@@ -64,6 +78,25 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getSubsections": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "skillsetSubsections"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getUserDataFunction": {
       "build": true,
       "dependsOn": [
@@ -109,6 +142,22 @@
         }
       ]
     },
+    "AMPLIFY_function_getSubsections_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSubsections"
+        }
+      ]
+    },
+    "AMPLIFY_function_getSubsections_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getSubsections"
+        }
+      ]
+    },
     "AMPLIFY_function_getUserDataFunction_deploymentBucketName": {
       "usedBy": [
         {
@@ -128,6 +177,10 @@
   },
   "storage": {
     "UserData": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    },
+    "skillsetSubsections": {
       "providerPlugin": "awscloudformation",
       "service": "DynamoDB"
     },

@@ -1,9 +1,6 @@
 import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Select, styled, TextField, Typography } from '@mui/material';
 import './AdminModalContent.scss';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
-import activitiesSample from '../../SampleData/ActivitiesSample';
-import subSectionsSample from '../../SampleData/SubsectionsSample';
-import teamsSample from '../../SampleData/TeamsSample';
 import Checkbox from '@mui/material/Checkbox';
 import { ActivityInformation, MemberInformation, NameGTidMap, SubsectionInformation, TeamInformation } from '../../Types/types';
 import { AdminModalContentProps } from '../../Types/props';

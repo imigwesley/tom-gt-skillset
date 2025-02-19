@@ -1,0 +1,10 @@
+{
+  "resourceName": "skillsetSubsections",
+  "tableName": "skillsetSubsections",
+  "partitionKey": {
+    "fieldName": "subsectionName",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

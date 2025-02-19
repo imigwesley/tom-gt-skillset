@@ -13,6 +13,7 @@ import { isActivityInformation, isDataValid, isMemberInformation, isSubsectionIn
 import { uploadFile } from '../../utils/imagesApi';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
 import { deleteUserInCognito } from '../../utils/cognitoUtil';
+import { createSubsection, deleteSubsection, getAllSubsections, getSubsection, updateSubsection } from '../../utils/subsectionsApi';
 
 
 const AdminPage = () => {
@@ -37,8 +38,6 @@ const AdminPage = () => {
     team: undefined
   });
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
-  const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
-
 
   const handleOpenModal = (entity: Operations) => {
     // console.log(entity);
@@ -94,12 +93,12 @@ const AdminPage = () => {
       ***********/
       case Operations.EDIT_USER:
         // edit record in db with information from frontend
-          if (!apiDataToSend.user) throw new Error;
-          // console.log('USER IS', apiDataToSend.user)
-          response = await updateSingleUserData(apiDataToSend?.user);
-          setResponseType(response ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'});
-          
-          // undefined if it did not go through
+        if (!apiDataToSend.user) throw new Error;
+        // console.log('USER IS', apiDataToSend.user)
+        response = await updateSingleUserData(apiDataToSend?.user);
+        setResponseType(response ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'});
+        
+        // undefined if it did not go through
 
         break;
 
@@ -125,44 +124,47 @@ const AdminPage = () => {
       /***********
       * TEAM API CALLS
       ***********/
-      case Operations.ADD_TEAM:
-        console.log('add new team submit');
-        //const createdTeamId = await createTeamInDB(); // add props to this function
-        // based on db response, show/hide info spinner
+      // case Operations.ADD_TEAM:
+      //   console.log('add new team submit');
+      //   //const createdTeamId = await createTeamInDB(); // add props to this function
+      //   // based on db response, show/hide info spinner
 
-        break;
-      case Operations.EDIT_TEAM:
-        console.log('edit team submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
+      //   break;
+      // case Operations.EDIT_TEAM:
+      //   console.log('edit team submit');
+      //   // edit record in db with information from frontend
+      //   // based on db response, show/hide info spinner
 
-        break;
-      case Operations.DELETE_TEAM:
-        console.log('delete team submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
+      //   break;
+      // case Operations.DELETE_TEAM:
+      //   console.log('delete team submit');
+      //   // edit record in db with information from frontend
+      //   // based on db response, show/hide info spinner
 
-        break;
+      //   break;
 
       /***********
       * SUBSECTION API CALLS
       ***********/
       case Operations.ADD_SUBSECTION:
         console.log('add new subsection submit');
-        //const createdSubsectionId = await createSubsectionInDB(); // add props to this function
-        // based on db response, show/hide info spinner
+        if (!apiDataToSend.subsection) throw new Error;
+        response = await createSubsection(apiDataToSend.subsection);
+        console.log('response from creation is: ', response);
 
         break;
       case Operations.EDIT_SUBSECTION:
         console.log('edit subsection submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
+        if (!apiDataToSend.subsection) throw new Error;
+        response = await updateSubsection(apiDataToSend.subsection);
+        console.log('response from updating is: ', response);
 
         break;
       case Operations.DELETE_SUBSECTION:
         console.log('delete subsection submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
+        if (!apiDataToSend.subsection) throw new Error;
+        response = await deleteSubsection(apiDataToSend.subsection.subsectionName);
+        console.log('response from deletion is: ', response);
 
         break;
 
@@ -261,13 +263,14 @@ const AdminPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const tempAllUsers = await getAllUsersData();
-      setAllUsers(tempAllUsers);
+      // redfactor this??
+      const allUsers = await getAllUsersData();
+      const allSubsections = await getAllSubsections();
 
-      const _users = tempAllUsers;
+      const _users = allUsers;
       const _teams = teamsSample;
       const _activities = activitiesSample;
-      const _subsections = subSectionsSample;
+      const _subsections = allSubsections;
 
       let temp: ApiReceiveInformation = {
         users: _users,
