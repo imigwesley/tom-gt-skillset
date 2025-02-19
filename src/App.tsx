@@ -8,7 +8,7 @@ import FeedbackPage from './Pages/Contact/Contact';
 import ProfilePage from './Pages/Profile/Profile';
 import AdminPage from './Pages/Admin/Admin';
 import Navbar from './Components/Navbar/Navbar';
-import TrainingModulesPage from './Pages/TrainingModules/TrainingModules';
+import TrainingModulesPage from './Pages/TrainingActivities/TrainingActivities';
 import { ThemeProvider } from '@mui/material/styles';
 import tomTheme from './Themes/TOMTheme';
 import { Authenticator, useAuthenticator, useTheme, Button, Heading, View, Image } from '@aws-amplify/ui-react';
@@ -138,7 +138,7 @@ const AppContent = ({ signOut, loggedUser }: any) => {
       <div className="main-body">
         <Routes>
           <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderNav}/>} />
-          <Route path="/modules/:moduleName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
+          <Route path="/activities/:activityName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/members" element={<MembersPage />} />
           <Route path="/contact" element={<FeedbackPage loggedInUser={loggedUser} />} />

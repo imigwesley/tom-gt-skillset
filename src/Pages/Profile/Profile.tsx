@@ -1,8 +1,9 @@
 import { Typography } from "@mui/material";
 import './Profile.scss';
-import { MemberInformation, PageProps } from '../../Types/types';
+import { MemberInformation } from '../../Types/types';
 import { useEffect, useState } from "react";
 import { getSingleUserData } from "../../utils/userApi";
+import { PageProps } from "../../Types/props";
 
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
@@ -22,10 +23,8 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
       teamMembership: [''],
       teamsAdvising: ['']
     },
-    moduleProgress: [{
-      moduleName: '',
-      percentComplete: 0.0,
-      isAssigned: false,
+    progress: [{
+      activityName: '',
       subsectionsComplete: []
     }]
   });
@@ -73,19 +72,26 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography className="info">{currUser.roles.role}</Typography>
 
         <Typography variant="h5" className="info-name">Section Progress:</Typography>
+        {currUser.progress ?
         <div>
-          {currUser.moduleProgress.map((module) => {
+          {currUser.progress?.map((activity) => {
             return (
               <div>
-                <Typography className="info-name">Module:</Typography>
-                <Typography className="info">{module.moduleName}</Typography>
+                <Typography className="info-name">Activity:</Typography>
+                <Typography className="info">{activity.activityName}</Typography>
 
                 <Typography className="info-name">Percent Complete:</Typography>
-                <Typography className="info">{module.percentComplete}</Typography>
+                {/* <Typography className="info">{activity.percentComplete}</Typography> */}
+                <Typography className="info">MAKE THIS PART</Typography>
               </div>
             )
           })}
         </div>
+        : 
+        <div>
+          'NONE'
+        </div>
+        }
       </div>
     </div>
   );

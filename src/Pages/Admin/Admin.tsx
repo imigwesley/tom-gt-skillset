@@ -3,12 +3,13 @@ import './Admin.scss';
 import '../../Feedback.scss';
 import { useEffect, useState } from 'react';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { ApiSendInformation, MemberInformation, ModalPages, Operations, StepSets, ModuleInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation } from '../../Types/types';
+import { ApiSendInformation, MemberInformation, SubsectionInformation, TeamInformation, ApiReceiveInformation, ActivityInformation } from '../../Types/types';
+import { ModalPages, Operations, StepSets } from '../../Types/enums';
 import teamsSample from '../../SampleData/TeamsSample';
-import modulesSample from '../../SampleData/ModulesSample';
+import activitiesSample from '../../SampleData/ActivitiesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { getAllUsersData, updateSingleUserData, deleteSingleUser } from '../../utils/userApi';
-import { isDataValid } from '../../utils/Utils';
+import { isActivityInformation, isDataValid, isMemberInformation, isSubsectionInformation, isTeamInformation } from '../../utils/Utils';
 import { uploadFile } from '../../utils/imagesApi';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
 import { deleteUserInCognito } from '../../utils/cognitoUtil';
@@ -24,14 +25,14 @@ const AdminPage = () => {
   // holds info received from api, puts into modal prop
   const [apiDataReceived, setApiDataReceived] = useState<ApiReceiveInformation>({
     users: undefined,
-    modules: undefined,
+    activities: undefined,
     subsections: undefined,
     teams: undefined
   });
   // holds info to send to api on admin 'submit' function
   const [apiDataToSend, setapiDataToSend] = useState<ApiSendInformation>({
     user: undefined,
-    module: undefined,
+    activity: undefined,
     subsection: undefined,
     team: undefined
   });
@@ -60,7 +61,7 @@ const AdminPage = () => {
     } else {
       // clicking 'next'
 
-      const infoInputPages = [ModalPages.EDIT_MODULE, 
+      const infoInputPages = [ModalPages.EDIT_ACTIVITY, 
         ModalPages.EDIT_SUBSECTION, 
         ModalPages.EDIT_TEAM, 
         ModalPages.EDIT_USER, 
@@ -168,22 +169,22 @@ const AdminPage = () => {
       /***********
       * MODULE API CALLS
       ***********/
-      case Operations.ADD_MODULE:
-        console.log('add new module submit');
-        //const createdModuleId = await createModuleInDB(); // add props to this function
+      case Operations.ADD_ACTIVITY:
+        console.log('add new activity submit');
+        //const createdActivityId = await createActivityInDB(); // add props to this function
         // based on db response, show/hide info spinner
         if (imageFile) uploadFile(imageFile);
 
 
         break;
-      case Operations.EDIT_MODULE:
-        console.log('edit module submit');
+      case Operations.EDIT_ACTIVITY:
+        console.log('edit activity submit');
         // edit record in db with information from frontend
         // based on db response, show/hide info spinner
 
         break;
-      case Operations.DELETE_MODULE:
-        console.log('delete module submit');
+      case Operations.DELETE_ACTIVITY:
+        console.log('delete activity submit');
         // edit record in db with information from frontend
         // based on db response, show/hide info spinner
 
@@ -194,7 +195,7 @@ const AdminPage = () => {
         console.log('default')
     }
     // if no image provided, call straight up
-    // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update module info table 
+    // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update activity info table 
 
     setIsWaitingOnApi(false);
     setTimeout(() => {
@@ -209,7 +210,7 @@ const AdminPage = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
     setapiDataToSend({
       user: undefined,
-      module: undefined,
+      activity: undefined,
       subsection: undefined,
       team: undefined
     });
@@ -220,40 +221,23 @@ const AdminPage = () => {
     setActiveStep(0);
     setapiDataToSend({
       user: undefined,
-      module: undefined,
+      activity: undefined,
       subsection: undefined,
       team: undefined
     });
     setImageFile(undefined);
   }
 
-  // type guards
-  function isMemberInformation(info: any): info is MemberInformation {
-    return (info as MemberInformation)?.identifiers?.gtID !== undefined;
-  }
-  
-  function isModuleInformation(info: any): info is ModuleInformation {
-    return (info as ModuleInformation)?.moduleName !== undefined;
-  }
-  
-  function isSubsectionInformation(info: any): info is SubsectionInformation {
-    return (info as SubsectionInformation)?.subsectionName !== undefined;
-  }
-  
-  function isTeamInformation(info: any): info is TeamInformation {
-    return (info as TeamInformation)?.teamName !== undefined;
-  }
-
-  const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
+  const handleApiInfoChange = (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => {
     console.log('changed inside admin.tsx', info)
     console.log('type is, ', typeof info);
     if (isMemberInformation(info)) {
       let temp = {...apiDataToSend};
       temp.user = info;
       setapiDataToSend(temp);
-    } else if (isModuleInformation(info)) {
+    } else if (isActivityInformation(info)) {
       let temp = {...apiDataToSend};
-      temp.module = info;
+      temp.activity = info;
       setapiDataToSend(temp);
     } else if (isSubsectionInformation(info)) {
       let temp = {...apiDataToSend};
@@ -282,13 +266,13 @@ const AdminPage = () => {
 
       const _users = tempAllUsers;
       const _teams = teamsSample;
-      const _modules = modulesSample;
+      const _activities = activitiesSample;
       const _subsections = subSectionsSample;
 
       let temp: ApiReceiveInformation = {
         users: _users,
         teams: _teams,
-        modules: _modules,
+        activities: _activities,
         subsections: _subsections
       }
       setApiDataReceived(temp);
@@ -350,54 +334,54 @@ const AdminPage = () => {
         </div> */}
 
         <div className='page-section'>
-          <Typography variant='h4' className='section-header'>Module Actions</Typography>
+          <Typography variant='h4' className='section-header'>Activity Actions</Typography>
           <Paper className='calls-surface'>
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Add Module Subsection</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Adds module subsection. Need to provide information.</Typography>
+                <Typography variant='h6'>Add Activity Subsection</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Adds activity subsection. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.ADD_SUBSECTION)}>Add Module Subsection</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.ADD_SUBSECTION)}>Add Activity Subsection</Button>
             </div>
             <Divider variant='middle' />
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Edit Module Subsection</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Edits Module Subsection. Need to provide information.</Typography>
+                <Typography variant='h6'>Edit Activity Subsection</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Edits Activity Subsection. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.EDIT_SUBSECTION)}>Edit Module Subsection</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.EDIT_SUBSECTION)}>Edit Activity Subsection</Button>
             </div>
             <Divider variant='middle'/>
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Delete Module Subsection</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Deletes Module Subsection. Need to provide information.</Typography>
+                <Typography variant='h6'>Delete Activity Subsection</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Deletes Activity Subsection. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.DELETE_SUBSECTION)}>Delete Module Subsection</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.DELETE_SUBSECTION)}>Delete Activity Subsection</Button>
             </div>
             <Divider variant='middle' />
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Add Module</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Adds Module. Need to provide information.</Typography>
+                <Typography variant='h6'>Add Activity</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Adds Activity. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.ADD_MODULE)}>Add Module</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.ADD_ACTIVITY)}>Add Activity</Button>
             </div>
             <Divider variant='middle' />
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Edit Module</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Edits Module. Need to provide information.</Typography>
+                <Typography variant='h6'>Edit Activity</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Edits Activity. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.EDIT_MODULE)}>Edit Module</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.EDIT_ACTIVITY)}>Edit Activity</Button>
             </div>
             <Divider variant='middle'/>
             <div className='call-section'>
               <div>
-                <Typography variant='h6'>Delete Module</Typography>
-                <Typography variant='subtitle2' className='subtitle'>Deletes Module. Need to provide information.</Typography>
+                <Typography variant='h6'>Delete Activity</Typography>
+                <Typography variant='subtitle2' className='subtitle'>Deletes Activity. Need to provide information.</Typography>
               </div>
-              <Button variant='contained' onClick={() => handleOpenModal(Operations.DELETE_MODULE)}>Delete Module</Button>
+              <Button variant='contained' onClick={() => handleOpenModal(Operations.DELETE_ACTIVITY)}>Delete Activity</Button>
             </div>
           </Paper>
         </div>

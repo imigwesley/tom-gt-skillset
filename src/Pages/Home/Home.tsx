@@ -4,86 +4,45 @@ import '../../Feedback.scss';
 import { Alert, Box, Button, Card, CardContent, CardMedia, CircularProgress, Dialog, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
-import modulesSample from '../../SampleData/ModulesSample';
-import { MemberInformation, ModuleInformation, PersonalModuleProgress, ModuleProgress, PageProps, StepSets, Operations, ModalPages, ApiReceiveInformation, ApiSendInformation, SubsectionInformation, TeamInformation } from '../../Types/types';
+import activitiesSample from '../../SampleData/ActivitiesSample';
+import { MemberInformation, ApiReceiveInformation, ApiSendInformation, SubsectionInformation, TeamInformation, ActivityInformation, ActivityProgress } from '../../Types/types';
 import { createSingleUserData, getSingleUserData } from '../../utils/userApi';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
-import { isDataValid } from '../../utils/Utils';
+import { isDataValid, isMemberInformation } from '../../utils/Utils';
 import teamsSample from '../../SampleData/TeamsSample';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
+import { StepSets, Operations } from '../../Types/enums';
+import { PageProps } from '../../Types/props';
 
 
 const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
   const navigate = useNavigate();
-
+  // user creation modal
   const [promptForUserRecordCreation, setPromptForUserRecordCreation] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [responseType, setResponseType] = useState(0);
-  const [currUser, setCurrUser] = useState<MemberInformation>({
-    userId: '',
-    identifiers: {
-      accountEmail: '',
-      name: '',
-      gtID: '',
-      otherEmails: ['']
-    },
-    roles: {
-        role: '',
-        isAdmin: false
-    },
-    teams: {
-        teamMembership: [''],
-        teamsAdvising: ['']
-    },
-    moduleProgress: [{
-        moduleName: '',
-        percentComplete: 0.0,
-        isAssigned: false,
-        subsectionsComplete: []
-    }]
-  });
+  
+  // home page
+  const [currUser, setCurrUser] = useState<MemberInformation | null>(null);
   const [apiDataReceived, setApiDataReceived] = useState<ApiReceiveInformation>({
     users: undefined,
-    modules: undefined,
+    activities: undefined,
     subsections: undefined,
     teams: undefined
   });
   const [apiDataToSend, setApiDataToSend] = useState<ApiSendInformation>({
     user: undefined,
-    module: undefined,
+    activity: undefined,
     subsection: undefined,
     team: undefined
   });
-
-  const [modules, setModules] = useState<ModuleInformation[]>([
-    {
-      moduleName: '',
-      subsections: ['', ''],
-      imageURL: ''
-    }
-  ]);
-
-  const [personalProgress, setPersonalProgress] = useState<PersonalModuleProgress>(
-    {
-      name: '',
-      modules: [
-        {
-          isAssigned: false,
-          progress: 0,
-          moduleName: '',
-          subsections: ['', ''],
-          imageURL: '',
-        }
-      ]
-  })
+  const [activities, setActivities] = useState<ActivityInformation[] | null>(null);
   
-  useEffect(() => {
-    console.log('isLoading changed', isLoading);
-  }, [isLoading])
 
+  /****************************** Helper functions ***********************************/
   const checkForUserAcct = async () => {
     let tempCurrUser: MemberInformation;
     try {
@@ -99,68 +58,32 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
           accountEmail: '',
           name: '',
           gtID: '',
-          otherEmails: ['']
+          otherEmails: []
         },
         roles: {
             role: '',
             isAdmin: false
         },
         teams: {
-            teamMembership: [''],
-            teamsAdvising: ['']
+            teamMembership: [],
+            teamsAdvising: []
         },
-        moduleProgress: [{
-            moduleName: '',
-            percentComplete: 0.0,
-            isAssigned: false,
-            subsectionsComplete: []
-        }]
+        progress: []
       }
     }
     return tempCurrUser;
   };
-
-  const matchProgressInformation = (tempCurrUser: MemberInformation) => {
-    const modules = modulesSample;
-    const _teams = teamsSample;
-
-
-    let temp: ApiReceiveInformation = {
-      users: [],
-      teams: _teams,
-      modules: [],
-      subsections: []
-    }
-    setApiDataReceived(temp);
-
-    setModules(modulesSample);
-    setCurrUser(tempCurrUser);
-
-    // find modules where user has progress, which user is assigned to
-    const combinedModules = modules.map((module: ModuleInformation) => {
-    const matchingProgressModule = tempCurrUser?.moduleProgress?.find((m: ModuleProgress) => m.moduleName === module.moduleName);
-      return {
-        ...module,
-        progress: matchingProgressModule ? matchingProgressModule.percentComplete : 0,
-        isAssigned: matchingProgressModule ? matchingProgressModule.isAssigned : false
-      }
-    })
-
-    combinedModules.sort((a, b) => {
-      return Number(b.isAssigned) - Number(a.isAssigned);
-    })
-
-    setPersonalProgress({
-      name: tempCurrUser?.identifiers?.name,
-      modules: combinedModules
-    });
-  }
   
 
   useEffect(() => {
     const fetchData = async () => {
       const tempCurrUser = await checkForUserAcct();
-      matchProgressInformation(tempCurrUser);      
+      // const allActivities = await getAllActivities();
+      const allActivities = activitiesSample;
+
+      setCurrUser(tempCurrUser);
+      setActivities(allActivities);
+
       setIsLoading(false);
     };
 
@@ -168,9 +91,11 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     fetchData();
   }, []);  
 
-  const handleCardClick = (moduleName: string) => {
-    console.log(moduleName);
-    navigate(`/modules/${moduleName}`);
+
+  /*********************************** Event handlers *************************************/
+  const handleCardClick = (activityName: string) => {
+    console.log(activityName);
+    navigate(`/activities/${activityName}`);
   }
 
   const handleCloseModal = () => {
@@ -215,17 +140,13 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
     setApiDataToSend({
       user: undefined,
-      module: undefined,
+      activity: undefined,
       subsection: undefined,
       team: undefined
     });
   };
 
-  function isMemberInformation(info: any): info is MemberInformation {
-    return (info as MemberInformation).identifiers.gtID !== undefined;
-  }
-
-  const handleApiInfoChange = (info: MemberInformation | ModuleInformation | SubsectionInformation | TeamInformation) => {
+  const handleApiInfoChange = (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => {
     console.log('changed inside home.tsx', info);
     if (isMemberInformation(info) && loggedInUser?.signInDetails?.loginId) {
       let temp = {...apiDataToSend};
@@ -298,19 +219,23 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
               Hello, {currUser?.identifiers?.name}! What would you like to learn today?
             </Typography>
           </div>
-          <div className='module-card-container'>
-            {personalProgress.modules.map((module, index) => {
+          <div className='activity-card-container'>
+            {activities?.map((activity, index) => {
+              const numSubsections = activity.subsectionNames.length;
+              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionsComplete.length;
+              const percentComplete = numCompleted ? numCompleted / numSubsections : 0.0;
+              
               return (
-                <Card className={`module-card ${module.isAssigned ? 'assigned' : ''}`} onClick={() => handleCardClick(module.moduleName)} key={index}>
+                <Card className={'activity-card'} onClick={() => handleCardClick(activity.activityName)} key={index}>
                   <CardMedia
-                    className='module-image'
-                    image={module.imageURL}
+                    className='activity-image'
+                    image={activity.imageURL}
                   />
-                  <CardContent className='module-card-content'>
+                  <CardContent className='activity-card-content'>
                     <Typography>
-                      {module.moduleName}
+                      {activity.activityName}
                     </Typography>
-                    <LinearProgressWithLabel progress={module.progress} />
+                    <LinearProgressWithLabel progress={percentComplete} />
                   </CardContent>
                 </Card>
               );

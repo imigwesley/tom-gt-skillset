@@ -1,8 +1,9 @@
 import { Button, TextField, Typography } from '@mui/material';
 import './Contact.scss';
 import { useEffect, useState } from 'react';
-import { MemberInformation, PageProps } from '../../Types/types';
+import { MemberInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
+import { PageProps } from '../../Types/props';
 
 const FeedbackPage = ({loggedInUser}: PageProps) => {
 
@@ -24,10 +25,8 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
         teamMembership: [''],
         teamsAdvising: ['']
     },
-    moduleProgress: [{
-        moduleName: '',
-        percentComplete: 0.0,
-        isAssigned: false,
+    progress: [{
+        activityName: '',
         subsectionsComplete: []
     }]
   });

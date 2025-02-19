@@ -83,11 +83,9 @@ export async function createSingleUserData(userData: MemberInformation) {
             identifiers: userData.identifiers,
             roles: userData.roles,
             teams: userData.teams,
-            moduleProgress: userData.moduleProgress.map((progress) => ({
-              subsectionsCpmplete: progress.subsectionsComplete,
-              moduleName: progress.moduleName,
-              isAssigned: progress.isAssigned,
-              percentComplete: progress.percentComplete
+            progress: userData.progress.map((progress) => ({
+              subsectionsComplete: progress.subsectionsComplete,
+              activityName: progress.activityName,
             })),
         };        
         const restOperation = post({
@@ -120,11 +118,9 @@ export async function updateSingleUserData(userData: MemberInformation) {
             identifiers: userData.identifiers,
             roles: userData.roles,
             teams: userData.teams,
-            moduleProgress: userData.moduleProgress.map((progress) => ({
-              subsectionsCpmplete: progress.subsectionsComplete,
-              moduleName: progress.moduleName,
-              isAssigned: progress.isAssigned,
-              percentComplete: progress.percentComplete
+            progress: userData.progress.map((progress) => ({
+              subsectionsComplete: progress.subsectionsComplete,
+              activityName: progress.activityName,
             })),
         };        
         const restOperation = put({
