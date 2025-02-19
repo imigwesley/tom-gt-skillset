@@ -10,7 +10,8 @@ const teamsSample = [
         ],
         "advisors": [
             '913655084', // David Kim
-        ]
+        ],
+        "progress": []
     },
     {
         "teamName": "Development",
@@ -19,7 +20,8 @@ const teamsSample = [
         ],
         "advisors": [
             '903855084'  // Noah King
-        ]
+        ],
+        "progress": []
     },
     {
         "teamName": "Engineering",
@@ -33,7 +35,8 @@ const teamsSample = [
         "advisors": [
             '943655084', // Olivia White
             '905655084'  // Logan Young
-        ]
+        ],
+        "progress": []
     },
     {
         "teamName": "Marketing",
@@ -46,8 +49,8 @@ const teamsSample = [
         ],
         "advisors": [
             '903655085', // Matthew Hall
-
-        ]
+        ],
+        "progress": []
     },
     {
         "teamName": "Operations",
@@ -59,8 +62,8 @@ const teamsSample = [
         ],
         "advisors": [
             '903655088', // Emily Clark
-
-        ]
+        ],
+        "progress": []
     },
     {
         "teamName": "CAD",
@@ -72,7 +75,8 @@ const teamsSample = [
         ],
         "advisors": [
             '903655087', // John Doe
-        ]
+        ],
+        "progress": []
     }
 ];
 

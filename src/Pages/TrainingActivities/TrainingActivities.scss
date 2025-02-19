@@ -1,6 +1,6 @@
 @import '../../Themes/TOMThemeVariables.scss';
 
-.module-page-container {
+.activity-page-container {
     display: flex;
     flex-direction: row;
     padding: 1% 1% 0% 1%;
@@ -16,7 +16,7 @@
         box-shadow: 0px 0px 5px gainsboro;
     }
     
-    .module-container {
+    .activity-container {
         display: flex;
         flex-direction: column;
         flex: 1;

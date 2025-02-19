@@ -2,45 +2,46 @@ import { Divider, LinearProgress, Typography } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './TrainingModules.scss';
+import './TrainingActivities.scss';
 import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
-import modulesSample from '../../SampleData/ModulesSample';
-import { ModuleProgress, ModuleInformation, PageProps, MemberInformation } from '../../Types/types';
+import { ActivityProgress, MemberInformation, ActivityInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
+import activitiesSample from '../../SampleData/ActivitiesSample';
+import { PageProps } from '../../Types/props';
 
 const TrainingModulesPage = ({loggedInUser}: PageProps) => {
-  const { moduleName } = useParams();
-  const [module, setModule] = useState<ModuleInformation>({
-    moduleName: '',
-    subsections: [],
+  const { activityName } = useParams();
+  const [activity, setActivity] = useState<ActivityInformation>({
+    isTeam: false,
+    isIndividual: false,
+    activityName: '',
+    subsectionNames: [],
     imageURL: ''
   });
   const [subsectionHtml, setSubsectionHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [currSubsection, setCurrSubsection] = useState('');
   const [subsections, setSubsections] = useState(['']);
-  const [memberProgress, setMemberProgress] = useState<ModuleProgress[]>([]);
-
-
+  const [memberProgress, setMemberProgress] = useState<ActivityProgress[]>([]);
 
 
   useEffect(() => {
     const fetchData = async () => {
       const singleUserResponse = await getSingleUserData(loggedInUser?.username);
       const tempCurrUser: MemberInformation = singleUserResponse[0];
-      setModule(modulesSample[0]); // change to last completed one
-      setSubsections(module.subsections);
-      const curr = module.subsections[0];
+      setActivity(activitiesSample[0]); // change to last completed one
+      setSubsections(activity.subsectionNames);
+      const curr = activity.subsectionNames[0];
       setCurrSubsection(curr);
       setSubsectionHtml(subSectionsSample.find((subsection) => subsection.subsectionName === curr)?.subsectionHtml || '');
-      setMemberProgress(tempCurrUser.moduleProgress);
+      setMemberProgress(tempCurrUser.progress);
       setIsLoading(false);
     };
 
     setIsLoading(true);
     fetchData();
-  }, [moduleName, module]);
+  }, [activityName, activity]);
 
 
   const handleSubsectionClick = (passedSubsection: string) => {
@@ -56,15 +57,15 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
             <LinearProgress />
           </div>
         :
-          <div className='module-page-container'>
+          <div className='activity-page-container'>
               <div className='background-card'>
-                <Typography variant='h4'>{moduleName}</Typography>
+                <Typography variant='h4'>{activityName}</Typography>
                 {subsections.map((subsection, index) => {
                   return (
                     <div key={index} onClick={() => handleSubsectionClick(subsection)}>
                       <SubsectionLink 
                         isCurrent={currSubsection === subsection} 
-                        isCompleted={memberProgress.find((curr) => curr.moduleName === moduleName)?.subsectionsComplete.includes(subsection) ? true : false} 
+                        isCompleted={memberProgress?.find((curr) => curr.activityName === activityName)?.subsectionsComplete.includes(subsection) ? true : false} 
                         name={subsection} 
                       />
                     </div>
@@ -72,7 +73,7 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
                 })}
               </div>
 
-              <div className='module-container background-card'>
+              <div className='activity-container background-card'>
                 <Typography variant='h3'>{currSubsection}</Typography>
                 <Divider variant='middle' />
                 <div className='quill'>
@@ -87,6 +88,5 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
 
     );
   };
-  // hardcode styling and big divs: only include option to rewrite module subsections, names, etc
   
   export default TrainingModulesPage;

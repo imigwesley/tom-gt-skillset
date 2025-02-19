@@ -1,7 +1,7 @@
 import { Card, CardContent, Divider, Typography } from "@mui/material";
 import './MemberInfoCard.scss';
 import clsx from 'clsx';
-import { MemberCardProps } from '../../Types/types';
+import { MemberCardProps } from '../../Types/props';
 
 
 const MemberInfoCard = ({member, isEven, isFirst, isLast}: MemberCardProps) => {

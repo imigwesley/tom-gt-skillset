@@ -3,8 +3,9 @@ import { Avatar, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import './Navbar.scss';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MemberInformation, NavbarProps } from '../../Types/types';
+import { MemberInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
+import { NavbarProps } from '../../Types/props';
 
 const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
   

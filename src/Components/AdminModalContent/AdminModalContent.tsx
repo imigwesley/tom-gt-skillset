@@ -1,14 +1,16 @@
-import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Popper, Select, styled, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Select, styled, TextField, Typography } from '@mui/material';
 import './AdminModalContent.scss';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
-import modulesSample from '../../SampleData/ModulesSample';
+import activitiesSample from '../../SampleData/ActivitiesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import teamsSample from '../../SampleData/TeamsSample';
 import Checkbox from '@mui/material/Checkbox';
-import { AdminModalContentProps, ApiSendInformation, MemberInformation, ModalPages, ModuleInformation, NameGTidMap, SubsectionInformation, TeamInformation, UserRoles } from '../../Types/types';
+import { ActivityInformation, MemberInformation, NameGTidMap, SubsectionInformation, TeamInformation } from '../../Types/types';
+import { AdminModalContentProps } from '../../Types/props';
 import { Add, AddPhotoAlternate, DeleteOutline } from '@mui/icons-material';
 import { validateEmailString } from '../../utils/Utils';
 import ReactQuill from 'react-quill';
+import { ModalPages } from '../../Types/enums';
 
 const toolbarOptions = [
   [{ 'header': [1, 2, 3, false] }],
@@ -35,7 +37,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
 
   const [userSelected, setUserSelected] = useState<string>(); // used??
   const [teamSelected, setTeamSelected] = useState<string>(); // used??
-  const [moduleSelected, setModuleSelected] = useState<string>(); // used??
+  const [activitySelected, setActivitySelected] = useState<string>(); // used??
   const [subsectionSelected, setSubsectionSelected] = useState<string>(); // used??
   const [usersGTidMap, setUsersGTidMap] = useState<NameGTidMap>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -60,34 +62,35 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
         teamMembership: [],
         teamsAdvising: []
     },
-    moduleProgress: [{
-        moduleName: '',
-        percentComplete: 0.0,
-        isAssigned: false,
+    progress: [{
+        activityName: '',
         subsectionsComplete: []
     }]
   });
   const [localTeamData, setLocalTeamData] = useState<TeamInformation | null>({
     teamName: '',
     membership: [],
-    advisors: []
+    advisors: [],
+    progress: []
   });
-  const [localModuleData, setLocalModuleData] = useState<ModuleInformation | null>({
-    moduleName: '',
-    subsections: [],
+  const [localActivityData, setLocalActivityData] = useState<ActivityInformation | null>({
+    isTeam: false,
+    isIndividual: false,
+    activityName: '',
+    subsectionNames: [],
     imageURL: ''
   })
   const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation | null>({
     subsectionName: '',
     subsectionHtml: '',
-    htmlEdited: false
   })
 
   // all data from api
   const teamsData: TeamInformation[] = passedApiInformation.teams || [{
       teamName: '',
       membership: [],
-      advisors: []
+      advisors: [],
+      progress: []
     }];
   const usersData: MemberInformation[] = passedApiInformation.users || [{
     userId: '',
@@ -105,22 +108,21 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
         teamMembership: [],
         teamsAdvising: []
     },
-    moduleProgress: [{
-        moduleName: '',
-        percentComplete: 0.0,
-        isAssigned: false,
+    progress: [{
+        activityName: '',
         subsectionsComplete: []
     }]
   }];
-  const modulesData: ModuleInformation[] = passedApiInformation.modules || [{
-    moduleName: '',
-    subsections: [],
-    imageURL: ''
+  const activitiesData: ActivityInformation[] = passedApiInformation.activities || [{
+    activityName: '',
+    subsectionNames: [],
+    imageURL: '',
+    isTeam: false,
+    isIndividual: false
   }];
   const subsectionsData: SubsectionInformation[] = passedApiInformation.subsections || [{
     subsectionName: '',
     subsectionHtml: '',
-    htmlEdited: false
   }];
 
   useEffect(() => {
@@ -160,7 +162,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     onApiInformationUpdate(temp);
   }
@@ -186,7 +188,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     
     setLocalUserData(temp);
@@ -221,7 +223,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
 
     setLocalUserData(temp);
@@ -254,7 +256,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             teamMembership: localUserData?.teams.teamMembership || [],
             teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: localUserData?.moduleProgress || []
+        progress: localUserData?.progress || []
       };
       onApiInformationUpdate(temp);
     }    
@@ -281,7 +283,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
 
     setLocalUserData(temp);
@@ -308,7 +310,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -331,7 +333,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     //         teamMembership: localUserData?.teams.teamMembership || [],
     //         teamsAdvising: localUserData?.teams.teamsAdvising || []
     //     },
-    //     moduleProgress: localUserData?.moduleProgress || []
+    //     progress: localUserData?.progress || []
     //   };
 
     //   onApiInformationUpdate(temp);
@@ -364,7 +366,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             teamMembership: localUserData?.teams.teamMembership || [],
             teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: localUserData?.moduleProgress || []
+        progress: localUserData?.progress || []
       };
       setLocalUserData(temp);
       if (value.length === 9) {
@@ -397,7 +399,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             teamMembership: localUserData?.teams.teamMembership || [],
             teamsAdvising: localUserData?.teams.teamsAdvising || []
         },
-        moduleProgress: localUserData?.moduleProgress || []
+        progress: localUserData?.progress || []
       };
       onApiInformationUpdate(temp);
     } 
@@ -420,7 +422,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: event.target.value,
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -443,7 +445,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: event.target.value
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     setLocalUserData(temp);
     onApiInformationUpdate(temp);
@@ -466,7 +468,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           teamMembership: localUserData?.teams.teamMembership || [],
           teamsAdvising: localUserData?.teams.teamsAdvising || []
       },
-      moduleProgress: localUserData?.moduleProgress || []
+      progress: localUserData?.progress || []
     };
     console.log('handling change user role. temp is: ', temp);
     console.log('here, localUserData is: ', localUserData)
@@ -483,6 +485,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
       teamName: event.target.value,
       advisors: localTeamData?.advisors || [],
       membership: localTeamData?.membership || [],
+      progress: localTeamData?.progress || []
     };
     setLocalTeamData(temp);
   };
@@ -493,6 +496,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
         teamName: event.target.value,
         advisors: localTeamData?.advisors || [],
         membership: localTeamData?.membership || [],
+        progress: localTeamData?.progress || []
       };
       onApiInformationUpdate(temp);
     } else {
@@ -507,6 +511,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
       teamName: localTeamData?.teamName || '',
       advisors: newValue.map((user) => user.identifiers.gtID),
       membership: localTeamData?.membership || [],
+      progress: localTeamData?.progress || []
     };
     setLocalTeamData(temp);
     onApiInformationUpdate(temp);
@@ -519,6 +524,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
       teamName: localTeamData?.teamName || '',
       advisors: localTeamData?.advisors || [],
       membership: newValue.map((user) => user.identifiers.gtID),
+      progress: localTeamData?.progress || []
     };
     setLocalTeamData(temp);
     onApiInformationUpdate(temp);
@@ -526,25 +532,29 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
 
   ////////////////////////// MODULE ACTIONS /////////////////////////////////////////////////////////
 
-  const handleChangeModuleName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const temp: ModuleInformation = {
-      moduleName: event.target.value,
-      subsections: localModuleData?.subsections || [],
-      imageURL: localModuleData?.imageURL || '',
+  const handleChangeActivityName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const temp: ActivityInformation = {
+      activityName: event.target.value,
+      subsectionNames: localActivityData?.subsectionNames || [],
+      imageURL: localActivityData?.imageURL || '',
+      isTeam: localActivityData?.isTeam || false,
+      isIndividual: localActivityData?.isIndividual || false,
     };
-    setLocalModuleData(temp);
+    setLocalActivityData(temp);
     onApiInformationUpdate(temp);
   }
 
-  const handleChangeModuleSubsectionsSelection = (event: SyntheticEvent<Element, Event>,
+  const handleChangeActivitySubsectionsSelection = (event: SyntheticEvent<Element, Event>,
     newValue: SubsectionInformation[],
     reason: AutocompleteChangeReason) => {
-    const temp: ModuleInformation = {
-      moduleName: localModuleData?.moduleName || '',
-      subsections: newValue.map((subsection) => subsection.subsectionName),
-      imageURL: localModuleData?.imageURL || '',
+    const temp: ActivityInformation = {
+      activityName: localActivityData?.activityName || '',
+      subsectionNames: newValue.map((subsection) => subsection.subsectionName),
+      imageURL: localActivityData?.imageURL || '',
+      isTeam: localActivityData?.isTeam || false,
+      isIndividual: localActivityData?.isIndividual || false,
     };
-    setLocalModuleData(temp);
+    setLocalActivityData(temp);
     onApiInformationUpdate(temp);
   }
 
@@ -566,7 +576,6 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     const temp: SubsectionInformation = {
       subsectionName: event.target.value,
       subsectionHtml: localSubsectionData?.subsectionHtml || '',
-      htmlEdited: false
     };
     setLocalSubsectionData(temp);
   };
@@ -578,7 +587,6 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     const temp: SubsectionInformation = {
       subsectionName: event.target.value,
       subsectionHtml: localSubsectionData?.subsectionHtml || '',
-      htmlEdited: false
     };
     onApiInformationUpdate(temp);
   };
@@ -592,7 +600,6 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
         const updatedData: SubsectionInformation = {
           subsectionName: prev?.subsectionName || '',
           subsectionHtml: currentHtml || '',
-          htmlEdited: true
         };
 
         onApiInformationUpdate(updatedData);
@@ -836,10 +843,8 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                         teamMembership: [],
                         teamsAdvising: []
                     },
-                    moduleProgress: [{
-                        moduleName: '',
-                        percentComplete: 0.0,
-                        isAssigned: false,
+                    progress: [{
+                        activityName: '',
                         subsectionsComplete: []
                     }]
                   });
@@ -866,123 +871,124 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
 
 
 
-      : page == ModalPages.EDIT_TEAM ?
-        <div>
-          <Typography variant='h4'>Edit Team Information</Typography>
-          <div className='input-info-section'>
-            <Typography>Team Name*:</Typography>
-            <TextField 
-              fullWidth 
-              value={localTeamData?.teamName} 
-              onChange={handleChangeTeamName} 
-              onBlur={handleTeamNameBlur}
-              className='input-box'
-              error={incorrectTeamNameError}
-              helperText={incorrectTeamNameError ? 'Team name is required' : ''}
-            />
-          </div>
-          <div className='input-info-section'>
-            <Typography>Team Members*:</Typography>
-            <FormControl fullWidth className='input-box'>
-              <Autocomplete
-                multiple
-                options={usersData}
-                value={usersData.filter((user) => localTeamData?.membership.includes(user.identifiers.gtID))}
-                onChange={handleChangeTeamMembership}
-                disableCloseOnSelect
-                PaperComponent={(props) => <StyledPaper {...props} />}
-                getOptionLabel={(option) => option.identifiers.name}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" placeholder={localTeamData?.membership.length === 0 ? "None Selected" : ''} />
-                )}
-                renderOption={(props, option, { selected }) => (
-                  <li {...props} key={option.identifiers.gtID}>
-                    <ListItemText primary={option.identifiers.name} />
-                  </li>
-                )}
-                renderTags={(selected) =>
-                  selected.length === 0 ? (
-                    <Typography variant="body2" color="textSecondary">
-                      None Selected
-                    </Typography>
-                  ) : (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((user) => (
-                        <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
-                      ))}
-                    </Box>
-                  )
-                }
-              />
-            </FormControl>
-          </div>
-          <div className='input-info-section'>
-            <Typography>Team Advisors*:</Typography>
-            <FormControl fullWidth className='input-box'>
-              <Autocomplete
-                multiple
-                options={usersData}
-                value={usersData.filter((user) => localTeamData?.advisors.includes(user.identifiers.name))}
-                onChange={handleChangeTeamAdvisors}
-                disableCloseOnSelect
-                PaperComponent={(props) => <StyledPaper {...props} />}
-                getOptionLabel={(option) => option.identifiers.name}
-                renderInput={(params) => (
-                  <TextField {...params} variant="outlined" placeholder={localTeamData?.advisors.length === 0 ? "None Selected" : ''} />
-                )}
-                renderOption={(props, option, { selected }) => (
-                  <li {...props} key={option.identifiers.name}>
-                    <ListItemText primary={option.identifiers.name} />
-                  </li>
-                )}
-                renderTags={(selected) =>
-                  selected.length === 0 ? (
-                    <Typography variant="body2" color="textSecondary">
-                      None Selected
-                    </Typography>
-                  ) : (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((user) => (
-                        <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
-                      ))}
-                    </Box>
-                  )
-                }
-              />
-            </FormControl>
-          </div>
-        </div>
-      : page == ModalPages.SELECT_TEAM ? (
-        <div className='selector-centering'>
-          <Typography variant='h5'>Select a team:</Typography>
-          <FormControl className='select-autocomplete'>
-            <Select
-              displayEmpty
-              renderValue={() => <Typography>{localTeamData?.teamName || 'Select a team'}</Typography>}
-              value={localTeamData?.teamName}
-              onChange={(e) => {
-                const team = teamsData.find((team) => team.teamName === e.target.value);
-                if (team) {
-                  setLocalTeamData(team);
-                  onApiInformationUpdate(team);
-                } else {
-                  setLocalTeamData(teamsData?.find((team) => team.teamName === teamSelected) || {
-                    teamName: '',
-                    membership: [],
-                    advisors: []
-                  });
-                }
-              }}              
-            >
-              {teamsData.sort((a, b) => a.teamName > b.teamName ? 0 : -1).map((team) => (
-                <MenuItem key={team.teamName} value={team.teamName}>
-                  {team.teamName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </div>
-      )
+      // : page == ModalPages.EDIT_TEAM ?
+      //   <div>
+      //     <Typography variant='h4'>Edit Team Information</Typography>
+      //     <div className='input-info-section'>
+      //       <Typography>Team Name*:</Typography>
+      //       <TextField 
+      //         fullWidth 
+      //         value={localTeamData?.teamName} 
+      //         onChange={handleChangeTeamName} 
+      //         onBlur={handleTeamNameBlur}
+      //         className='input-box'
+      //         error={incorrectTeamNameError}
+      //         helperText={incorrectTeamNameError ? 'Team name is required' : ''}
+      //       />
+      //     </div>
+      //     <div className='input-info-section'>
+      //       <Typography>Team Members*:</Typography>
+      //       <FormControl fullWidth className='input-box'>
+      //         <Autocomplete
+      //           multiple
+      //           options={usersData}
+      //           value={usersData.filter((user) => localTeamData?.membership.includes(user.identifiers.gtID))}
+      //           onChange={handleChangeTeamMembership}
+      //           disableCloseOnSelect
+      //           PaperComponent={(props) => <StyledPaper {...props} />}
+      //           getOptionLabel={(option) => option.identifiers.name}
+      //           renderInput={(params) => (
+      //             <TextField {...params} variant="outlined" placeholder={localTeamData?.membership.length === 0 ? "None Selected" : ''} />
+      //           )}
+      //           renderOption={(props, option, { selected }) => (
+      //             <li {...props} key={option.identifiers.gtID}>
+      //               <ListItemText primary={option.identifiers.name} />
+      //             </li>
+      //           )}
+      //           renderTags={(selected) =>
+      //             selected.length === 0 ? (
+      //               <Typography variant="body2" color="textSecondary">
+      //                 None Selected
+      //               </Typography>
+      //             ) : (
+      //               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+      //                 {selected.map((user) => (
+      //                   <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
+      //                 ))}
+      //               </Box>
+      //             )
+      //           }
+      //         />
+      //       </FormControl>
+      //     </div>
+      //     <div className='input-info-section'>
+      //       <Typography>Team Advisors*:</Typography>
+      //       <FormControl fullWidth className='input-box'>
+      //         <Autocomplete
+      //           multiple
+      //           options={usersData}
+      //           value={usersData.filter((user) => localTeamData?.advisors.includes(user.identifiers.name))}
+      //           onChange={handleChangeTeamAdvisors}
+      //           disableCloseOnSelect
+      //           PaperComponent={(props) => <StyledPaper {...props} />}
+      //           getOptionLabel={(option) => option.identifiers.name}
+      //           renderInput={(params) => (
+      //             <TextField {...params} variant="outlined" placeholder={localTeamData?.advisors.length === 0 ? "None Selected" : ''} />
+      //           )}
+      //           renderOption={(props, option, { selected }) => (
+      //             <li {...props} key={option.identifiers.name}>
+      //               <ListItemText primary={option.identifiers.name} />
+      //             </li>
+      //           )}
+      //           renderTags={(selected) =>
+      //             selected.length === 0 ? (
+      //               <Typography variant="body2" color="textSecondary">
+      //                 None Selected
+      //               </Typography>
+      //             ) : (
+      //               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+      //                 {selected.map((user) => (
+      //                   <Chip key={user.identifiers.gtID} label={usersGTidMap[user.identifiers.gtID] || user.identifiers.gtID} />
+      //                 ))}
+      //               </Box>
+      //             )
+      //           }
+      //         />
+      //       </FormControl>
+      //     </div>
+      //   </div>
+      // : page == ModalPages.SELECT_TEAM ? (
+      //   <div className='selector-centering'>
+      //     <Typography variant='h5'>Select a team:</Typography>
+      //     <FormControl className='select-autocomplete'>
+      //       <Select
+      //         displayEmpty
+      //         renderValue={() => <Typography>{localTeamData?.teamName || 'Select a team'}</Typography>}
+      //         value={localTeamData?.teamName}
+      //         onChange={(e) => {
+      //           const team = teamsData.find((team) => team.teamName === e.target.value);
+      //           if (team) {
+      //             setLocalTeamData(team);
+      //             onApiInformationUpdate(team);
+      //           } else {
+      //             setLocalTeamData(teamsData?.find((team) => team.teamName === teamSelected) || {
+      //               teamName: '',
+      //               membership: [],
+      //               advisors: [],
+      //               progress: []
+      //             });
+      //           }
+      //         }}              
+      //       >
+      //         {teamsData.sort((a, b) => a.teamName > b.teamName ? 0 : -1).map((team) => (
+      //           <MenuItem key={team.teamName} value={team.teamName}>
+      //             {team.teamName}
+      //           </MenuItem>
+      //         ))}
+      //       </Select>
+      //     </FormControl>
+      //   </div>
+      // )
 
       : page == ModalPages.EDIT_SUBSECTION ?
         <div>
@@ -1009,22 +1015,22 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             <button onClick={handleSaveSubsectionHtml}>Save</button>
           </div>
           <div className='input-info-section'>
-            <Typography>Assign to Module:</Typography>
+            <Typography>Assign to Activity:</Typography>
             <FormControl fullWidth className='input-box'>
               <Select  
                 // fullWidth
-                // renderValue={() => <Typography>{localModuleData?.moduleName}</Typography>}
-                // value={localModuleData?.moduleName}
+                // renderValue={() => <Typography>{localActivityData?.activityName}</Typography>}
+                // value={localActivityData?.activityName}
                 onChange={(e) => {
-                  const module = modulesData.find((module) => module.moduleName === e.target.value);
+                  const activity = activitiesData.find((activity) => activity.activityName === e.target.value);
                   console.log('e is ', e)
-                  console.log('module is ', module)
+                  console.log('activity is ', activity)
                   // TODO: add in ability to send this to api
                 }}              
                 >
-                {modulesData.sort((a, b) => a.moduleName > b.moduleName ? 0 : -1).map((module) => (
-                  <MenuItem key={module.moduleName} value={module.moduleName}>
-                    {module.moduleName}
+                {activitiesData.sort((a, b) => a.activityName > b.activityName ? 0 : -1).map((activity) => (
+                  <MenuItem key={activity.activityName} value={activity.activityName}>
+                    {activity.activityName}
                   </MenuItem>
                 ))}
               </Select>
@@ -1048,7 +1054,6 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                   setLocalSubsectionData(subsectionsData?.find((subsection) => subsection.subsectionName === subsectionSelected) || {
                     subsectionName: '',
                     subsectionHtml: '',
-                    htmlEdited: false
                   });
                 }
               }}
@@ -1072,27 +1077,27 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
 
 
 
-      : page == ModalPages.EDIT_MODULE ? (
+      : page == ModalPages.EDIT_ACTIVITY ? (
         <div>
-          <Typography variant='h4'>Edit Module Information</Typography>
+          <Typography variant='h4'>Edit Activity Information</Typography>
           <div className='input-info-section'>
-            <Typography>Module Name*:</Typography>
-            <TextField fullWidth value={localModuleData?.moduleName} onChange={handleChangeModuleName} className='input-box'/>
+            <Typography>Activity Name*:</Typography>
+            <TextField fullWidth value={localActivityData?.activityName} onChange={handleChangeActivityName} className='input-box'/>
           </div>
           <div className='input-info-section'>
-            <Typography>Module Subsections*:</Typography>
-            <Typography className='italics'>Subsections must be created before being added to a module</Typography>
+            <Typography>Activity Subsections*:</Typography>
+            <Typography className='italics'>Subsections must be created before being added to a activity</Typography>
             <FormControl fullWidth className='input-box'>
               <Autocomplete
                 multiple
                 options={subsectionsData}
-                value={subsectionsData.filter((subsection) => localModuleData?.subsections.includes(subsection.subsectionName))}
-                onChange={handleChangeModuleSubsectionsSelection}
+                value={subsectionsData.filter((subsection) => localActivityData?.subsectionNames.includes(subsection.subsectionName))}
+                onChange={handleChangeActivitySubsectionsSelection}
                 disableCloseOnSelect
                 PaperComponent={(props) => <StyledPaper {...props} />}
                 getOptionLabel={(option) => option.subsectionName}
                 renderInput={(params) => (
-                  <TextField {...params} variant="outlined" placeholder={localModuleData?.subsections.length === 0 ? "None Selected" : ''} />
+                  <TextField {...params} variant="outlined" placeholder={localActivityData?.subsectionNames.length === 0 ? "None Selected" : ''} />
                 )}
                 renderOption={(props, option, { selected }) => (
                   <li {...props} key={option.subsectionName}>
@@ -1117,11 +1122,11 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             </FormControl>
           </div>
           <div className='input-info-section'>
-            <Typography>Module Image*:</Typography>
+            <Typography>Activity Image*:</Typography>
             <Typography className='italics'>Include an preview for the home screen. Must be a png.</Typography>
               <input 
                 accept='image/png'
-                id='upload-module-image'
+                id='upload-activity-image'
                 type='file'
                 style={{ display: 'none' }}
                 onChange={handleImageUpload}
@@ -1131,7 +1136,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                   <Box>
                     <img src={selectedImage} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
                   </Box>
-                  <label htmlFor='upload-module-image' >
+                  <label htmlFor='upload-activity-image' >
                     <Button color="primary" component="span">
                       <AddPhotoAlternate className='button-icon'/>
                       <Typography>
@@ -1142,7 +1147,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                 </div>
               )
               : (
-                <label htmlFor='upload-module-image' >
+                <label htmlFor='upload-activity-image' >
                   <Button color="primary" component="span">
                     <AddPhotoAlternate className='button-icon'/>
                     <Typography>
@@ -1154,35 +1159,37 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           </div>
         </div>
       )
-      : page == ModalPages.SELECT_MODULE ? (
+      : page == ModalPages.SELECT_ACTIVITY ? (
         <div className='selector-centering'>
-          <Typography variant='h5'>Select a module:</Typography>
+          <Typography variant='h5'>Select an activity:</Typography>
           <FormControl className='select-autocomplete'>
             <Select  
               displayEmpty
-              renderValue={() => <Typography>{localModuleData?.moduleName || 'Select a module'}</Typography>}
-              value={localModuleData?.moduleName}
+              renderValue={() => <Typography>{localActivityData?.activityName || 'Select an activity'}</Typography>}
+              value={localActivityData?.activityName}
               onChange={(e) => {
-                const module = modulesData.find((module) => module.moduleName === e.target.value);
+                const activity = activitiesData.find((activity) => activity.activityName === e.target.value);
                 console.log('e is ', e)
-                console.log('module is ', module)
-                if (module) {
-                  setLocalModuleData(module);
-                  onApiInformationUpdate(module);
+                console.log('activity is ', activity)
+                if (activity) {
+                  setLocalActivityData(activity);
+                  onApiInformationUpdate(activity);
                 } else {
                   console.log('made it in here')
                   // TODO: does this ever get reached?
-                  setLocalModuleData(modulesData?.find((module) => module.moduleName === moduleSelected) || {
-                    moduleName: '',
-                    subsections: [],
-                    imageURL: ''
+                  setLocalActivityData(activitiesData?.find((activity) => activity.activityName === activitySelected) || {
+                    activityName: '',
+                    subsectionNames: [],
+                    imageURL: '',
+                    isIndividual: false,
+                    isTeam: false
                   });
                 }
               }}              
               >
-              {modulesData.sort((a, b) => a.moduleName > b.moduleName ? 0 : -1).map((module) => (
-                <MenuItem key={module.moduleName} value={module.moduleName}>
-                  {module.moduleName}
+              {activitiesData.sort((a, b) => a.activityName > b.activityName ? 0 : -1).map((activity) => (
+                <MenuItem key={activity.activityName} value={activity.activityName}>
+                  {activity.activityName}
                 </MenuItem>
               ))}
             </Select>
@@ -1233,20 +1240,20 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             </div>
           </div>
         </div>
-      : (page === ModalPages.CONFIRM_SAVE_MODULE || page === ModalPages.CONFIRM_DELETE_MODULE) ?
+      : (page === ModalPages.CONFIRM_SAVE_ACTIVITY || page === ModalPages.CONFIRM_DELETE_ACTIVITY) ?
         <div>
-          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_MODULE ? 'Confirm Module Information:' : 'Confirm Module Deletion:'}</Typography>
+          <Typography variant='h4'>{page === ModalPages.CONFIRM_SAVE_ACTIVITY ? 'Confirm Activity Information:' : 'Confirm Activity Deletion:'}</Typography>
           <div>
             <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Module name:</Typography>
-              <Typography className='indent'>{localModuleData?.moduleName}</Typography>
+              <Typography variant="h6" className='italics'>Activity name:</Typography>
+              <Typography className='indent'>{localActivityData?.activityName}</Typography>
             </div>
             <div className='confirm-section'>
               <Typography variant="h6" className='italics'>Subsections:</Typography>
-              <Typography className='indent'>{localModuleData?.subsections.join(', ')}</Typography>
+              <Typography className='indent'>{localActivityData?.subsectionNames.join(', ')}</Typography>
             </div>
             <div className='confirm-section'>
-              <Typography variant="h6" className='italics'>Module Image:</Typography>
+              <Typography variant="h6" className='italics'>Activity Image:</Typography>
               <img src={selectedImage || ''} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
             </div>
           </div>
