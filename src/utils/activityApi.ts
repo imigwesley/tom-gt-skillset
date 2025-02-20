@@ -1,5 +1,5 @@
 import { del, get, post, put } from 'aws-amplify/api';
-import { SubsectionInformation } from '../Types/types';
+import { ActivityInformation } from '../Types/types';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 async function getAuthToken(): Promise<string> {
@@ -13,12 +13,12 @@ async function getAuthToken(): Promise<string> {
 }
 
 
-export async function getAllSubsections(): Promise<SubsectionInformation[]> {
+export async function getAllActivities(): Promise<ActivityInformation[]> {
     try {
         const authToken = await getAuthToken();
         const restOperation = get({ 
-            apiName: 'subsectionsApi',
-            path: `/subsections`,
+            apiName: 'activityApi',
+            path: `/activity`,
             options: {
                 headers: {
                     Authorization: authToken
@@ -27,20 +27,20 @@ export async function getAllSubsections(): Promise<SubsectionInformation[]> {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        // console.log('All subsections: ', response);
+        // console.log('All activities: ', response);
         return response;
     } catch (e) {
-        console.log('GET all subsections call failed: ', e);
+        console.log('GET all activities call failed: ', e);
         return [];
     }
 }
 
-export async function getSubsection (subsectionName: string | undefined) {
+export async function getActivity (activityName: string | undefined) {
     try {
         const authToken = await getAuthToken();
         const restOperation = get({ 
-            apiName: 'subsectionsApi',
-            path: `/subsections/${subsectionName}`,
+            apiName: 'activityApi',
+            path: `/activity/${activityName}`,
             options: {
                 body: {
                     Authorization: authToken
@@ -49,19 +49,19 @@ export async function getSubsection (subsectionName: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Subsection: ', response);
+        console.log('Activity: ', response);
         return response;
     } catch (e) {
-        console.log('GET subsection call failed: ', e);
+        console.log('GET activity call failed: ', e);
     }
 };
 
-export async function deleteSubsection (subsectionName: string | undefined) {
+export async function deleteActivity (activityName: string | undefined) {
     try {
         const authToken = await getAuthToken();
         const restOperation = del({ 
-            apiName: 'subsectionsApi',
-            path: `/subsections/object/${subsectionName}`,
+            apiName: 'activityApi',
+            path: `/activity/object/${activityName}`,
             options: {
                 headers: {
                     Authorization: authToken
@@ -71,20 +71,24 @@ export async function deleteSubsection (subsectionName: string | undefined) {
         const response = await restOperation.response;
         return response;
     } catch (e) {
-        console.log('DELETE subsection call failed: ', e);
+        console.log('DELETE activity call failed: ', e);
     }
 };
 
-export async function createSubsection(subsectionData: SubsectionInformation) {
+export async function createActivity(activityData: ActivityInformation) {
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
-            subsectionName: subsectionData.subsectionName,
-            subsectionHtml: subsectionData.subsectionHtml
-        };        
+            isTeam: activityData.isTeam,
+            isIndividual: activityData.isIndividual,
+            activityName: activityData.activityName,
+            subsectionNames: activityData.subsectionNames,
+            imagePath: activityData.imagePath
+        };
+        console.log('fixed body is', fixedBody)
         const restOperation = post({
-            apiName: 'subsectionsApi',
-            path: '/subsections/',
+            apiName: 'activityApi',
+            path: '/activity/',
             options: {
                 body: fixedBody,
                 headers: { 
@@ -94,25 +98,28 @@ export async function createSubsection(subsectionData: SubsectionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created subsection: ', response);
+        console.log('Created activity: ', response);
         return response;
     } catch (e) {
-        console.log('POST subsection call failed: ', e);
+        console.log('POST activity call failed: ', e);
     }
 }
 
 
 
-export async function updateSubsection(subsectionData: SubsectionInformation) {
+export async function updateActivity(activityData: ActivityInformation) {
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
-            subsectionName: subsectionData.subsectionName,
-            subsectionHtml: subsectionData.subsectionHtml
-        };      
+            isTeam: activityData.isTeam,
+            isIndividual: activityData.isIndividual,
+            activityName: activityData.activityName,
+            subsectionNames: activityData.subsectionNames,
+            imagePath: activityData.imagePath
+        };    
         const restOperation = put({
-            apiName: 'subsectionsApi',
-            path: '/subsections/',
+            apiName: 'activityApi',
+            path: '/activity/',
             options: {
                 body: fixedBody,
                 headers: { 
@@ -122,9 +129,9 @@ export async function updateSubsection(subsectionData: SubsectionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated subsection: ', response);
+        console.log('Updated activity: ', response);
         return response;
     } catch (e) {
-        console.log('PUT subsection call failed: ', e);
+        console.log('PUT activity call failed: ', e);
     }
 }

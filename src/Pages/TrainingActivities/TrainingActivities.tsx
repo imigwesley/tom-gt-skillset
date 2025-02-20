@@ -17,7 +17,7 @@ const TrainingModulesPage = ({loggedInUser}: PageProps) => {
     isIndividual: false,
     activityName: '',
     subsectionNames: [],
-    imageURL: ''
+    imagePath: ''
   });
   const [subsectionHtml, setSubsectionHtml] = useState('');
   const [isLoading, setIsLoading] = useState(true);

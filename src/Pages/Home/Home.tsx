@@ -4,7 +4,6 @@ import '../../Feedback.scss';
 import { Alert, Box, Button, Card, CardContent, CardMedia, CircularProgress, Dialog, Step, StepLabel, Stepper, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
-import activitiesSample from '../../SampleData/ActivitiesSample';
 import { MemberInformation, ApiReceiveInformation, ApiSendInformation, SubsectionInformation, TeamInformation, ActivityInformation, ActivityProgress } from '../../Types/types';
 import { createSingleUserData, getSingleUserData } from '../../utils/userApi';
 import AdminModalContent from '../../Components/AdminModalContent/AdminModalContent';
@@ -13,6 +12,10 @@ import teamsSample from '../../SampleData/TeamsSample';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
 import { StepSets, Operations } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
+import { getAllActivities } from '../../utils/activityApi';
+import { getFile } from '../../utils/imagesApi';
+import { StorageImage } from '@aws-amplify/ui-react-storage';
+import { ResponseBodyMixin } from '@aws-amplify/core/internals/aws-client-utils';
 
 
 const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
@@ -77,12 +80,19 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const tempCurrUser = await checkForUserAcct();
-      // const allActivities = await getAllActivities();
-      const allActivities = activitiesSample;
 
+      const tempCurrUser = await checkForUserAcct();
+      let tempAllActivities = await getAllActivities();
+
+      tempAllActivities = await Promise.all(
+        tempAllActivities.map(async (activity) => {
+          const imageUrl = await getFile(activity.imagePath);
+          return { ...activity, imagePath: imageUrl };
+        })
+      );      
+      
       setCurrUser(tempCurrUser);
-      setActivities(allActivities);
+      setActivities(tempAllActivities);
 
       setIsLoading(false);
     };
@@ -228,8 +238,9 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
               return (
                 <Card className={'activity-card'} onClick={() => handleCardClick(activity.activityName)} key={index}>
                   <CardMedia
-                    className='activity-image'
-                    image={activity.imageURL}
+                    className="activity-image"
+                    component="img" 
+                    src={activity.imagePath}
                   />
                   <CardContent className='activity-card-content'>
                     <Typography>

@@ -1,0 +1,10 @@
+{
+  "resourceName": "skillsetActivities",
+  "tableName": "skillsetActivities",
+  "partitionKey": {
+    "fieldName": "activityName",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

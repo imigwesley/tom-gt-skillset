@@ -1,5 +1,19 @@
 {
   "api": {
+    "activityApi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "getActivity"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
     "cognitoApi": {
       "dependsOn": [
         {
@@ -78,6 +92,25 @@
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     },
+    "getActivity": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "skillsetActivities"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
     "getSubsections": {
       "build": true,
       "dependsOn": [
@@ -142,6 +175,22 @@
         }
       ]
     },
+    "AMPLIFY_function_getActivity_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getActivity"
+        }
+      ]
+    },
+    "AMPLIFY_function_getActivity_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "getActivity"
+        }
+      ]
+    },
     "AMPLIFY_function_getSubsections_deploymentBucketName": {
       "usedBy": [
         {
@@ -177,6 +226,10 @@
   },
   "storage": {
     "UserData": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    },
+    "skillsetActivities": {
       "providerPlugin": "awscloudformation",
       "service": "DynamoDB"
     },

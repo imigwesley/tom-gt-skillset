@@ -1,26 +1,30 @@
-import { downloadData, uploadData } from 'aws-amplify/storage';
+import { downloadData, uploadData, remove } from 'aws-amplify/storage';
 
 
 export async function getFile(filePath: string) {
     const { body, eTag } = await downloadData({
-        path: `public/images/${filePath}`,
+        path: filePath,
         options: {
-            onProgress: (event) => {
-                console.log(event.transferredBytes);
-            }, // optional progress callback
-            bytesRange: {
-                start: 1024,
-                end: 2048
-            } // optional bytes range parameter to download a part of the file, the 2nd MB of the file in this example
+            onProgress: ({ transferredBytes, totalBytes }) => {
+              if (totalBytes) {
+                console.log(
+                  `Download progress ${
+                    Math.round((transferredBytes / totalBytes) * 100)
+                  } %`
+                );
+              }
+            }
         }
     }).result;
+    const blob = await body.blob();
+    return URL.createObjectURL(blob);
 }
 
-export async function uploadFile(file: File) {
+export async function uploadFile(file: File, isImage: boolean) {
     console.log('file to upload is ', file);
     try {
         const result = await uploadData({
-          path: `public/images/${file.name}`, 
+          path: `public/${isImage ? 'images' : 'submissions'}/${file.name}`, 
           data: file,
           options: {
             onProgress: ({ transferredBytes, totalBytes }) => {
@@ -35,7 +39,19 @@ export async function uploadFile(file: File) {
           }
         }).result;
         console.log('Succeeded: ', result);
+        return result.path;
     } catch (error) {
         console.log('Error : ', error);
     }
+}
+
+export async function deleteFile(deletePath: string, isImage: boolean) {
+  console.log('deleting file at this path: ', deletePath);
+  try{
+    await remove({ 
+      path: deletePath,
+    });
+  } catch (e) {
+    console.log('Error deleting file: ', e)
+  }
 }

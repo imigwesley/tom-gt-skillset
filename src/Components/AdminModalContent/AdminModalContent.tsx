@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, IconButton, ListItemText, MenuItem, Paper, Select, styled, TextField, Typography } from '@mui/material';
+import { Autocomplete, AutocompleteChangeReason, Box, Button, Chip, FormControl, FormControlLabel, IconButton, ListItemText, MenuItem, Paper, Radio, RadioGroup, Select, styled, TextField, Typography } from '@mui/material';
 import './AdminModalContent.scss';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import Checkbox from '@mui/material/Checkbox';
@@ -38,6 +38,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
   const [subsectionSelected, setSubsectionSelected] = useState<string>(); // used??
   const [usersGTidMap, setUsersGTidMap] = useState<NameGTidMap>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [activityWorkMode, setActivityWorkMode] = useState<string>('');
 
   const quillRef = useRef<ReactQuill>(null);
 
@@ -75,7 +76,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     isIndividual: false,
     activityName: '',
     subsectionNames: [],
-    imageURL: ''
+    imagePath: ''
   })
   const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation | null>({
     subsectionName: '',
@@ -113,7 +114,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
   const activitiesData: ActivityInformation[] = passedApiInformation.activities || [{
     activityName: '',
     subsectionNames: [],
-    imageURL: '',
+    imagePath: '',
     isTeam: false,
     isIndividual: false
   }];
@@ -121,6 +122,10 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     subsectionName: '',
     subsectionHtml: '',
   }];
+
+  useEffect(() => {
+    console.log('info received is', passedApiInformation)
+  }, [])
 
   useEffect(() => {
     // console.log('here too, ', passedApiInformation);
@@ -533,7 +538,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
     const temp: ActivityInformation = {
       activityName: event.target.value,
       subsectionNames: localActivityData?.subsectionNames || [],
-      imageURL: localActivityData?.imageURL || '',
+      imagePath: localActivityData?.imagePath || '',
       isTeam: localActivityData?.isTeam || false,
       isIndividual: localActivityData?.isIndividual || false,
     };
@@ -543,13 +548,26 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
 
   const handleChangeActivitySubsectionsSelection = (event: SyntheticEvent<Element, Event>,
     newValue: SubsectionInformation[],
-    reason: AutocompleteChangeReason) => {
+    reason: AutocompleteChangeReason
+  ) => {
     const temp: ActivityInformation = {
       activityName: localActivityData?.activityName || '',
       subsectionNames: newValue.map((subsection) => subsection.subsectionName),
-      imageURL: localActivityData?.imageURL || '',
+      imagePath: localActivityData?.imagePath || '',
       isTeam: localActivityData?.isTeam || false,
       isIndividual: localActivityData?.isIndividual || false,
+    };
+    setLocalActivityData(temp);
+    onApiInformationUpdate(temp);
+  }
+
+  const handleChangeActivityWorkMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const temp: ActivityInformation = {
+      activityName: localActivityData?.activityName || '',
+      subsectionNames: localActivityData?.subsectionNames || [],
+      imagePath: localActivityData?.imagePath || '',
+      isTeam: event.target.value === 'team',
+      isIndividual: event.target.value === 'individual',
     };
     setLocalActivityData(temp);
     onApiInformationUpdate(temp);
@@ -558,9 +576,18 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setSelectedImage(imageUrl);
-      onImageProvided?.(file); // TODO: will need to update the url based on what s3 says
+      // const imageUrl = URL.createObjectURL(file);
+      const temp: ActivityInformation = {
+        activityName: localActivityData?.activityName || '',
+        subsectionNames: localActivityData?.subsectionNames || [],
+        imagePath: file.name,
+        isTeam: localActivityData?.isTeam || false,
+        isIndividual: localActivityData?.isIndividual || false,
+      };
+      // setSelectedImage(imageUrl);
+      setLocalActivityData(temp);
+      onApiInformationUpdate(temp);
+      onImageProvided?.(file);
     }
   };
 
@@ -1083,7 +1110,6 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
           </div>
           <div className='input-info-section'>
             <Typography>Activity Subsections*:</Typography>
-            <Typography className='italics'>Subsections must be created before being added to a activity</Typography>
             <FormControl fullWidth className='input-box'>
               <Autocomplete
                 multiple
@@ -1119,6 +1145,18 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
             </FormControl>
           </div>
           <div className='input-info-section'>
+            <FormControl>
+              <RadioGroup
+                name="radio-buttons-group"
+                value={localActivityData?.isIndividual ? 'individual' : localActivityData?.isTeam ? 'team' : ''}
+                onChange={handleChangeActivityWorkMode}
+              >
+                <FormControlLabel value="individual" control={<Radio />} label="Individual" />
+                <FormControlLabel value="team" control={<Radio />} label="As a Team" />
+              </RadioGroup>
+            </FormControl>
+          </div>
+          <div className='input-info-section'>
             <Typography>Activity Image*:</Typography>
             <Typography className='italics'>Include an preview for the home screen. Must be a png.</Typography>
               <input 
@@ -1128,10 +1166,10 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                 style={{ display: 'none' }}
                 onChange={handleImageUpload}
               />
-              {selectedImage ? (
+              {localActivityData?.imagePath ? (
                 <div className='image-upload-section'>
                   <Box>
-                    <img src={selectedImage} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
+                    <img src={localActivityData.imagePath} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />
                   </Box>
                   <label htmlFor='upload-activity-image' >
                     <Button color="primary" component="span">
@@ -1177,7 +1215,7 @@ const AdminModalContent = ({ page, passedApiInformation, isCreatingUser, onApiIn
                   setLocalActivityData(activitiesData?.find((activity) => activity.activityName === activitySelected) || {
                     activityName: '',
                     subsectionNames: [],
-                    imageURL: '',
+                    imagePath: '',
                     isIndividual: false,
                     isTeam: false
                   });

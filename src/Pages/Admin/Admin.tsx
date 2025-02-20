@@ -10,10 +10,11 @@ import activitiesSample from '../../SampleData/ActivitiesSample';
 import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { getAllUsersData, updateSingleUserData, deleteSingleUser } from '../../utils/userApi';
 import { isActivityInformation, isDataValid, isMemberInformation, isSubsectionInformation, isTeamInformation } from '../../utils/Utils';
-import { uploadFile } from '../../utils/imagesApi';
+import { deleteFile, uploadFile } from '../../utils/imagesApi';
 import { RestApiResponse } from '@aws-amplify/api-rest/dist/esm/types';
 import { deleteUserInCognito } from '../../utils/cognitoUtil';
-import { createSubsection, deleteSubsection, getAllSubsections, getSubsection, updateSubsection } from '../../utils/subsectionsApi';
+import { createSubsection, deleteSubsection, getAllSubsections, updateSubsection } from '../../utils/subsectionsApi';
+import { createActivity, deleteActivity, getAllActivities, updateActivity } from '../../utils/activityApi';
 
 
 const AdminPage = () => {
@@ -85,7 +86,10 @@ const AdminPage = () => {
     handleCloseModal();
     setIsWaitingOnApi(true);
     console.log('data waiting for the api is: ', apiDataToSend)
-    let response;
+    let dynamoResponse;
+    let cognitoResponse;
+    let s3Response;
+    let tempActivity;
 
     switch (currentOperation) {
       /***********
@@ -95,22 +99,19 @@ const AdminPage = () => {
         // edit record in db with information from frontend
         if (!apiDataToSend.user) throw new Error;
         // console.log('USER IS', apiDataToSend.user)
-        response = await updateSingleUserData(apiDataToSend?.user);
-        setResponseType(response ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'});
-        
-        // undefined if it did not go through
-
+        dynamoResponse = await updateSingleUserData(apiDataToSend?.user);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'});
         break;
 
       case Operations.DELETE_USER:
           if (!apiDataToSend.user) throw new Error;
           // remove from cognito user pool
-          const cognitoResponse = await deleteUserInCognito(apiDataToSend?.user.userId);
+          cognitoResponse = await deleteUserInCognito(apiDataToSend?.user.userId);
           console.log('cognito delete user response is', cognitoResponse);
 
           // delete record in dynamo table
-          const dynamoResponse = await deleteSingleUser(apiDataToSend?.user.userId);
-          console.log('response from deletion is', response);
+          dynamoResponse = await deleteSingleUser(apiDataToSend?.user.userId);
+          console.log('response from deletion is', dynamoResponse);
 
           if (cognitoResponse) {
             // update to check for dynamo response also
@@ -118,7 +119,6 @@ const AdminPage = () => {
           } else {
             setResponseType({isSuccess: false, message: 'Failed to edit user. Please try again.'});
           }
-
         break;
 
       /***********
@@ -144,60 +144,66 @@ const AdminPage = () => {
       //   break;
 
       /***********
-      * SUBSECTION API CALLS
+      * SUBSECTIONS API CALLS
       ***********/
       case Operations.ADD_SUBSECTION:
         console.log('add new subsection submit');
         if (!apiDataToSend.subsection) throw new Error;
-        response = await createSubsection(apiDataToSend.subsection);
-        console.log('response from creation is: ', response);
-
+        dynamoResponse = await createSubsection(apiDataToSend.subsection);
+        console.log('response from creation is: ', dynamoResponse);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully created subsection.'} : {isSuccess: false, message: 'Failed to create subsection. Please try again.'});
         break;
+
       case Operations.EDIT_SUBSECTION:
         console.log('edit subsection submit');
         if (!apiDataToSend.subsection) throw new Error;
-        response = await updateSubsection(apiDataToSend.subsection);
-        console.log('response from updating is: ', response);
-
+        dynamoResponse = await updateSubsection(apiDataToSend.subsection);
+        console.log('response from updating is: ', dynamoResponse);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully edited subsection.'} : {isSuccess: false, message: 'Failed to edit subsection. Please try again.'});
         break;
+
       case Operations.DELETE_SUBSECTION:
         console.log('delete subsection submit');
         if (!apiDataToSend.subsection) throw new Error;
-        response = await deleteSubsection(apiDataToSend.subsection.subsectionName);
-        console.log('response from deletion is: ', response);
-
+        dynamoResponse = await deleteSubsection(apiDataToSend.subsection.subsectionName);
+        console.log('response from deletion is: ', dynamoResponse);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully deleted subsection.'} : {isSuccess: false, message: 'Failed to delete subsection. Please try again.'});
         break;
 
       /***********
-      * MODULE API CALLS
+      * ACTIVITIES API CALLS
       ***********/
       case Operations.ADD_ACTIVITY:
         console.log('add new activity submit');
-        //const createdActivityId = await createActivityInDB(); // add props to this function
-        // based on db response, show/hide info spinner
-        if (imageFile) uploadFile(imageFile);
-
-
+        if (!apiDataToSend.activity || !imageFile) throw new Error;
+        s3Response = await uploadFile(imageFile, true);
+        if (!s3Response) throw new Error;
+        tempActivity = {...apiDataToSend.activity, imagePath: s3Response}
+        dynamoResponse = await createActivity(tempActivity)
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully created activity.'} : {isSuccess: false, message: 'Failed to create activity. Please try again.'});
         break;
+
       case Operations.EDIT_ACTIVITY:
         console.log('edit activity submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
-
+        if (!apiDataToSend.activity || !imageFile) throw new Error;
+        s3Response = await uploadFile(imageFile, true);
+        if (!s3Response) throw new Error;
+        tempActivity = {...apiDataToSend.activity, imagePath: s3Response}
+        dynamoResponse = await updateActivity(tempActivity);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully edited activity.'} : {isSuccess: false, message: 'Failed to edit activity. Please try again.'});
         break;
+
       case Operations.DELETE_ACTIVITY:
         console.log('delete activity submit');
-        // edit record in db with information from frontend
-        // based on db response, show/hide info spinner
-
+        if (!apiDataToSend.activity) throw new Error;
+        dynamoResponse = await deleteActivity(apiDataToSend.activity.activityName);
+        s3Response = await deleteFile(apiDataToSend.activity.imagePath, true);
+        setResponseType(dynamoResponse ? {isSuccess: true, message: 'Successfully deleted activity.'} : {isSuccess: false, message: 'Failed to delete activity. Please try again.'});
         break;
 
-        
       default:
         console.log('default')
     }
-    // if no image provided, call straight up
-    // if image provided, (1) call endpoint to upload it into s3. (2) save this url into apiDataToSend object (3) call endpoint to update activity info table 
 
     setIsWaitingOnApi(false);
     setTimeout(() => {
@@ -263,20 +269,16 @@ const AdminPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // redfactor this??
+      // refactor this??
       const allUsers = await getAllUsersData();
       const allSubsections = await getAllSubsections();
-
-      const _users = allUsers;
-      const _teams = teamsSample;
-      const _activities = activitiesSample;
-      const _subsections = allSubsections;
+      const allActivities = await getAllActivities();
 
       let temp: ApiReceiveInformation = {
-        users: _users,
-        teams: _teams,
-        activities: _activities,
-        subsections: _subsections
+        users: allUsers,
+        teams: teamsSample, //////////////////////// change when integrating w teams
+        activities: allActivities,
+        subsections: allSubsections
       }
       setApiDataReceived(temp);
     };

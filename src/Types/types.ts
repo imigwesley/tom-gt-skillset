@@ -30,7 +30,7 @@ export interface ActivityInformation {
     isIndividual: boolean,
     activityName: string,
     subsectionNames: string[],
-    imageURL: string
+    imagePath: string
 }
 
 export interface SubsectionInformation {
