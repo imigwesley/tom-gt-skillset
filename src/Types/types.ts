@@ -36,6 +36,7 @@ export interface ActivityInformation {
 export interface SubsectionInformation {
     subsectionName: string,
     subsectionHtml: string,
+    hasDeliverable: boolean
 }
 
 /********************   Sub Data Types      *******************/
@@ -69,13 +70,6 @@ export interface APIResponse {
     message: string
 }
 
-export interface ApiReceiveInformation {
-    users: MemberInformation[] | undefined,
-    activities: ActivityInformation[] | undefined,
-    subsections: SubsectionInformation[] | undefined,
-    teams: TeamInformation[] | undefined
-}
-
 export interface ApiSendInformation {
     user: MemberInformation | undefined,
     activity: ActivityInformation | undefined,
@@ -83,8 +77,27 @@ export interface ApiSendInformation {
     team: TeamInformation | undefined
 }
 
-/********************   Misc.       *******************/
+/********************   Submission Review       *******************/
+export interface SubmissionInformation {
+    id: string,
+    subsectionName: string,
+    timeSubmitted: string,
+    isApproved: boolean,
+    submittedBy: string,
+    submissionFiles: string[]
+}
 
+export interface SubsectionSubmissions {
+    subsectionName: string,
+    submissions: SubmissionInformation[]
+}
+
+export interface ActivitySubmissions {
+    activityName: string,
+    subsectionSubmissions: SubsectionSubmissions[]
+}
+
+/********************   Misc.       *******************/
 export interface NameGTidMap {
     [key: string]: string
 }

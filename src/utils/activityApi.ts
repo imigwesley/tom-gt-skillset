@@ -135,3 +135,15 @@ export async function updateActivity(activityData: ActivityInformation) {
         console.log('PUT activity call failed: ', e);
     }
 }
+
+export async function addSubsectionToActivity(activityName: string, subsectionName: string) {
+    const activity = await getActivity(activityName);
+    console.log('Got activity! it is', activity);
+    const updatedActivity = { 
+        ...activity[0], 
+        subsectionNames: [...activity[0].subsectionNames, subsectionName] 
+    };
+    console.log('updated Activity is', updatedActivity)
+    return updateActivity(updatedActivity);
+}
+

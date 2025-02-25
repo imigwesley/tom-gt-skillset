@@ -18,6 +18,8 @@ import '@aws-amplify/ui-react/styles.css';
 import './auth.scss';
 import { signUp, SignUpInput } from 'aws-amplify/auth';
 import { useEffect, useState } from 'react';
+import { ImageCacheProvider } from './ImageCacheContext';
+import SubmissionsPage from './Pages/Submissions/Submissions';
 
 Amplify.configure(awsmobile);
 
@@ -135,17 +137,20 @@ const AppContent = ({ signOut, loggedUser }: any) => {
       {(location.pathname !== '/login') && (
         <Navbar signOutFunction={signOut} loggedInUser={loggedUser} key={navKey}/>
       )}
-      <div className="main-body">
-        <Routes>
-          <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderNav}/>} />
-          <Route path="/activities/:activityName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/members" element={<MembersPage />} />
-          <Route path="/contact" element={<FeedbackPage loggedInUser={loggedUser} />} />
-          <Route path="/profile" element={<ProfilePage loggedInUser={loggedUser} />} />
-          <Route path="/admin" element={<AdminPage />} />
-        </Routes>
-      </div>
+      <ImageCacheProvider>
+        <div className="main-body">
+          <Routes>
+            <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderNav}/>} />
+            <Route path="/activities/:activityName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/members" element={<MembersPage />} />
+            <Route path="/contact" element={<FeedbackPage loggedInUser={loggedUser} />} />
+            <Route path="/profile" element={<ProfilePage loggedInUser={loggedUser} />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/submissions" element={<SubmissionsPage loggedInUser={loggedUser} />} />
+          </Routes>
+        </div>
+      </ImageCacheProvider>
       <div className="footer" />
     </>
   );

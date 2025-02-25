@@ -1,5 +1,3 @@
-@import '../../Themes/TOMThemeVariables.scss';
-
 
 .input-info-container {
     height: 90%;
@@ -19,6 +17,7 @@
             display: flex;
             flex-direction: row;
             align-items: flex-start;
+            padding-bottom: 5px;
         }
     }
 
@@ -45,6 +44,11 @@
     .add-email-button {
         display: flex;
         align-items: center;
+        background-color: #F0F0F0;
+
+        &:hover {
+            background-color: #e0e0e0;
+        }
 
         .add-other {
             margin-top: 5px;

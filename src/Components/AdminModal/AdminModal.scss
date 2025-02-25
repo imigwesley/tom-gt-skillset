@@ -1,0 +1,46 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
+.modal {
+    padding: 15px;
+
+    .modal-stepper {
+        padding: 20px 0px 0px 0px;
+        width: 50%;
+        margin: auto;
+    }
+
+    .modal-content {
+        height: 450px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .alert {
+        margin: 5px 0px;
+        width: 90%;
+    }
+
+    .modal-footer {
+        display: flex;
+        flex-direction: row;
+        padding-top: 2;
+    }
+
+}
+
+.cancel-button {
+    color: rgb(123, 0, 0) !important;
+    background-color: rgba(123, 0, 0, .1) !important;
+    &:hover {
+        background-color: rgba(123, 0, 0, .15) !important;
+    }
+}
+
+.proceed-button {
+    color: $tom-blue !important;
+    background-color: rgba(1, 145, 183, .1) !important;
+    &:hover {
+        background-color: rgba(1, 145, 183, .2) !important; 
+    }
+}
