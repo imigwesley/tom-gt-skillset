@@ -1,0 +1,91 @@
+.drag-drop-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    border: 2px dashed #d1d5db;
+    border-radius: 1rem;
+    background-color: #f9fafb;
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+  
+    .upload-instructions {
+      font-size: 1.125rem;
+      color: #4b5563;
+      margin-bottom: 1rem;
+      text-align: center;
+  
+      &.drag-active {
+        color: #2563eb;
+      }
+    }
+  
+    // Drag & Drop Area
+    .drop-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      width: 100%;
+      background-color: #f3f4f6;
+      border-radius: 1rem;
+      border: 2px dashed #d1d5db;
+      cursor: pointer;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      text-align: center;
+  
+      &:hover {
+        background-color: #e5e7eb; // Light hover effect
+        border-color: #a1a1aa; // Darker border on hover
+      }
+  
+      &.active {
+        background-color: #e0f7fa; // Light blue when dragging
+        border-color: #64b5f6; // Light blue border on active
+      }
+    }
+  
+    // File Previews Section
+    // .file-previews {
+    //   margin-top: 1.5rem;
+    //   width: 100%;
+    //   ul {
+    //     list-style-type: disc;
+    //     padding-left: 1.5rem;
+    //     font-size: 1rem;
+    //     color: #4b5563;
+    //   }
+    //   li {
+    //     margin-bottom: 0.5rem;
+    //   }
+    // }
+  
+    // Upload Button
+    .upload-btn {
+      margin-top: 1.5rem;
+      padding: 0.75rem 2rem;
+      background-color: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 1.125rem;
+      transition: background-color 0.3s ease;
+  
+      &:hover {
+        background-color: #1d4ed8; // Darker blue on hover
+      }
+  
+      &:disabled {
+        background-color: #d1d5db;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+.file-card {
+    display: flex;
+    flex-direction: row;
+}
+  

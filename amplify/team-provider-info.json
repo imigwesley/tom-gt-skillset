@@ -1,68 +1,4 @@
 {
-  "dev": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-tomgtskillset-dev-fd347-authRole",
-      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-fd347-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-fd347-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-tomgtskillset-dev-fd347-deployment",
-      "UnauthRoleName": "amplify-tomgtskillset-dev-fd347-unauthRole",
-      "StackName": "amplify-tomgtskillset-dev-fd347",
-      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-dev-fd347/6a9b0d00-d91d-11ef-a879-1271428e233b",
-      "AmplifyAppId": "dd0d2urej3zr3"
-    },
-    "categories": {
-      "storage": {
-        "UserData": {}
-      },
-      "function": {
-        "getUserDataFunction": {
-          "deploymentBucketName": "amplify-tomgtskillset-dev-fd347-deployment",
-          "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
-        },
-        "UserData": {}
-      },
-      "api": {
-        "userApi": {}
-      },
-      "auth": {
-        "tomgtskillsetf97c16adf97c16ad": {}
-      }
-    }
-  },
-  "test": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-tomgtskillset-test-4a009-authRole",
-      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-test-4a009-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-test-4a009-authRole",
-      "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-tomgtskillset-test-4a009-deployment",
-      "UnauthRoleName": "amplify-tomgtskillset-test-4a009-unauthRole",
-      "StackName": "amplify-tomgtskillset-test-4a009",
-      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-test-4a009/af072ca0-de8e-11ef-90f8-125981b3c83d",
-      "AmplifyAppId": "d178nlgj4objjm",
-      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-tomgtskillset-test-4a009-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
-    },
-    "categories": {
-      "auth": {
-        "tomgtskillsetf97c16adf97c16ad": {}
-      },
-      "function": {
-        "getUserDataFunction": {
-          "deploymentBucketName": "amplify-tomgtskillset-test-4a009-deployment",
-          "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
-        },
-        "UserData": {}
-      },
-      "api": {
-        "userApi": {}
-      },
-      "storage": {
-        "UserData": {},
-        "skillsets3": {}
-      }
-    }
-  },
   "prod": {
     "awscloudformation": {
       "AuthRoleName": "amplify-tomgtskillset-prod-f09ab-authRole",
@@ -89,14 +25,80 @@
           "userPoolId": "us-east-1_0nC7xySgE",
           "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
           "s3Key": "amplify-builds/deleteCognitoUser-436158677868754a4c78-build.zip"
-        }
+        },
+        "getSubsections": {
+          "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
+          "s3Key": "amplify-builds/getSubsections-42584854444345655559-build.zip"
+        },
+        "getActivity": {
+          "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
+          "s3Key": "amplify-builds/getActivity-596963622f7659326352-build.zip"
+        },
+        "skillsetActivities": {},
+        "skillsetSubsections": {}
       },
       "api": {
         "userApi": {},
-        "cognitoApi": {}
+        "cognitoApi": {},
+        "subsectionsApi": {},
+        "activityApi": {}
       },
       "storage": {
         "UserData": {},
+        "skillsets3": {},
+        "skillsetSubsections": {},
+        "skillsetActivities": {}
+      }
+    }
+  },
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-tomgtskillset-dev-93e46-authRole",
+      "UnauthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-93e46-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::324037291589:role/amplify-tomgtskillset-dev-93e46-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+      "UnauthRoleName": "amplify-tomgtskillset-dev-93e46-unauthRole",
+      "StackName": "amplify-tomgtskillset-dev-93e46",
+      "StackId": "arn:aws:cloudformation:us-east-1:324037291589:stack/amplify-tomgtskillset-dev-93e46/0737ff00-f486-11ef-8130-0afff695f19b",
+      "AmplifyAppId": "d178nlgj4objjm"
+    },
+    "categories": {
+      "auth": {
+        "tomgtskillsetf97c16adf97c16ad": {}
+      },
+      "function": {
+        "deleteCognitoUser": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/deleteCognitoUser-686f4762626459575538-build.zip",
+          "userPoolId": "us-east-1_uKVmqN62t"
+        },
+        "getActivity": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/getActivity-596963622f7659326352-build.zip"
+        },
+        "getSubsections": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/getSubsections-42584854444345655559-build.zip"
+        },
+        "getUserDataFunction": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/getUserDataFunction-43443539415344526f79-build.zip"
+        },
+        "skillsetActivities": {},
+        "skillsetSubsections": {},
+        "UserData": {}
+      },
+      "api": {
+        "activityApi": {},
+        "cognitoApi": {},
+        "subsectionsApi": {},
+        "userApi": {}
+      },
+      "storage": {
+        "UserData": {},
+        "skillsetActivities": {},
+        "skillsetSubsections": {},
         "skillsets3": {}
       }
     }

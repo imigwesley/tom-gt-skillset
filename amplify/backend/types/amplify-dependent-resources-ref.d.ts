@@ -1,6 +1,16 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
+    "activityApi": {
+      "ApiId": "string",
+      "ApiName": "string",
+      "RootUrl": "string"
+    },
     "cognitoApi": {
+      "ApiId": "string",
+      "ApiName": "string",
+      "RootUrl": "string"
+    },
+    "subsectionsApi": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
@@ -31,6 +41,20 @@ export type AmplifyDependentResourcesAttributes = {
       "Name": "string",
       "Region": "string"
     },
+    "getActivity": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "getSubsections": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
     "getUserDataFunction": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
@@ -41,6 +65,22 @@ export type AmplifyDependentResourcesAttributes = {
   },
   "storage": {
     "UserData": {
+      "Arn": "string",
+      "Name": "string",
+      "PartitionKeyName": "string",
+      "PartitionKeyType": "string",
+      "Region": "string",
+      "StreamArn": "string"
+    },
+    "skillsetActivities": {
+      "Arn": "string",
+      "Name": "string",
+      "PartitionKeyName": "string",
+      "PartitionKeyType": "string",
+      "Region": "string",
+      "StreamArn": "string"
+    },
+    "skillsetSubsections": {
       "Arn": "string",
       "Name": "string",
       "PartitionKeyName": "string",

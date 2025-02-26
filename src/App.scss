@@ -12,3 +12,15 @@
 .main-body {
     padding: 10px 50px 0px 50px;
 }
+
+.feedback {
+    border: 1px solid;
+  }
+  
+  .feedback.MuiAlert-root.MuiAlert-standardSuccess {
+    border-color: #2e7d32;
+  }
+  
+  .feedback.MuiAlert-root.MuiAlert-standardError {
+    border-color: #d32f2f;
+  }

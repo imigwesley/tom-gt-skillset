@@ -1,15 +1,24 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
-import { ModalPages } from "./enums";
-import { ActivityInformation, ApiReceiveInformation, MemberInformation, SubsectionInformation, TeamInformation } from "./types";
+import { ModalPages, Operations } from "./enums";
+import { ActivityInformation, MemberInformation, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
 
-// AdminModalContent component
+export interface AdminModalProps {
+    currentOperation: Operations,
+    closeModal: () => void,
+    passResponseProgress: (waiting: boolean, response: { isSuccess: boolean | null; message: string; }) => void,
+}
+
 export interface AdminModalContentProps {
-    page: ModalPages,
-    passedApiInformation: ApiReceiveInformation,
-    isCreatingUser?: boolean,
-    onApiInformationUpdate: (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => void,
-    onImageProvided?:(file: File) => void;
+    userInput?: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation,
+    editOrCreate?: string,
+    saveOrDelete?: string,
+    tempImage?: string,
+    activityChosen?: string,
+    onApiInformationUpdate?: (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => void,
+    onImageProvided?:(file: File) => void,
+    onLocalUrlCreated?:(tempUrl: string) => void,
+    onActivityChosenForSubsection?:(activity: string) => void,
 }
 
 export interface PageProps {
@@ -29,4 +38,11 @@ export interface MemberCardProps {
     isEven: boolean,
     isFirst: boolean,
     isLast: boolean
+}
+
+// submission row component
+export interface TableRowProps {
+    rowInformation: SubmissionInformation,
+    loggedInUser: AuthUser | undefined,
+    personal: boolean
 }

@@ -59,6 +59,9 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
       case 'admin':
         navigate('/admin');
         break;
+      case 'submissions':
+        navigate('/submissions');
+        break;
       case 'contact':
         navigate('/contact');
         break;
@@ -113,6 +116,7 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem>
           <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
           {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
+          <MenuItem onClick={() => handlePageClick('submissions')}>Review Submissions</MenuItem>
           <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem>
           <MenuItem onClick={signOutFunction}>Sign Out</MenuItem>
         </Menu>
