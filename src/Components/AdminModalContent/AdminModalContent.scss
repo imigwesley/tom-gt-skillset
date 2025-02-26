@@ -83,9 +83,15 @@
     color: gray;
 }
 
-// .ql-editor {
-//     min-height: 150px;
-// }
+.ql-editor {
+    min-height: 150px !important;
+    // max-height: 300px;
+    // overflow: scroll;
+}
+
+.ql-tooltip {
+    margin-left: 20%;
+}
 
 .select-autocomplete {
     width: 60%;

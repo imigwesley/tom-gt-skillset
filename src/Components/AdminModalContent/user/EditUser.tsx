@@ -6,7 +6,6 @@ import { AdminModalContentProps } from "../../../Types/props";
 import { useEffect, useState } from "react";
 import '../AdminModalContent.scss';
 import { fetchAuthSession } from "@aws-amplify/core";
-import SubmissionUpload from "../../SubmissionUpload/SubmissionUpload";
 
 
 
@@ -345,7 +344,6 @@ const EditUser = ({editOrCreate, onApiInformationUpdate, userInput}: AdminModalC
   return (
     <div className='input-info-container'>
       <Typography variant='h4'>{(editOrCreate === 'create') ? 'We noticed you\'re new to Skillset! Please provide some information about yourself:' : 'Edit User Information'}</Typography>
-      <SubmissionUpload />
       <div className='input-info-section'>
         <Typography>Name (first and last)*:</Typography>
         <TextField 

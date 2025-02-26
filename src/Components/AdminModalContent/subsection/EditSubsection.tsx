@@ -1,4 +1,4 @@
-import { Typography, TextField, FormControl, Select, MenuItem, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { Typography, TextField, FormControl, Select, MenuItem, RadioGroup, FormControlLabel, Radio, CircularProgress } from "@mui/material";
 import ReactQuill from "react-quill";
 import { AdminModalContentProps } from "../../../Types/props";
 import { useEffect, useRef, useState } from "react";
@@ -10,9 +10,9 @@ import '../AdminModalContent.scss';
 const toolbarOptions = [
   [{ 'header': [1, 2, 3, false] }],
   ['blockquote', 'code-block'],
-  ['bold', 'italic', 'underline', 'strike'],
+  ['italic', 'underline', 'strike'],
   [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-  ['link', 'image', 'video'],
+  ['link', 'video'], // TODO: image handler
   ['clean']
 ];
 
@@ -20,7 +20,11 @@ const EditSubsection = ({onApiInformationUpdate, onActivityChosenForSubsection, 
 
   const quillRef = useRef<ReactQuill>(null);
   const [incorrectSubsectionNameError, setIncorrectSubsectionNameError] = useState(false);
-  const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation>();
+  const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation>({
+    subsectionName: '',
+    subsectionHtml: '',
+    hasDeliverable: false
+  });
   const [allActivities, setAllActivities] = useState<ActivityInformation[]>([]);
   const [chosenActivity, setChosenActivity] = useState('');
 
@@ -129,7 +133,6 @@ const EditSubsection = ({onApiInformationUpdate, onActivityChosenForSubsection, 
           ref={quillRef}
           onChange={handleChangeSubsectionHtml}
         />
-        {/* <button onClick={handleSaveSubsectionHtml}>Save</button> */}
       </div>
       <div className='input-info-section'>
         <Typography>Assign to Activity:</Typography>

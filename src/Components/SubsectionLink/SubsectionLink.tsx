@@ -12,13 +12,14 @@ const SubsectionLink = ({isCompleted, name, isCurrent}: SubsectionLinkProps) => 
 
   return (
     <div className='link-container'>
+      <Typography variant='body1' className={`${isCurrent ? 'current' : ''}`}>{name}</Typography>
+      <div style={{flexGrow: 1}} />
       {isCompleted
       ?
-        <TaskAlt />
+        <TaskAlt fontSize='small'/>
       :
-        <RadioButtonUncheckedOutlined />
+        <RadioButtonUncheckedOutlined fontSize='small' />
       }
-      <Typography variant='body1' className={`${isCurrent ? 'current' : ''}`}>{name}</Typography>
     </div>
   );
 }

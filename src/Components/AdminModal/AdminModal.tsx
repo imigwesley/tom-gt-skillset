@@ -194,7 +194,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
       * SUBSECTIONS API CALLS
       ***********/
       case Operations.ADD_SUBSECTION:
-        // console.log('add new subsection submit');
+        console.log('add new subsection submit');
         if (!infoFromModalForApi.subsection) throw new Error;
         dynamoResponse = await createSubsection(infoFromModalForApi.subsection);
         subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
@@ -204,19 +204,22 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         break;
 
       case Operations.EDIT_SUBSECTION:
-        // console.log('edit subsection submit');
+        console.log('edit subsection submit');
         if (!infoFromModalForApi.subsection) throw new Error;
         dynamoResponse = await updateSubsection(infoFromModalForApi.subsection);
-        subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
+        if (activityForSubsection) {
+          subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
+        }
         // console.log('response adding subsection to activity is: ', subsectionResponse)
         // console.log('response from updating is: ', dynamoResponse);
         passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully edited subsection.'} : {isSuccess: false, message: 'Failed to edit subsection. Please try again.'});
         break;
 
       case Operations.DELETE_SUBSECTION:
-        // console.log('delete subsection submit');
+        console.log('delete subsection submit');
         if (!infoFromModalForApi.subsection) throw new Error;
         dynamoResponse = await deleteSubsection(infoFromModalForApi.subsection.subsectionName);
+        // TODO: remove subsection name from all activities it is a part of - maybe a popup confirm??
         // console.log('response from deletion is: ', dynamoResponse);
         passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully deleted subsection.'} : {isSuccess: false, message: 'Failed to delete subsection. Please try again.'});
         break;
@@ -236,10 +239,14 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
 
       case Operations.EDIT_ACTIVITY:
         // console.log('edit activity submit');
-        if (!infoFromModalForApi.activity || !imageFile) throw new Error;
-        s3Response = await uploadFile(imageFile, true);
-        if (!s3Response) throw new Error;
-        tempActivity = {...infoFromModalForApi.activity, imagePath: s3Response}
+        if (!infoFromModalForApi.activity) throw new Error;
+        console.log('image file is', imageFile);
+        console.log('image path is', infoFromModalForApi.activity.imagePath)
+        if (imageFile) {
+          s3Response = await uploadFile(imageFile, true);
+          if (!s3Response) throw new Error;
+        }
+        tempActivity = {...infoFromModalForApi.activity, imagePath: s3Response || infoFromModalForApi.activity.imagePath}
         dynamoResponse = await updateActivity(tempActivity);
         passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully edited activity.'} : {isSuccess: false, message: 'Failed to edit activity. Please try again.'});
         break;

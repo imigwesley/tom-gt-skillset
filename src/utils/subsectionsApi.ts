@@ -80,7 +80,8 @@ export async function createSubsection(subsectionData: SubsectionInformation) {
         const authToken = await getAuthToken();
         const fixedBody = {
             subsectionName: subsectionData.subsectionName,
-            subsectionHtml: subsectionData.subsectionHtml
+            subsectionHtml: subsectionData.subsectionHtml,
+            hasDeliverable: subsectionData.hasDeliverable ?? false
         };        
         const restOperation = post({
             apiName: 'subsectionsApi',
@@ -104,11 +105,13 @@ export async function createSubsection(subsectionData: SubsectionInformation) {
 
 
 export async function updateSubsection(subsectionData: SubsectionInformation) {
+    console.log('about to send', subsectionData)
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
             subsectionName: subsectionData.subsectionName,
-            subsectionHtml: subsectionData.subsectionHtml
+            subsectionHtml: subsectionData.subsectionHtml,
+            hasDeliverable: subsectionData.hasDeliverable ?? false
         };      
         const restOperation = put({
             apiName: 'subsectionsApi',

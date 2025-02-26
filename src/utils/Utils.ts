@@ -60,7 +60,7 @@ export const isDataValid = (data: ApiSendInformation, imageFile: File | undefine
     || ( // or if activity is valid (necessary info exists, image is uploaded)
       data.activity
       && data.activity.activityName !== ''
-      && (data.activity.subsectionNames?.length !== 0 && data.activity.subsectionNames[0] !== '')
+      // && (data.activity.subsectionNames?.length !== 0 && data.activity.subsectionNames[0] !== '')
       && data.activity.imagePath
     )
     || ( // or if subsection is valid
