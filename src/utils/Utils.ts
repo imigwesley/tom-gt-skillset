@@ -35,10 +35,10 @@ export function isSubmissionInformation(info: any): info is SubmissionInformatio
 export const isDataValid = (data: ApiSendInformation, imageFile: File | undefined, activeStep: number) => {
   const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
-  console.log('validating user: ', data.user)
-  console.log('validating team: ', data.team)
-  console.log('validating activity: ', data.activity)
-  console.log('validating image ', imageFile);
+  // console.log('validating user: ', data.user)
+  // console.log('validating team: ', data.team)
+  // console.log('validating activity: ', data.activity)
+  // console.log('validating image ', imageFile);
 
   const temp = (
     ( // user is valid
@@ -69,7 +69,7 @@ export const isDataValid = (data: ApiSendInformation, imageFile: File | undefine
       && data.subsection.subsectionHtml !== ''
     )
   ) // or () or () 
-  console.log('isDataValid returns', temp || false)
+  // console.log('isDataValid returns', temp || false)
   return temp || false; // case where data is not defined
 }
 

@@ -37,7 +37,13 @@ const ConfirmActivity = ({saveOrDelete, userInput, tempImage}: AdminModalContent
         </div>
         <div className='confirm-section'>
           <Typography variant="h6" className='italics'>Subsections:</Typography>
-          <Typography className='indent'>{localActivityData?.subsectionNames.join(', ')}</Typography>
+          <ol>
+            {localActivityData?.subsectionNames.map((sub, index) => (
+              <li key={index}>
+                {sub}
+              </li>
+            ))}
+          </ol>
         </div>
         <div className='confirm-section'>
           <Typography variant="h6" className='italics'>Activity Format:</Typography>

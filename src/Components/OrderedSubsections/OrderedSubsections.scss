@@ -1,0 +1,34 @@
+.subsection-card {
+    width: 50%;
+    padding: 8px;
+    margin: 4px 0;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    &.grabbable {
+        cursor: grab;
+    }
+
+    .card-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.ops-bar {
+    display: flex;
+    margin-top: 16px;
+    gap: 20px;
+
+    .large-element {
+        width: 35%;
+    }
+
+    .small-element {
+        width: 10%;
+    }
+
+    .button {
+        margin: 15px;
+    }
+}

@@ -363,7 +363,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         disableEscapeKeyDown={currentOperation === Operations.ADD_USER}
         transitionDuration={0}
       >
-        <Box className={'modal'}>
+        <Box className='modal'>
           <Stepper activeStep={activeStep} className='modal-stepper'>
             {StepSets[currentOperation].map((label) => (
               <Step key={label}>

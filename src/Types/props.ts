@@ -46,3 +46,10 @@ export interface TableRowProps {
     loggedInUser: AuthUser | undefined,
     personal: boolean
 }
+
+// order, add subsections to activity props
+export interface OrderedSubsectionsProps {
+    allSubsections: SubsectionInformation[],
+    initialChosenOptions: string[],
+    onChange: (arg: string[]) => void
+}
