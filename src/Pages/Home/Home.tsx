@@ -102,10 +102,8 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     navigate(`/activities/${activityName}`);
   }
 
-  const handleCloseModal = () => {
-    setPromptForUserRecordCreation(false);
-    if (onUserCreation) onUserCreation();
-    // setInvalidUserData(false);
+  const handleRefreshPage = () => {
+    onUserCreation?.();
   }
 
 
@@ -174,7 +172,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
         </div>
       :
         <div>
-          { promptForUserRecordCreation && <AdminModal currentOperation={Operations.ADD_USER} closeModal={handleCloseModal} passResponseProgress={handleApiProgress} />}
+          { promptForUserRecordCreation && <AdminModal currentOperation={Operations.ADD_USER} closeModal={handleRefreshPage} passResponseProgress={handleApiProgress} />}
           <div className='header'>
             <Typography variant='h4' align='center'>
               Hello, {currUser?.identifiers?.name}! What would you like to learn today?

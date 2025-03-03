@@ -121,7 +121,6 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
   };
 
   const handleSubmit = async () => {
-    closeModal();
     passResponseProgress(true, {isSuccess: null, message: ''});
     console.log('data waiting for the api is: ', infoFromModalForApi)
     let dynamoResponse;
@@ -262,6 +261,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
       default:
         // console.log('default')
     }
+    closeModal();
 
     setTimeout(() => {
       passResponseProgress(false, {
