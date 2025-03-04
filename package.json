@@ -21,6 +21,7 @@
     "aws-amplify": "^6.12.1",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.7.7",
+    "bootstrap-icons": "^1.11.3",
     "clsx": "^2.1.1",
     "mui": "^0.0.1",
     "quill": "^2.0.2",

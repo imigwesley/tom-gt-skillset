@@ -1,19 +1,21 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .drag-drop-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
-    border: 2px dashed #d1d5db;
+    padding: 15px;
+    border: 2px solid #d1d5db;
     border-radius: 1rem;
     background-color: #f9fafb;
     width: 100%;
-    max-width: 600px;
+    max-width: 400px;
     margin: auto;
+    gap: 5px;
   
     .upload-instructions {
-      font-size: 1.125rem;
       color: #4b5563;
-      margin-bottom: 1rem;
+      margin: 5px 0px;
       text-align: center;
   
       &.drag-active {
@@ -21,12 +23,12 @@
       }
     }
   
-    // Drag & Drop Area
     .drop-area {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 1.5rem;
+      padding: 10px;
       width: 100%;
       background-color: #f3f4f6;
       border-radius: 1rem;
@@ -34,58 +36,60 @@
       cursor: pointer;
       transition: background-color 0.3s ease, border-color 0.3s ease;
       text-align: center;
+
+      .cloud-icon {
+        font-size: 2.2rem;
+      }
   
       &:hover {
-        background-color: #e5e7eb; // Light hover effect
-        border-color: #a1a1aa; // Darker border on hover
+        background-color: #e5e7eb;
+        border-color: #a1a1aa;
       }
   
       &.active {
-        background-color: #e0f7fa; // Light blue when dragging
-        border-color: #64b5f6; // Light blue border on active
+        background-color: #e0f7fa;
+        border-color: #64b5f6;
       }
     }
   
-    // File Previews Section
-    // .file-previews {
-    //   margin-top: 1.5rem;
-    //   width: 100%;
-    //   ul {
-    //     list-style-type: disc;
-    //     padding-left: 1.5rem;
-    //     font-size: 1rem;
-    //     color: #4b5563;
-    //   }
-    //   li {
-    //     margin-bottom: 0.5rem;
-    //   }
-    // }
-  
-    // Upload Button
-    .upload-btn {
-      margin-top: 1.5rem;
-      padding: 0.75rem 2rem;
-      background-color: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      font-size: 1.125rem;
-      transition: background-color 0.3s ease;
-  
+  .upload-btn {
+    padding-top: 10px;
+    width: 100%;
+    background-color: $tom-blue;
+    color: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $tom-blue;
+    }
+
+    &:disabled {
+      background-color: #d1d5db;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.file-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+
+  .file-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 6px;
+    width: 100%;
+
+    .delete-icon {
       &:hover {
-        background-color: #1d4ed8; // Darker blue on hover
-      }
-  
-      &:disabled {
-        background-color: #d1d5db;
-        cursor: not-allowed;
+        background-color: transparent;
       }
     }
   }
-
-.file-card {
-    display: flex;
-    flex-direction: row;
 }
+
   

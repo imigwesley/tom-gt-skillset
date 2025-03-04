@@ -37,7 +37,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
       Activities
     </Link>,
     <Typography key="3" sx={{ color: 'text.primary' }}>
-      {currActivity.activityName + ' - ' + currSubsection?.subsectionName}
+      {currActivity.activityName}
     </Typography>,
   ]
 
@@ -137,7 +137,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
               </div>
               {currSubsection?.hasDeliverable &&
                 <div>
-                  {/*<SubmissionUpload />*/}
+                  <SubmissionUpload />
                 </div>
               }
             </div>
