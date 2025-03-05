@@ -1,12 +1,12 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
 import { ModalPages, Operations } from "./enums";
-import { ActivityInformation, MemberInformation, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
+import { ActivityInformation, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
 
 export interface AdminModalProps {
     currentOperation: Operations,
     closeModal: () => void,
-    passResponseProgress: (waiting: boolean, response: { isSuccess: boolean | null; message: string; }) => void,
+    passResponseProgress: (arg: ResponseInfo) => void,
 }
 
 export interface AdminModalContentProps {
@@ -47,9 +47,18 @@ export interface TableRowProps {
     personal: boolean
 }
 
-// order, add subsections to activity props
+// add/order subsections for activity component
 export interface OrderedSubsectionsProps {
     allSubsections: SubsectionInformation[],
     initialChosenOptions: string[],
     onChange: (arg: string[]) => void
 }
+
+export interface SubmissionUploadProps {
+    loggedInUser: AuthUser | undefined,
+    subsection: string,
+    currActivity: string | undefined,
+    passResponseProgress: (arg: ResponseInfo) => void,
+}
+
+// Linear progress with pct complete

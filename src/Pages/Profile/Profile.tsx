@@ -25,7 +25,7 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
     },
     progress: [{
       activityName: '',
-      subsectionsComplete: []
+      subsectionProgress: []
     }]
   });
 

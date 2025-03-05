@@ -15,7 +15,7 @@ export interface MemberInformation {
         teamMembership: string[],
         teamsAdvising: string[]
     },
-    progress: ActivityProgress[]
+    progress: ActivityProgress[],
 }
 
 export interface TeamInformation {
@@ -42,7 +42,12 @@ export interface SubsectionInformation {
 /********************   Sub Data Types      *******************/
 export interface ActivityProgress {
     activityName: string,
-    subsectionsComplete: string[]
+    subsectionProgress: SubmissionRecord[]
+}
+
+export interface SubmissionRecord {
+    subsection: string,
+    submissionIds: string[]
 }
 
 /********************   Sorted members on directory page   *******************/
@@ -79,7 +84,7 @@ export interface ApiSendInformation {
 
 /********************   Submission Review       *******************/
 export interface SubmissionInformation {
-    id: string,
+    submissionId: string,
     subsectionName: string,
     timeSubmitted: string,
     isApproved: boolean,
@@ -100,4 +105,12 @@ export interface ActivitySubmissions {
 /********************   Misc.       *******************/
 export interface NameGTidMap {
     [key: string]: string
+}
+
+export interface ResponseInfo {
+    waiting: boolean,
+    response: {
+        isSuccess: boolean | null,
+        message: string
+    }
 }

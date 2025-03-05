@@ -18,7 +18,7 @@ import ConfirmActivity from "../AdminModalContent/activity/ConfirmActivity";
 import ConfirmUser from "../AdminModalContent/user/ConfirmUser";
 import ConfirmSubsection from "../AdminModalContent/subsection/ConfirmSubsection";
 import ConfirmTeam from "../AdminModalContent/team/ConfirmTeam";
-import { deleteSingleUser, updateSingleUserData } from "../../utils/userApi";
+import { createSingleUserData, deleteSingleUser, updateSingleUserData } from "../../utils/userApi";
 import { createActivity, updateActivity, deleteActivity, addSubsectionToActivity } from "../../utils/activityApi";
 import { deleteUserInCognito } from "../../utils/cognitoUtil";
 import { uploadFile, deleteFile } from "../../utils/imagesApi";
@@ -60,7 +60,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
     },
     progress: [{
         activityName: '',
-        subsectionsComplete: []
+        subsectionProgress: []
     }]
   });
   const [localTeamData, setLocalTeamData] = useState<TeamInformation | null>({
@@ -121,7 +121,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
   };
 
   const handleSubmit = async () => {
-    passResponseProgress(true, {isSuccess: null, message: ''});
+    passResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
     console.log('data waiting for the api is: ', infoFromModalForApi)
     let dynamoResponse;
     let cognitoResponse;
@@ -137,8 +137,8 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         // create user in db
         if (!infoFromModalForApi.user) throw new Error;
         // console.log('USER IS', infoFromModalForApi.user)
-        dynamoResponse = await updateSingleUserData(infoFromModalForApi?.user);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully created user.'} : {isSuccess: false, message: 'Failed to create user. Please try again.'});
+        dynamoResponse = await createSingleUserData(infoFromModalForApi?.user);
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully created user.'} : {isSuccess: false, message: 'Failed to create user. Please try again.'})});
         break;
 
       case Operations.EDIT_USER:
@@ -146,7 +146,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         if (!infoFromModalForApi.user) throw new Error;
         // console.log('USER IS', infoFromModalForApi.user)
         dynamoResponse = await updateSingleUserData(infoFromModalForApi?.user);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'})});
         break;
 
       case Operations.DELETE_USER:
@@ -161,9 +161,9 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
 
           if (cognitoResponse) {
             // update to check for dynamo response also
-            passResponseProgress(false, {isSuccess: true, message: 'Successfully edited user.'});
+            passResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully edited user.'}});
           } else {
-            passResponseProgress(false, {isSuccess: false, message: 'Failed to edit user. Please try again.'});
+            passResponseProgress({waiting: false, response: {isSuccess: false, message: 'Failed to edit user. Please try again.'}});
           }
         break;
 
@@ -199,7 +199,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
         // console.log('response adding subsection to activity is: ', subsectionResponse)
         // console.log('response from creation is: ', dynamoResponse);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully created subsection.'} : {isSuccess: false, message: 'Failed to create subsection. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully created subsection.'} : {isSuccess: false, message: 'Failed to create subsection. Please try again.'})});
         break;
 
       case Operations.EDIT_SUBSECTION:
@@ -211,7 +211,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         }
         // console.log('response adding subsection to activity is: ', subsectionResponse)
         // console.log('response from updating is: ', dynamoResponse);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully edited subsection.'} : {isSuccess: false, message: 'Failed to edit subsection. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully updated subsection.'} : {isSuccess: false, message: 'Failed to update subsection. Please try again.'})});
         break;
 
       case Operations.DELETE_SUBSECTION:
@@ -220,7 +220,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         dynamoResponse = await deleteSubsection(infoFromModalForApi.subsection.subsectionName);
         // TODO: remove subsection name from all activities it is a part of - maybe a popup confirm??
         // console.log('response from deletion is: ', dynamoResponse);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully deleted subsection.'} : {isSuccess: false, message: 'Failed to delete subsection. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully deleted subsection.'} : {isSuccess: false, message: 'Failed to delete subsection. Please try again.'})});
         break;
 
       /***********
@@ -233,7 +233,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         if (!s3Response) throw new Error;
         tempActivity = {...infoFromModalForApi.activity, imagePath: s3Response}
         dynamoResponse = await createActivity(tempActivity)
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully created activity.'} : {isSuccess: false, message: 'Failed to create activity. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully created activity.'} : {isSuccess: false, message: 'Failed to create activity. Please try again.'})});
         break;
 
       case Operations.EDIT_ACTIVITY:
@@ -247,7 +247,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         }
         tempActivity = {...infoFromModalForApi.activity, imagePath: s3Response || infoFromModalForApi.activity.imagePath}
         dynamoResponse = await updateActivity(tempActivity);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully edited activity.'} : {isSuccess: false, message: 'Failed to edit activity. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully edited activity.'} : {isSuccess: false, message: 'Failed to edit activity. Please try again.'})});
         break;
 
       case Operations.DELETE_ACTIVITY:
@@ -255,7 +255,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         if (!infoFromModalForApi.activity) throw new Error;
         dynamoResponse = await deleteActivity(infoFromModalForApi.activity.activityName);
         s3Response = await deleteFile(infoFromModalForApi.activity.imagePath, true);
-        passResponseProgress(false, dynamoResponse ? {isSuccess: true, message: 'Successfully deleted activity.'} : {isSuccess: false, message: 'Failed to delete activity. Please try again.'});
+        passResponseProgress({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully deleted activity.'} : {isSuccess: false, message: 'Failed to delete activity. Please try again.'})});
         break;
 
       default:
@@ -264,9 +264,12 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
     closeModal();
 
     setTimeout(() => {
-      passResponseProgress(false, {
-        isSuccess: null,
-        message: ''
+      passResponseProgress({
+        waiting: false, 
+        response: {
+          isSuccess: null,
+          message: ''
+        }
       });
     }, 1500);
   }

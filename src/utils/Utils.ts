@@ -29,7 +29,7 @@ export function isTeamInformation(info: any): info is TeamInformation {
 }
 
 export function isSubmissionInformation(info: any): info is SubmissionInformation {
-  return (info as SubmissionInformation)?.id !== undefined;
+  return (info as SubmissionInformation)?.submissionId !== undefined;
 }
 
 export const isDataValid = (data: ApiSendInformation, imageFile: File | undefined, activeStep: number) => {

@@ -87,19 +87,25 @@
         },
         "skillsetActivities": {},
         "skillsetSubsections": {},
-        "UserData": {}
+        "UserData": {},
+        "submissionFunc": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/submissionFunc-4833643748494a325946-build.zip"
+        }
       },
       "api": {
         "activityApi": {},
         "cognitoApi": {},
         "subsectionsApi": {},
-        "userApi": {}
+        "userApi": {},
+        "submissionApi": {}
       },
       "storage": {
         "UserData": {},
         "skillsetActivities": {},
         "skillsetSubsections": {},
-        "skillsets3": {}
+        "skillsets3": {},
+        "submissionMeta": {}
       }
     }
   }

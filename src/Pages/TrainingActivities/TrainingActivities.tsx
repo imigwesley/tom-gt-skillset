@@ -1,11 +1,11 @@
-import { Breadcrumbs, CircularProgress, Divider, LinearProgress, Link, Typography } from '@mui/material';
+import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, LinearProgress, Link, Typography } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import './TrainingActivities.scss';
 import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 // import subSectionsSample from '../../SampleData/SubsectionsSample';
-import { ActivityProgress, MemberInformation, ActivityInformation, SubsectionInformation } from '../../Types/types';
+import { ActivityProgress, MemberInformation, ActivityInformation, SubsectionInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 // import activitiesSample from '../../SampleData/ActivitiesSample';
 import { PageProps } from '../../Types/props';
@@ -28,6 +28,16 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
+    {
+      waiting: false, 
+      response: {
+        isSuccess: null, 
+        message: ''
+      }
+    }
+  );
+  const [startedSubmission, setStartedSubmission] = useState(false);
   const [allSubsections, setAllSubsections] = useState<SubsectionInformation[]>([]);
   const [currSubsection, setCurrSubsection] = useState<SubsectionInformation>();
   const [memberProgress, setMemberProgress] = useState<ActivityProgress[]>([]);
@@ -84,7 +94,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const findNextSubsectionToComplete = (progress: ActivityProgress | undefined, names: string[]): string => {
     if (!progress) return names[0];
     for (const name of names) {
-      if (!progress.subsectionsComplete.includes(name)) {
+      if (!progress.subsectionProgress.find((sub) => sub.subsection === name)) {
         return name;
       }
     }
@@ -94,6 +104,12 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const handleSubsectionClick = (passedSubsection: string) => {
     setCurrSubsection(allSubsections.find((subsection) => subsection.subsectionName === passedSubsection));
   };
+
+  const handleResponseProgress = (resp: ResponseInfo) => {
+    setResponseInfo(resp);
+    // hide submission component if successfully submitted
+    if (!resp.waiting && resp.response.isSuccess !== false) setStartedSubmission(false);
+  }
 
   return (
     <div>      
@@ -118,7 +134,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                     <div key={index} onClick={() => handleSubsectionClick(subsection)}>
                       <SubsectionLink 
                         isCurrent={currSubsection?.subsectionName === subsection} 
-                        isCompleted={memberProgress?.find((curr) => curr.activityName === currActivity.activityName)?.subsectionsComplete.includes(subsection) ? true : false} 
+                        isCompleted={memberProgress?.find((curr) => curr.activityName === currActivity.activityName)?.subsectionProgress.find((sub) => sub.subsection === subsection) ? true : false} 
                         name={subsection} 
                       />
                     </div>
@@ -135,14 +151,36 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                   <div className='ql-editor' dangerouslySetInnerHTML={{__html: currSubsection?.subsectionHtml || ''}}/>
                 </div>
               </div>
-              {currSubsection?.hasDeliverable &&
-                <div>
-                  <SubmissionUpload />
-                </div>
-              }
+              {currSubsection?.hasDeliverable && (
+                startedSubmission ?
+                  <div className='submission-container'>
+                    <SubmissionUpload loggedInUser={loggedInUser} subsection={currSubsection?.subsectionName} currActivity={activityName} passResponseProgress={handleResponseProgress}/>
+                    <Button className='cancel' variant='contained' disableRipple onClick={() => setStartedSubmission(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                : 
+                  <div>
+                    <Button variant='contained' disableRipple onClick={() => setStartedSubmission(true)}>
+                      Start submission
+                    </Button>
+                  </div>
+              )}
             </div>
         </div>
         </>
+      }
+      <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={responseInfo.waiting}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      {responseInfo.response.isSuccess !== null &&
+        <div className='feedback-container'>
+          <Alert className='feedback' severity={responseInfo.response.isSuccess ? 'success' : 'error'}>{responseInfo.response.message}</Alert>
+        </div>
       }
     </div>
   );

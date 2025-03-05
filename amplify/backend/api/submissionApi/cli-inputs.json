@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/submission": {
+      "name": "/submission",
+      "lambdaFunction": "submissionFunc",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

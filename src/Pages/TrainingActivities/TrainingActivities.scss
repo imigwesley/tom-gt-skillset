@@ -21,7 +21,6 @@
     .background-card {
         width: fit-content;
         height: fit-content;
-        margin-top: 2%;
         background-color: $accent-white;
         padding: 15px;
         border-radius: 9px;
@@ -36,6 +35,18 @@
     
         .header {
             padding: 20px;
+        }
+    }
+
+    .submission-container {
+        display: flex;
+        flex-direction: column;
+        max-width: 400px;
+        margin: auto;
+        gap: 5px;
+
+        .cancel {
+            width: fit-content;
         }
     }
 }

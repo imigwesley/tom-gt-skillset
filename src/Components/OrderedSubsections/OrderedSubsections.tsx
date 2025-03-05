@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Button, TextField, LinearProgress, Select, MenuItem, Typography, IconButton } from "@mui/material";
-import { v4 as uuidv4 } from "uuid"; // Generates unique IDs
+import { v4 as uuidv4 } from "uuid";
 import { OrderedSubsectionsProps } from "../../Types/props";
 import { Delete } from "@mui/icons-material";
 import './OrderedSubsections.scss';

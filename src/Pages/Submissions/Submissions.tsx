@@ -5,9 +5,9 @@ import { KeyboardArrowDown, KeyboardArrowUp, MoreHoriz, RowingSharp } from "@mui
 import { useState, useEffect } from "react";
 import { ActivityInformation, ActivitySubmissions, MemberInformation, SubmissionInformation, SubsectionSubmissions } from "../../Types/types";
 import { getAllActivities } from "../../utils/activityApi";
-import subsSample from "../../SampleData/SubmissionsSample";
 import { getSingleUserData } from "../../utils/userApi";
 import './Submissions.scss';
+import { getAllSubmissions } from "../../utils/submissionApi";
 
 
 const SubmissionsPage = ({loggedInUser}: PageProps) => {
@@ -27,7 +27,7 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
       const tempCurrUser: MemberInformation = singleUserResponse[0];
       setCurrUser(tempCurrUser);
 
-      const submissionsResponse = subsSample // await getAllSubmissions();
+      const submissionsResponse = await getAllSubmissions();
       const activityResponse = await getAllActivities();
 
       const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, tempCurrUser);
@@ -136,21 +136,29 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
   };
 
   const handleSubmissionMenuClose = () => {
+    console.log("anchorEl: ", anchorEl);
+console.log("submissionMenuOpen: ", submissionMenuOpen);
+
     setAnchorEl(null);
     setSubmissionMenuOpen(false);
   }
 
   const handleOpenSubmissionMenu = (event: React.MouseEvent<HTMLElement>) => {
+    console.log("anchorEl: ", anchorEl);
+console.log("submissionMenuOpen: ", submissionMenuOpen);
     setAnchorEl(event.currentTarget);
     setSubmissionMenuOpen(true);
+    console.log("anchorEl: ", anchorEl);
+console.log("submissionMenuOpen: ", submissionMenuOpen);
+
   }
 
   return (
     <div className="page-container">
       <div className="header">
         <div className="tabs-container">
-          <Tabs value={currentTab} onChange={handleChangeTab}>
-            <Tab disableRipple label='Your Submissions' />
+          <Tabs value={currentTab} onChange={handleChangeTab} >
+            <Tab disableRipple label='Your Submissions' className={!currUser?.roles.isAdmin ? 'non-clickable' : ''}/>
             {currUser?.roles.isAdmin && <Tab disableRipple label='Review Submissions' />}
           </Tabs>
         </div>
@@ -192,21 +200,35 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
                               </TableRow>
                             </TableHead>
                             <TableBody>
-                              {subsection.submissions.map((submission) => (
-                                <TableRow key={submission.id}>
-                                  <TableCell>{new Date(submission.timeSubmitted).toLocaleString()}</TableCell>
+                              {subsection.submissions.map((submission) => {
+                                let tempSubmissionFiles: string[] = [];
+                                submission.submissionFiles.forEach((file)=> {
+                                  tempSubmissionFiles.push(file?.split('/').pop() || '')
+                                })
+                                return (
+                                <TableRow key={submission.submissionId}>
+                                  <TableCell>
+                                    {new Date(Number(submission.timeSubmitted)).toLocaleString('en-US', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    })}
+                                  </TableCell>
                                   <TableCell>{submission.isApproved ? "Approved" : "Pending approval"}</TableCell>
-                                  <TableCell>{submission.submissionFiles.join(", ") || "No Files"}</TableCell>
+                                  <TableCell>{tempSubmissionFiles.join(", ") || "No Files"}</TableCell>
                                   <TableCell>
                                 <IconButton disableRipple onClick={handleOpenSubmissionMenu}>
                                   <MoreHoriz />
                                 </IconButton> 
-                                <Menu anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
+                                <Menu elevation={1} anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
+                                  <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete') }>Delete Submission</MenuItem>
+                                  <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
                                 </Menu>
                               </TableCell>
                                 </TableRow>
-                              ))}
+                              )})}
                             </TableBody>
                           </Table>
                         ) : (
@@ -256,7 +278,7 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
                         </TableHead>
                         <TableBody>
                           {subsection.submissions.map((submission) => (
-                            <TableRow key={submission.id}>
+                            <TableRow key={submission.submissionId}>
                               <TableCell>{new Date(submission.timeSubmitted).toLocaleString()}</TableCell>
                               <TableCell>{submission.submittedBy}</TableCell>
                               <TableCell>{submission.isApproved ? "Approved" : "Pending approval"}</TableCell>
@@ -265,10 +287,10 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
                                 <IconButton disableRipple onClick={handleOpenSubmissionMenu}>
                                   <MoreHoriz />
                                 </IconButton> 
-                                <Menu anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('approve') }>Approve Submission</MenuItem>
-                                  {/* <MenuItem onClick={() => { handleClose(); }}>Reject Submission</MenuItem> */}
+                                <Menu elevation={1} anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
+                                  <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('approve') }>Approve Submission</MenuItem>
+                                  <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete') }>Delete Submission</MenuItem>
+                                  <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
                                 </Menu>
                               </TableCell>
                             </TableRow>
