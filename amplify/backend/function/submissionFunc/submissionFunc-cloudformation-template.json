@@ -97,12 +97,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "tomgtskillsetLambdaRoleee70e035",
+            "tomgtskillsetLambdaRolee631b75d",
             {
               "Fn::Join": [
                 "",
                 [
-                  "tomgtskillsetLambdaRoleee70e035",
+                  "tomgtskillsetLambdaRolee631b75d",
                   "-",
                   {
                     "Ref": "env"
