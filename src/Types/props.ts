@@ -1,7 +1,7 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
 import { ModalPages, Operations } from "./enums";
-import { ActivityInformation, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
+import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
 
 export interface AdminModalProps {
     currentOperation: Operations,
@@ -61,4 +61,11 @@ export interface SubmissionUploadProps {
     passResponseProgress: (arg: ResponseInfo) => void,
 }
 
-// Linear progress with pct complete
+// review progress page component
+export interface ReviewProgressProps {
+    isPersonal: boolean,
+    activitySubmissions: ActivitySubmissions[],
+    allUsers: MemberInformation[],
+    passResponseProgress: (arg: ResponseInfo) => void,
+    onUpdateSubmission: () => void
+}

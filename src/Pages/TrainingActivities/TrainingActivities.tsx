@@ -1,13 +1,10 @@
-import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, LinearProgress, Link, Typography } from '@mui/material';
-import axios from 'axios';
+import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, Link, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './TrainingActivities.scss';
 import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
-// import subSectionsSample from '../../SampleData/SubsectionsSample';
 import { ActivityProgress, MemberInformation, ActivityInformation, SubsectionInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
-// import activitiesSample from '../../SampleData/ActivitiesSample';
 import { PageProps } from '../../Types/props';
 import { NavigateNext } from '@mui/icons-material';
 import { getAllActivities } from '../../utils/activityApi';
@@ -74,22 +71,26 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
       // Get subsection info
       const subsectionsResponse = await getAllSubsections();
       setAllSubsections(subsectionsResponse);
+
+      // direct to relevant subsection: last worked on if in same activity, or next one not yet finished if not same activity
+      let todoSubsection: string;
+      const storedSubsection = localStorage.getItem('subsection');
+      if (storedSubsection && tempCurrActivity.subsectionNames.includes(storedSubsection)) {
+        todoSubsection = storedSubsection;
+      } else {
+        localStorage.removeItem('subsection');
+        todoSubsection = findNextSubsectionToComplete(
+          tempCurrUser.progress.find((prog) => prog.activityName === currActivity.activityName),
+          tempCurrActivity.subsectionNames
+        );
+      }
+      setCurrSubsection(subsectionsResponse.find((sub) => sub.subsectionName === todoSubsection));
+
       setIsLoading(false);
     };
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    if (allSubsections.length > 0) {
-      const todoSubsectionName = findNextSubsectionToComplete(
-        memberProgress.find((prog) => prog.activityName === currActivity.activityName),
-        currActivity.subsectionNames
-      );
-      setCurrSubsection(allSubsections.find((sub) => sub.subsectionName === todoSubsectionName));
-      setIsLoading(false);
-    }
-  }, [allSubsections, memberProgress, currActivity]);
 
   const findNextSubsectionToComplete = (progress: ActivityProgress | undefined, names: string[]): string => {
     if (!progress) return names[0];
@@ -103,6 +104,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
 
   const handleSubsectionClick = (passedSubsection: string) => {
     setCurrSubsection(allSubsections.find((subsection) => subsection.subsectionName === passedSubsection));
+    localStorage.setItem('subsection', passedSubsection);
   };
 
   const handleResponseProgress = (resp: ResponseInfo) => {
@@ -155,7 +157,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                 startedSubmission ?
                   <div className='submission-container'>
                     <SubmissionUpload loggedInUser={loggedInUser} subsection={currSubsection?.subsectionName} currActivity={activityName} passResponseProgress={handleResponseProgress}/>
-                    <Button className='cancel' variant='contained' disableRipple onClick={() => setStartedSubmission(false)}>
+                    <Button variant='contained' disableRipple onClick={() => setStartedSubmission(false)}>
                       Cancel
                     </Button>
                   </div>

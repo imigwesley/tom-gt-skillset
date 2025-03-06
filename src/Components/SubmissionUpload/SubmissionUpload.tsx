@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button, IconButton, Typography } from "@mui/material";
 import './SubmissionUpload.scss';
-import { Close, DeleteOutline } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { uploadFile } from "../../utils/imagesApi";
-import { ActivityProgress, MemberInformation, SubmissionInformation } from "../../Types/types";
-import { v4 as uuidv4 } from "uuid"; // Generates unique IDs
+import { MemberInformation, SubmissionInformation } from "../../Types/types";
+import { v4 as uuidv4 } from "uuid";
 import { SubmissionUploadProps } from "../../Types/props";
 import { getSingleUserData, updateSingleUserData } from "../../utils/userApi";
 import { createSubmission } from "../../utils/submissionApi";
-import { getActivity } from "../../utils/activityApi";
 
 
 
@@ -43,7 +42,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
         submissionId: uuidv4(),
         subsectionName: subsection,
         timeSubmitted: new Date().getTime().toString(),
-        isApproved: false,
+        isApproved: null,
         submittedBy: loggedInUser?.username || '',
         submissionFiles: filePaths
       };

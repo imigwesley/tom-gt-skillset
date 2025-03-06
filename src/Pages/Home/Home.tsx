@@ -187,7 +187,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
           <div className='activity-card-container'>
             {activities?.map((activity, index) => {
               const numSubsections = activity.subsectionNames.length;
-              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionProgress.length;
+              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionProgress.length || 0.0;
               const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
               
               return (

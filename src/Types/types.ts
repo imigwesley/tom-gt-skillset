@@ -83,23 +83,22 @@ export interface ApiSendInformation {
 }
 
 /********************   Submission Review       *******************/
-export interface SubmissionInformation {
-    submissionId: string,
-    subsectionName: string,
-    timeSubmitted: string,
-    isApproved: boolean,
-    submittedBy: string,
-    submissionFiles: string[]
+export interface ActivitySubmissions {
+    activityName: string,
+    subsectionSubmissions: SubsectionSubmissions[]
 }
-
 export interface SubsectionSubmissions {
     subsectionName: string,
     submissions: SubmissionInformation[]
 }
 
-export interface ActivitySubmissions {
-    activityName: string,
-    subsectionSubmissions: SubsectionSubmissions[]
+export interface SubmissionInformation {
+    submissionId: string,
+    subsectionName: string,
+    timeSubmitted: string,
+    isApproved: boolean | null,
+    submittedBy: string,
+    submissionFiles: string[]
 }
 
 /********************   Misc.       *******************/

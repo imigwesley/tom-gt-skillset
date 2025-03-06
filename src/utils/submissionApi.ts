@@ -107,7 +107,7 @@ export async function createSubmission(submissionData: SubmissionInformation) {
 
 
 
-export async function updateSubsection(submissionData: SubmissionInformation) {
+export async function updateSubmission(submissionData: SubmissionInformation) {
     console.log('about to send', submissionData)
     try {
         const authToken = await getAuthToken();
