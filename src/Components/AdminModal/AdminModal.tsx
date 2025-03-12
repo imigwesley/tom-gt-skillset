@@ -271,7 +271,7 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
           message: ''
         }
       });
-    }, 1500);
+    }, 2000);
   }
   
   const handleReset = () => {

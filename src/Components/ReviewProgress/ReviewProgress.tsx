@@ -74,7 +74,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     }
     setTimeout(() => {
       passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
-    }, 1500);
+    }, 2000);
   }
 
   const downloadSubmission = (submission: SubmissionInformation) => {
@@ -95,7 +95,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     }
     setTimeout(() => {
       passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
-    }, 1500);
+    }, 2000);
   }
 
   const rejectSubmission = async (submission: SubmissionInformation) => {
@@ -110,7 +110,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     }
     setTimeout(() => {
       passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
-    }, 1500);
+    }, 2000);
   }
 
   const handleSubmissionMenuClick = (op: string, type: string, submission: SubmissionInformation) => {

@@ -42,6 +42,30 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   });
   const [activities, setActivities] = useState<ActivityInformation[] | null>(null);
   const { getImage } = useImageCache();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setResponseInfo({waiting: true, response: {isSuccess: null, message: ''}});
+
+      const tempCurrUser = await checkForUserAcct();
+      let tempAllActivities = await getAllActivities();
+
+      // load images
+      tempAllActivities = await Promise.all(
+        tempAllActivities.map(async (activity) => {
+          if (!activity.imagePath) return { ...activity, imagePath: "" };
+          const imageUrl = await getImage(activity.imagePath);
+          return { ...activity, imagePath: imageUrl };
+        })
+      );
+
+      setCurrUser(tempCurrUser);
+      setActivities(tempAllActivities);
+      setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
+    };
+
+    fetchData();
+  }, []);
   
 
   /****************************** Helper functions ***********************************/
@@ -76,33 +100,6 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     return tempCurrUser;
   };
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setResponseInfo({waiting: true, response: {isSuccess: null, message: ''}});
-
-      const tempCurrUser = await checkForUserAcct();
-      let tempAllActivities = await getAllActivities();
-
-      // load images
-      tempAllActivities = await Promise.all(
-        tempAllActivities.map(async (activity) => {
-          if (!activity.imagePath) return { ...activity, imagePath: "" };
-          const imageUrl = await getImage(activity.imagePath);
-          return { ...activity, imagePath: imageUrl };
-        })
-      );
-
-      setCurrUser(tempCurrUser);
-      setActivities(tempAllActivities);
-      setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
-    };
-
-    fetchData();
-  }, []);
-
-
-
   /*********************************** Event handlers *************************************/
   const handleCardClick = (activityName: string) => {
     console.log(activityName);
@@ -113,62 +110,9 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     onUserCreation?.();
   }
 
-
   const handleApiProgress = (resp: ResponseInfo) => {
     setResponseInfo(resp);
   }
-
-  // const handleNext = async () => {
-  //   if (activeStep === 1) {
-  //     // submit button
-  //     handleCloseModal();
-  //     setIsLoading(true);
-  //     console.log('data waiting for the api is: ', apiDataToSend)
-
-  //     if (!apiDataToSend.user) throw new Error;
-  //     console.log('right before creation it is:',apiDataToSend.user)
-  //     const response = await createSingleUserData(apiDataToSend?.user);
-  //     console.log('response is', response)
-  //     setCurrUser(apiDataToSend?.user);
-  //     handleApiResponse(response);
-  //     setIsLoading(false);
-  //   } else {
-  //     // next button
-  //     if (!isDataValid(apiDataToSend, undefined, activeStep)) {
-  //       setInvalidapiDataToSend(true);
-  //     } else {
-  //       setInvalidapiDataToSend(false);
-  //       setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  //     }
-  //   }
-  // };
-  
-  // const handleBack = () => {
-  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  //   setApiDataToSend({
-  //     user: undefined,
-  //     activity: undefined,
-  //     subsection: undefined,
-  //     team: undefined
-  //   });
-  // };
-
-  // const handleApiInfoChange = (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => {
-  //   console.log('changed inside home.tsx', info);
-  //   if (isMemberInformation(info) && loggedInUser?.signInDetails?.loginId) {
-  //     let temp = {...apiDataToSend};
-  //     temp.user = info;
-  //     temp.user.identifiers.accountEmail = loggedInUser?.signInDetails?.loginId;
-  //     temp.user.userId = loggedInUser?.username;
-  //     temp.user.roles = {
-  //       isAdmin: false,
-  //       role: 'Member'
-  //     }
-  //     setApiDataToSend(temp);
-  //   } else {
-  //     console.warn('invalid member information')
-  //   }
-  // }
 
   return (
     <div className='home-page-container'>

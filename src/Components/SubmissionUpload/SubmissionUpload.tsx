@@ -103,7 +103,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
             message: ''
           }
         });
-      }, 1500);
+      }, 2000);
     } catch (error) {
       passResponseProgress({waiting: false, response: {isSuccess: false, message: 'Error submitting! Please try again.'}});
       setTimeout(() => {
@@ -114,7 +114,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
             message: ''
           }
         });
-      }, 1500);
+      }, 2000);
       console.error("Error in handleUploadForIndividual:", error);
     }
   };

@@ -1,3 +1,5 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
 .subsection-title {
     display: flex;
     flex-direction: row;
@@ -14,7 +16,9 @@
     }
     
     &.pending {
-        background-color: rgb(229, 246, 253);
+        background-color: rgba($tom-blue, 0.2);
+        // background-color: rgb(229, 246, 253);
+
     }
     
     &.rejected {
@@ -22,5 +26,9 @@
         
     }
 
+}
+
+.css-e87tjb-MuiButtonBase-root-MuiTab-root.Mui-selected {
+    color: $tom-blue !important;
 }
 

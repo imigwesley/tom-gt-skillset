@@ -74,15 +74,15 @@ export async function downloadFile(filePath: string, fileName: string) {
     const blob = await body.blob();
     const url = URL.createObjectURL(blob);
 
-    // Create a temporary anchor element to trigger the download
+    // javascript to download file
     const a = document.createElement('a');
     a.href = url;
-    a.download = fileName; // Set the filename for the downloaded file
+    a.download = fileName;
     document.body.appendChild(a);
-    a.click(); // Trigger download
-    document.body.removeChild(a); // Clean up
+    a.click();
+    document.body.removeChild(a);
     
-    // Free up the URL object after some time
+    // free up URL object after some time
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (error) {
     console.error('Error downloading file:', error);
