@@ -186,7 +186,11 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                         minute: '2-digit',
                                       })}
                                     </TableCell>
-                                    <TableCell>{submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}</TableCell>
+                                    <TableCell>
+                                      <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
+                                        {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
+                                      </div>
+                                    </TableCell>
                                     <TableCell>
                                       {submission.submissionFiles.length > 0
                                         ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
@@ -235,7 +239,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
         </div>
       :
         <div>
-          {activitySubmissions.map((activity) => (
+          {sortedSubmissions.map((activity) => (
             <div className="activity-page-section" key={activity.activityName + ' '}>
               <div className="activity-title">
                 <Typography variant="h5">
@@ -300,7 +304,11 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                   <TableCell>
                                     {allUsers.find((user) => user.userId === submission.submittedBy)?.identifiers.name}
                                   </TableCell>
-                                  <TableCell>{submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}</TableCell>
+                                  <TableCell>
+                                    <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
+                                      {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
+                                    </div>
+                                  </TableCell>
                                   <TableCell>
                                     {submission.submissionFiles.length > 0
                                       ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")

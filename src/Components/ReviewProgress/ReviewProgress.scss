@@ -3,3 +3,24 @@
     flex-direction: row;
     gap: 5px;
 }
+
+.status {
+    border-radius: 3px;
+    padding: 2px 5px;
+    width: fit-content;
+
+    &.approved {
+        background-color: rgb(237, 247, 237);
+    }
+    
+    &.pending {
+        background-color: rgb(229, 246, 253);
+    }
+    
+    &.rejected {
+        background-color: rgb(253, 237, 237);
+        
+    }
+
+}
+
