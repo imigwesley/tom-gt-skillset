@@ -93,21 +93,25 @@ const MembersPage = () => {
           <div>
             {sortType === SORT_TYPE.ROLE ?
             <div>
-              <Typography variant='h3'>Officers</Typography>
-              <div>
-                {membersByRole.officers.map((member, index) => {
-                  return (
-                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
-                  )
-                })}
+              <div className='sort-group'>
+                <Typography variant='h3'>Officers</Typography>
+                <div>
+                  {membersByRole.officers.map((member, index) => {
+                    return (
+                      <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
+                    )
+                  })}
+                </div>
               </div>
-              <Typography variant='h3'>Members</Typography>
-              <div>
-                {membersByRole.members.map((member, index) => {
-                  return (
-                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
-                  )
-                })}
+              <div className='sort-group'>
+                <Typography variant='h3'>Members</Typography>
+                <div>
+                  {membersByRole.members.map((member, index) => {
+                    return (
+                      <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
+                    )
+                  })}
+                </div>
               </div>
             </div>
             :
@@ -115,7 +119,7 @@ const MembersPage = () => {
             <div>
               {membersByTeam.map((team) => {
                 return (
-                  <div>
+                  <div className='sort-group'>
                     <Typography variant='h3'>{team.team}</Typography>
                     <div style={{borderRadius: '5px'}} id='wesley'>
                       {team.members.map((member, index) => {

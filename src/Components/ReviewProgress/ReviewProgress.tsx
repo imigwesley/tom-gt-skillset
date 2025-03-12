@@ -1,7 +1,7 @@
 import { KeyboardArrowDown, MoreHoriz } from "@mui/icons-material";
 import { Typography, Accordion, AccordionSummary, AccordionDetails, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Menu, MenuItem } from "@mui/material";
 import { ReviewProgressProps } from "../../Types/props";
-import { SubmissionInformation } from "../../Types/types";
+import { ActivitySubmissions, SubmissionInformation } from "../../Types/types";
 import { deleteFile, downloadFile } from "../../utils/imagesApi";
 import { deleteSubmission, updateSubmission } from "../../utils/submissionApi";
 import { updateSingleUserData } from "../../utils/userApi";
@@ -11,10 +11,24 @@ import './ReviewProgress.scss';
 const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponseProgress, onUpdateSubmission}: ReviewProgressProps) => {
   const [anchorElMap, setAnchorElMap] = useState<{ [key: string]: HTMLElement | null }>({});
   const [submissionMenuOpenMap, setSubmissionMenuOpenMap] = useState<{ [key: string]: boolean }>({});
+  const [sortedSubmissions, setSortedSubmissions] = useState<ActivitySubmissions[]>([]);
 
-  useEffect(()=> {
-    console.log('changed submissions array', activitySubmissions)
-  }, [activitySubmissions])
+  useEffect(() => {
+    if (!activitySubmissions) return;
+
+    const sorted = activitySubmissions.map(activity => ({
+        ...activity,
+        subsectionSubmissions: activity.subsectionSubmissions.map(subsection => ({
+            ...subsection,
+            submissions: [...subsection.submissions].sort(
+                (a, b) => Number(b.timeSubmitted) - Number(a.timeSubmitted)
+            )
+        }))
+    }));
+
+    console.log(sorted)
+    setSortedSubmissions(sorted);
+}, [activitySubmissions]);
 
   const deleteSubmissionRecord = async (submission: SubmissionInformation) => {
     try {
@@ -132,7 +146,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     <>
       {isPersonal ? 
         <div>
-          {activitySubmissions.map((activity) => (
+          {sortedSubmissions.map((activity) => (
             <div className="activity-page-section" key={activity.activityName}>
               <Typography variant="h5">{activity.activityName}</Typography>
               {activity.subsectionSubmissions.reduce((acc, subsection) => acc + subsection.submissions.length, 0) > 0 ? (

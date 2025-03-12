@@ -13,6 +13,9 @@
         margin-top: 10px;
     }
 
+    .sort-group {
+        margin-bottom: 5px;
+    }
 
 }
 
@@ -31,4 +34,5 @@
 .lettergroups-container {
     display: flex;
     flex-direction: column;
+    gap: 5px;
 }
