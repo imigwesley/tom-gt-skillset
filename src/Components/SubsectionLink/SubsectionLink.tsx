@@ -6,13 +6,15 @@ interface SubsectionLinkProps {
   isCompleted: boolean,
   name: string,
   isCurrent: boolean,
+  index: number
 }
 
-const SubsectionLink = ({isCompleted, name, isCurrent}: SubsectionLinkProps) => {
+const SubsectionLink = ({isCompleted, name, isCurrent, index}: SubsectionLinkProps) => {
 
   return (
-    <div className='link-container'>
-      <Typography variant='body1' className={`${isCurrent ? 'current' : ''}`}>{name}</Typography>
+    <div className={`link-container ${isCurrent ? 'current' : ''}`} >
+      <Typography variant='body1'>{(index + 1) + ') '}</Typography>
+      <Typography variant='body1' className='link'>{name}</Typography>
       <div style={{flexGrow: 1}} />
       {isCompleted
       ?

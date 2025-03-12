@@ -2,29 +2,32 @@
 
 .modal {
     padding: 15px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 
     .modal-stepper {
-        padding: 20px 0px 0px 0px;
         width: 50%;
         margin: auto;
+        height: 4%;
     }
 
     .modal-content {
-        height: 450px;
         display: flex;
         align-items: center;
         justify-content: center;
+        height: 86%;
     }
 
     .alert {
         margin: 5px 0px;
-        width: 90%;
+        width: fit-content;
+        align-self: center;
     }
 
     .modal-footer {
         display: flex;
         flex-direction: row;
-        padding-top: 2;
     }
 
 }

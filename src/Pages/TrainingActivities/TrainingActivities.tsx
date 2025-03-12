@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, Link, Typography } from '@mui/material';
+import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, IconButton, Link, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './TrainingActivities.scss';
@@ -6,10 +6,11 @@ import SubsectionLink from '../../Components/SubsectionLink/SubsectionLink';
 import { ActivityProgress, MemberInformation, ActivityInformation, SubsectionInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 import { PageProps } from '../../Types/props';
-import { NavigateNext } from '@mui/icons-material';
+import { NavigateNext, List, West } from '@mui/icons-material';
 import { getAllActivities } from '../../utils/activityApi';
 import { getAllSubsections } from '../../utils/subsectionsApi';
 import SubmissionUpload from '../../Components/SubmissionUpload/SubmissionUpload';
+import { motion } from 'framer-motion';
 
 
 
@@ -38,6 +39,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const [allSubsections, setAllSubsections] = useState<SubsectionInformation[]>([]);
   const [currSubsection, setCurrSubsection] = useState<SubsectionInformation>();
   const [memberProgress, setMemberProgress] = useState<ActivityProgress[]>([]);
+  const [menuOpen, setMenuOpen] = useState(true);
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/')} className='breadcrumb-link' >
@@ -123,53 +125,77 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
         </div>
       :
         <>
-        <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
-          {breadcrumbs}
-        </Breadcrumbs>
-        <div className='activity-page-container'>
-            <div className='background-card'>
-              <Typography variant='h5'>{currActivity.activityName}</Typography>
-              <Divider variant='middle' />
-              <div className='links-container'>
-                {currActivity.subsectionNames.map((subsection, index) => {
-                  return (
-                    <div key={index} onClick={() => handleSubsectionClick(subsection)}>
-                      <SubsectionLink 
-                        isCurrent={currSubsection?.subsectionName === subsection} 
-                        isCompleted={memberProgress?.find((curr) => curr.activityName === currActivity.activityName)?.subsectionProgress.find((sub) => sub.subsection === subsection) ? true : false} 
-                        name={subsection} 
-                      />
+          <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
+            {breadcrumbs}
+          </Breadcrumbs>
+          <div className='activity-page-container'>
+            <div className={`sidebar-container ${menuOpen ? 'open' : 'collapsed'}`}>
+                <motion.div className="toggle-button">
+                    <IconButton disableTouchRipple onClick={() => setMenuOpen(!menuOpen)}>
+                        {menuOpen ? <West /> : <List />}
+                    </IconButton>
+                </motion.div>
+                <motion.div className={`motion-container ${menuOpen ? 'open' : ''}`}>
+                    <div className={`background-card ${menuOpen ? 'visible' : ''}`}>
+                        <Typography variant="h5">{currActivity.activityName}</Typography>
+                        <Divider />
+                        <div className="links-container">
+                            {currActivity.subsectionNames.map((subsection, index) => (
+                                <div key={index} onClick={() => handleSubsectionClick(subsection)}>
+                                    <SubsectionLink
+                                        index={index}
+                                        isCurrent={currSubsection?.subsectionName === subsection}
+                                        isCompleted={memberProgress?.find((curr) => curr.activityName === currActivity.activityName)
+                                            ?.subsectionProgress.find((sub) => sub.subsection === subsection)
+                                            ? true
+                                            : false
+                                        }
+                                        name={subsection}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                  );
-                })}
-              </div>
+                </motion.div>
             </div>
 
-            <div className='activity-container background-card'>
-              <Typography variant='h4'>{currSubsection?.subsectionName || ''}</Typography>
-              <Divider variant='middle' />
-              <div className='quill'>
-                <div className='ql-snow'>
-                  <div className='ql-editor' dangerouslySetInnerHTML={{__html: currSubsection?.subsectionHtml || ''}}/>
+            <motion.div 
+              className="content-section" 
+              // animate={{ flexGrow: menuOpen ? 0.75 : 1 }} 
+
+              transition={{duration: 0.3, ease: 'easeInOut'}}
+            >
+                <div className="activity-container background-card visible" >
+                    <Typography variant="h4">{currSubsection?.subsectionName || ""}</Typography>
+                    <Divider variant="middle" />
+                    <div className="quill">
+                        <div className="ql-snow">
+                            <div className="ql-editor" dangerouslySetInnerHTML={{ __html: currSubsection?.subsectionHtml || "" }} />
+                        </div>
+                    </div>
+                    {currSubsection?.hasDeliverable &&
+                        (startedSubmission ? (
+                            <div className="submission-container">
+                                <SubmissionUpload
+                                    loggedInUser={loggedInUser}
+                                    subsection={currSubsection?.subsectionName}
+                                    currActivity={activityName}
+                                    passResponseProgress={handleResponseProgress}
+                                />
+                                <Button variant="contained" disableRipple onClick={() => setStartedSubmission(false)}>
+                                    Cancel
+                                </Button>
+                            </div>
+                        ) : (
+                            <div>
+                                <Button variant="contained" disableRipple onClick={() => setStartedSubmission(true)}>
+                                    Start submission
+                                </Button>
+                            </div>
+                    ))}
                 </div>
-              </div>
-              {currSubsection?.hasDeliverable && (
-                startedSubmission ?
-                  <div className='submission-container'>
-                    <SubmissionUpload loggedInUser={loggedInUser} subsection={currSubsection?.subsectionName} currActivity={activityName} passResponseProgress={handleResponseProgress}/>
-                    <Button variant='contained' disableRipple onClick={() => setStartedSubmission(false)}>
-                      Cancel
-                    </Button>
-                  </div>
-                : 
-                  <div>
-                    <Button variant='contained' disableRipple onClick={() => setStartedSubmission(true)}>
-                      Start submission
-                    </Button>
-                  </div>
-              )}
-            </div>
-        </div>
+            </motion.div>
+          </div>
         </>
       }
       <Backdrop

@@ -1,4 +1,4 @@
-import { Stepper, Step, StepLabel, Alert, Button, Dialog } from "@mui/material";
+import { Stepper, Step, StepLabel, Alert, Button, Dialog, DialogContent } from "@mui/material";
 import { Box } from "@mui/system";
 import { ModalPages, Operations, StepSets } from "../../Types/enums";
 import { AdminModalProps } from "../../Types/props";
@@ -317,39 +317,6 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
   const handleActivityChosenForSubsection = (activity: string) => {
     setActivityForSubsection(activity);
   }
-  
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     // refactor this??
-  //     const allUsers = await getAllUsersData();
-  //     const allSubsections = await getAllSubsections();
-  //     const allActivities = await getAllActivities();
-
-  //     let temp: ApiReceiveInformation = {
-  //       users: allUsers,
-  //       teams: teamsSample, //////////////////////// change when integrating w teams
-  //       activities: allActivities,
-  //       subsections: allSubsections
-  //     }
-  //     setApiDataReceived(temp);
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-    //     // console.log('here too, ', passedApiInformation);
-    //     if (passedApiInformation.users) {
-    //       setUsersGTidMap(passedApiInformation?.users.reduce((acc: {[key: string]: string}, member) => {
-    //         acc[member.identifiers.gtID] = member.identifiers.name;
-    //         return acc;
-    //       }, {}));
-    //     } else {
-    //       console.warn('no users found. Gtid map cannot be set.')
-    //     }
-        
-    //   }, [passedApiInformation])
 
 
   return (
@@ -366,127 +333,129 @@ const AdminModal = ({currentOperation, closeModal, passResponseProgress}: AdminM
         disableEscapeKeyDown={currentOperation === Operations.ADD_USER}
         transitionDuration={0}
       >
-        <Box className='modal'>
-          <Stepper activeStep={activeStep} className='modal-stepper'>
-            {StepSets[currentOperation].map((label) => (
-              <Step key={label}>
-                <StepLabel/>
-              </Step>
-            ))}
-          </Stepper>
-            <div className="modal-content">
-              { (activePage === ModalPages.EDIT_USER) ?
-                (
-                  <EditUser 
-                    editOrCreate={currentOperation === Operations.ADD_USER ? 'create' : 'edit'} 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.user}
-                  />
-                ) : (activePage === ModalPages.EDIT_TEAM) ?
-                (
-                  <EditTeam 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.team}
-                  />
-                ) : (activePage === ModalPages.EDIT_SUBSECTION) ?
-                (
-                  <EditSubsection 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.subsection}
-                    onActivityChosenForSubsection={handleActivityChosenForSubsection}
-                    activityChosen={activityForSubsection}
-                  />
-                ) : (activePage === ModalPages.EDIT_ACTIVITY) ?
-                (
-                  <EditActivity 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    onImageProvided={handleImageProvided}
-                    onLocalUrlCreated={handleLocalUrlCreated}
-                    userInput={infoFromModalForApi.activity}
-                    tempImage={tempImageUrl}
-                  />
-                ): (activePage === ModalPages.SELECT_USER) ?
-                (
-                  <SelectUser 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                  />
-                )   
-                : (activePage === ModalPages.SELECT_TEAM) ?
-                (
-                  <SelectTeam 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                  />
-                ) 
-                : (activePage === ModalPages.SELECT_SUBSECTION) ?
-                (
-                  <SelectSubsection 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                  />
-                )  
-                : (activePage === ModalPages.SELECT_ACTIVITY) ?
-                (
-                  <SelectActivity 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                  />
-                ) : ((activePage === ModalPages.CONFIRM_SAVE_USER) || (activePage === ModalPages.CONFIRM_DELETE_USER)) ?
-                (
-                  <ConfirmUser 
-                    saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_USER) ? 'save' : 'delete'} 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.user}
-                  />
-                ) 
-                : ((activePage === ModalPages.CONFIRM_SAVE_TEAM) || (activePage === ModalPages.CONFIRM_DELETE_TEAM)) ?
-                (
-                  <ConfirmTeam 
-                    saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_TEAM) ? 'save' : 'delete'} 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.team}
-                  />
-                ) : ((activePage === ModalPages.CONFIRM_SAVE_SUBSECTION) || (activePage === ModalPages.CONFIRM_DELETE_SUBSECTION)) ?
-                (
-                  <ConfirmSubsection 
-                    saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_SUBSECTION) ? 'save' : 'delete'} 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.subsection}
-                    activityChosen={activityForSubsection}
-                  />
-                ) 
-                : ((activePage === ModalPages.CONFIRM_SAVE_ACTIVITY) || (activePage === ModalPages.CONFIRM_DELETE_ACTIVITY)) ?
-                (
-                  <ConfirmActivity 
-                    saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_ACTIVITY) ? 'save' : 'delete'} 
-                    onApiInformationUpdate={handleApiInfoUpdate}
-                    userInput={infoFromModalForApi.activity}
-                    tempImage={tempImageUrl}
-                  />
-                ) :
-                ( <div /> )
-              }
-            </div>
-            {invalidinfoFromModalForApi && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
-            <div className='modal-footer'>
-              { currentOperation !== Operations.ADD_USER && <Button
-                className='cancel-button'
-                onClick={closeModal}
-                sx={{ mr: 1 }}
-              >
-                Cancel
-              </Button> }
-              <div style={{flexGrow: '1'}} />
-              <Button
-                // disabled={activeStep === 0}
-                onClick={handleBack}
-                sx={{ mr: 1, display: activeStep === 0 ? 'none': '' }}
-                className='proceed-button'
-              >
-                Back
-              </Button>
-              <Button onClick={activeStep === StepSets[currentOperation].length - 1 ? handleSubmit : handleNext} className='proceed-button'>
-                {activeStep === StepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
-              </Button>
-            </div>
-        </Box>
+        <div id='dialog-content' style={{height: '90vh', padding: 0}}>
+          <div className='modal'>
+            <Stepper activeStep={activeStep} className='modal-stepper'>
+              {StepSets[currentOperation].map((label) => (
+                <Step key={label}>
+                  <StepLabel/>
+                </Step>
+              ))}
+            </Stepper>
+              <div className="modal-content">
+                { (activePage === ModalPages.EDIT_USER) ?
+                  (
+                    <EditUser 
+                      editOrCreate={currentOperation === Operations.ADD_USER ? 'create' : 'edit'} 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.user}
+                    />
+                  ) : (activePage === ModalPages.EDIT_TEAM) ?
+                  (
+                    <EditTeam 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.team}
+                    />
+                  ) : (activePage === ModalPages.EDIT_SUBSECTION) ?
+                  (
+                    <EditSubsection 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.subsection}
+                      onActivityChosenForSubsection={handleActivityChosenForSubsection}
+                      activityChosen={activityForSubsection}
+                    />
+                  ) : (activePage === ModalPages.EDIT_ACTIVITY) ?
+                  (
+                    <EditActivity 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      onImageProvided={handleImageProvided}
+                      onLocalUrlCreated={handleLocalUrlCreated}
+                      userInput={infoFromModalForApi.activity}
+                      tempImage={tempImageUrl}
+                    />
+                  ): (activePage === ModalPages.SELECT_USER) ?
+                  (
+                    <SelectUser 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                    />
+                  )   
+                  : (activePage === ModalPages.SELECT_TEAM) ?
+                  (
+                    <SelectTeam 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                    />
+                  ) 
+                  : (activePage === ModalPages.SELECT_SUBSECTION) ?
+                  (
+                    <SelectSubsection 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                    />
+                  )  
+                  : (activePage === ModalPages.SELECT_ACTIVITY) ?
+                  (
+                    <SelectActivity 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                    />
+                  ) : ((activePage === ModalPages.CONFIRM_SAVE_USER) || (activePage === ModalPages.CONFIRM_DELETE_USER)) ?
+                  (
+                    <ConfirmUser 
+                      saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_USER) ? 'save' : 'delete'} 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.user}
+                    />
+                  ) 
+                  : ((activePage === ModalPages.CONFIRM_SAVE_TEAM) || (activePage === ModalPages.CONFIRM_DELETE_TEAM)) ?
+                  (
+                    <ConfirmTeam 
+                      saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_TEAM) ? 'save' : 'delete'} 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.team}
+                    />
+                  ) : ((activePage === ModalPages.CONFIRM_SAVE_SUBSECTION) || (activePage === ModalPages.CONFIRM_DELETE_SUBSECTION)) ?
+                  (
+                    <ConfirmSubsection 
+                      saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_SUBSECTION) ? 'save' : 'delete'} 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.subsection}
+                      activityChosen={activityForSubsection}
+                    />
+                  ) 
+                  : ((activePage === ModalPages.CONFIRM_SAVE_ACTIVITY) || (activePage === ModalPages.CONFIRM_DELETE_ACTIVITY)) ?
+                  (
+                    <ConfirmActivity 
+                      saveOrDelete={(activePage === ModalPages.CONFIRM_SAVE_ACTIVITY) ? 'save' : 'delete'} 
+                      onApiInformationUpdate={handleApiInfoUpdate}
+                      userInput={infoFromModalForApi.activity}
+                      tempImage={tempImageUrl}
+                    />
+                  ) :
+                  ( <div /> )
+                }
+              </div>
+              {invalidinfoFromModalForApi && <Alert severity='warning' className='alert'>One or more required fields is invalid or missing.</Alert>}
+              <div className='modal-footer'>
+                { currentOperation !== Operations.ADD_USER && <Button
+                  className='cancel-button'
+                  onClick={closeModal}
+                  sx={{ mr: 1 }}
+                >
+                  Cancel
+                </Button> }
+                <div style={{flexGrow: '1'}} />
+                <Button
+                  // disabled={activeStep === 0}
+                  onClick={handleBack}
+                  sx={{ mr: 1, display: activeStep === 0 ? 'none': '' }}
+                  className='proceed-button'
+                >
+                  Back
+                </Button>
+                <Button onClick={activeStep === StepSets[currentOperation].length - 1 ? handleSubmit : handleNext} className='proceed-button'>
+                  {activeStep === StepSets[currentOperation].length - 1 ? 'Submit' : 'Next'}
+                </Button>
+              </div>
+          </div>
+        </div>
       </Dialog>
     </div>
   )
