@@ -80,43 +80,47 @@ const MembersPage = () => {
           </div>
         :
         <div className='members-container'>
-          <div className='sorting-section'>
+          <div className='sort-type-selector'>
             <Typography variant='h5'>
               Sort by:
             </Typography>
             <ButtonGroup>
-              <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple={sortType === SORT_TYPE.ROLE} className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
+              <Button onClick={() => handleSortClick(SORT_TYPE.ROLE)} disableRipple className={sortType === SORT_TYPE.ROLE ? 'selected' : 'unselected'}>Role</Button>
               {/* <Button onClick={() => handleSortClick(SORT_TYPE.TEAM)} disableRipple={sortType === SORT_TYPE.TEAM} className={sortType === SORT_TYPE.TEAM ? 'selected' : 'unselected'}>Team</Button> */}
-              <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple={sortType === SORT_TYPE.ALPHABETICALLY} className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
+              <Button onClick={() => handleSortClick(SORT_TYPE.ALPHABETICALLY)} disableRipple className={sortType === SORT_TYPE.ALPHABETICALLY ? 'selected' : 'unselected'}>Alphabetical</Button>
             </ButtonGroup>
           </div>
-          <div>
+          <div className='members-section'>
             {sortType === SORT_TYPE.ROLE ?
-            <div>
-              <Typography variant='h3'>Officers</Typography>
+            <>
               <div>
-                {membersByRole.officers.map((member, index) => {
-                  return (
-                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
-                  )
-                })}
+                <Typography variant='h3' className='title'>Officers</Typography>
+                <div>
+                  {membersByRole.officers.map((member, index) => {
+                    return (
+                      <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.officers.length - 1}/>
+                    )
+                  })}
+                </div>
               </div>
-              <Typography variant='h3'>Members</Typography>
               <div>
-                {membersByRole.members.map((member, index) => {
-                  return (
-                    <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
-                  )
-                })}
+                <Typography variant='h3' className='title'>Members</Typography>
+                <div>
+                  {membersByRole.members.map((member, index) => {
+                    return (
+                      <MemberInfoCard key={member.identifiers.gtID} member={member} isEven={index % 2 === 0} isFirst={index === 0} isLast={index === membersByRole.members.length - 1}/>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            </>
             :
             sortType === SORT_TYPE.TEAM ?
-            <div>
+            <>
               {membersByTeam.map((team) => {
                 return (
                   <div>
-                    <Typography variant='h3'>{team.team}</Typography>
+                    <Typography variant='h3' className='title'>{team.team}</Typography>
                     <div style={{borderRadius: '5px'}} id='wesley'>
                       {team.members.map((member, index) => {
                         return (
@@ -127,14 +131,14 @@ const MembersPage = () => {
                   </div>
                 )
               })}
-            </div>
+            </>
             :
-            <div>
-              <div className='lettergroups-container'>
+            <>
+              <div className='members-section'>
                 {membersAlphabetically.map((letterGroup, index) => {
                   return (
                     <div key={letterGroup.letter}>
-                      <Typography variant='h3'>{letterGroup.letter.toUpperCase()}</Typography>
+                      <Typography variant='h3' className='title'>{letterGroup.letter.toUpperCase()}</Typography>
                       <div>
                         {letterGroup.members.map((member, index) => {
                           return (
@@ -146,7 +150,7 @@ const MembersPage = () => {
                   )
                 })}
               </div>
-            </div>
+            </>
             }
           </div>
         </div>}

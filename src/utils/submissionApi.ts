@@ -1,5 +1,5 @@
 import { del, get, post, put } from 'aws-amplify/api';
-import { MemberInformation } from '../Types/types';
+import { SubmissionInformation } from '../Types/types';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 async function getAuthToken(): Promise<string> {
@@ -13,12 +13,12 @@ async function getAuthToken(): Promise<string> {
 }
 
 
-export async function getAllUsersData(): Promise<MemberInformation[]> {
+export async function getAllSubmissions(): Promise<SubmissionInformation[]> {
     try {
         const authToken = await getAuthToken();
         const restOperation = get({ 
-            apiName: 'userApi',
-            path: `/userData`,
+            apiName: 'submissionApi',
+            path: `/submission`,
             options: {
                 headers: {
                     Authorization: authToken
@@ -27,21 +27,20 @@ export async function getAllUsersData(): Promise<MemberInformation[]> {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        // console.log('All users: ', response);
+        // console.log('All submissions: ', response);
         return response;
     } catch (e) {
-        console.log('GET all users call failed: ', e);
+        console.log('GET all submissions call failed: ', e);
         return [];
     }
 }
 
-// this works
-export async function getSingleUserData (givenId: string | undefined) {
+export async function getSubmission (submissionId: string | undefined) {
     try {
         const authToken = await getAuthToken();
         const restOperation = get({ 
-            apiName: 'userApi',
-            path: `/userData/${givenId}`,
+            apiName: 'submissionApi',
+            path: `/submission/${submissionId}`,
             options: {
                 body: {
                     Authorization: authToken
@@ -50,50 +49,46 @@ export async function getSingleUserData (givenId: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Single user: ', response);
+        // console.log('Submission: ', response);
         return response;
     } catch (e) {
-        console.log('GET single user call failed: ', e);
+        console.log('GET submission call failed: ', e);
     }
 };
 
-export async function deleteSingleUser (givenId: string | undefined) {
+export async function deleteSubmission (submissionId: string | undefined) {
     try {
         const authToken = await getAuthToken();
         const restOperation = del({ 
-            apiName: 'userApi',
-            path: `/userData/object/${givenId}`,
+            apiName: 'submissionApi',
+            path: `/submission/object/${submissionId}`,
             options: {
                 headers: {
                     Authorization: authToken
                 }
             }
         });
-        await restOperation.response;
+        const response = await restOperation.response;
+        return response;
     } catch (e) {
-        console.log('DEL single user call failed: ', e);
+        console.log('DELETE submission call failed: ', e);
     }
 };
 
-export async function createSingleUserData(userData: MemberInformation) {
+export async function createSubmission(submissionData: SubmissionInformation) {
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
-            userId: userData.userId,
-            identifiers: userData.identifiers,
-            roles: userData.roles,
-            teams: userData.teams,
-            progress: userData.progress.map((progress) => ({
-              subsectionProgress: progress.subsectionProgress.map((sub)=> ({
-                subsection: sub.subsection,
-                submissionIds: sub.submissionIds
-              })),
-              activityName: progress.activityName,
-            })),
+            submissionId: submissionData.submissionId,
+            subsectionName: submissionData.subsectionName,
+            timeSubmitted: submissionData.timeSubmitted,
+            isApproved: submissionData.isApproved,
+            submittedBy: submissionData.submittedBy,
+            submissionFiles: submissionData.submissionFiles
         };        
         const restOperation = post({
-            apiName: 'userApi',
-            path: '/userData/',
+            apiName: 'submissionApi',
+            path: '/submission/',
             options: {
                 body: fixedBody,
                 headers: { 
@@ -103,35 +98,30 @@ export async function createSingleUserData(userData: MemberInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created single user: ', response);
+        console.log('Created submission: ', response);
         return response;
     } catch (e) {
-        console.log('create single user call failed: ', e);
+        console.log('POST submission call failed: ', e);
     }
 }
 
 
 
-export async function updateSingleUserData(userData: MemberInformation) {
-    console.log('user data here is', userData);
+export async function updateSubmission(submissionData: SubmissionInformation) {
+    console.log('about to send', submissionData)
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
-            userId: userData.userId,
-            identifiers: userData.identifiers,
-            roles: userData.roles,
-            teams: userData.teams,
-            progress: userData.progress.map((progress) => ({
-                subsectionProgress: progress.subsectionProgress.map((sub)=> ({
-                  subsection: sub.subsection,
-                  submissionIds: sub.submissionIds
-                })),
-                activityName: progress.activityName,
-            })),
-        };        
+            submissionId: submissionData.submissionId,
+            subsectionName: submissionData.subsectionName,
+            timeSubmitted: submissionData.timeSubmitted,
+            isApproved: submissionData.isApproved,
+            submittedBy: submissionData.submittedBy,
+            submissionFiles: submissionData.submissionFiles
+        };      
         const restOperation = put({
-            apiName: 'userApi',
-            path: '/userData/',
+            apiName: 'submissionApi',
+            path: '/submission/',
             options: {
                 body: fixedBody,
                 headers: { 
@@ -141,9 +131,9 @@ export async function updateSingleUserData(userData: MemberInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated single user: ', response);
+        console.log('Updated submission: ', response);
         return response;
     } catch (e) {
-        console.log('update single user call failed: ', e);
+        console.log('PUT submission call failed: ', e);
     }
 }

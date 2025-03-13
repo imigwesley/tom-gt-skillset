@@ -1,3 +1,4 @@
+@import '../../Themes/TOMThemeVariables.scss';
 
 .input-info-container {
     height: 90%;
@@ -7,7 +8,7 @@
     
 
     .input-info-section {
-        padding: 5px 0px 5px 0px;
+        padding: 20px 0px;
 
         .input-box {
             width: 90%;
@@ -95,4 +96,12 @@
 
 .select-autocomplete {
     width: 60%;
+}
+
+.css-1a6y9ro-MuiButtonBase-root-MuiRadio-root.Mui-checked {
+    color: $tom-blue !important;
+}
+
+.css-xvvbf0-MuiButtonBase-root-MuiButton-root {
+    background-color: $tom-blue !important;
 }

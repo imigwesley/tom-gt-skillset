@@ -1,14 +1,22 @@
 .link-container {
     display: flex;
     flex-direction: row;
+    align-items: flex-start;
     gap: 10px;
     cursor: pointer;
+    border-radius: 5px;
+    padding: 5px;
 
-    &:hover {
-        text-decoration: underline;
+    &.current {
+        background-color: rgb(240,240,240);
     }
 
+    &:hover {
+        background-color: rgb(225,225,225);
+    }
+    
+
     .current {
-        text-decoration: underline;
+        font-weight: bold;
     }
 }

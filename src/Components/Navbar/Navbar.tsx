@@ -47,12 +47,12 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           navigate('/');
         }
         break;
-      case 'about':
-        navigate('/about');
-        break;
-      case 'tomWebsite':
-        window.open('https://tomglobal.org/', '_blank');
-        break;
+      // case 'about':
+      //   navigate('/about');
+      //   break;
+      // case 'tomWebsite':
+      //   window.open('https://tomglobal.org/', '_blank');
+      //   break;
       case 'members':
         navigate('/members');
         break;
@@ -62,9 +62,9 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
       case 'submissions':
         navigate('/submissions');
         break;
-      case 'contact':
-        navigate('/contact');
-        break;
+      // case 'contact':
+      //   navigate('/contact');
+      //   break;
       case 'profile':
         navigate('/profile');
         break;
@@ -112,12 +112,12 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           transitionDuration={10}
         >
           <MenuItem onClick={() => handlePageClick('home')}>Home</MenuItem>
-          <MenuItem onClick={() => handlePageClick('about')}>About</MenuItem>
-          <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem>
+          {/* <MenuItem onClick={() => handlePageClick('about')}>About</MenuItem> */}
+          {/* <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem> */}
           <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
-          {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
           <MenuItem onClick={() => handlePageClick('submissions')}>Review Submissions</MenuItem>
-          <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem>
+          {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
+          {/* <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem> */}
           <MenuItem onClick={signOutFunction}>Sign Out</MenuItem>
         </Menu>
     </div>

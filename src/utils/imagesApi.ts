@@ -55,3 +55,36 @@ export async function deleteFile(deletePath: string, isImage: boolean) {
     console.log('Error deleting file: ', e)
   }
 }
+
+export async function downloadFile(filePath: string, fileName: string) {
+  try {
+    const { body } = await downloadData({
+      path: filePath,
+      options: {
+        onProgress: ({ transferredBytes, totalBytes }) => {
+          if (totalBytes) {
+            console.log(
+              `Download progress ${Math.round((transferredBytes / totalBytes) * 100)}%`
+            );
+          }
+        }
+      }
+    }).result;
+    
+    const blob = await body.blob();
+    const url = URL.createObjectURL(blob);
+
+    // javascript to download file
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    // free up URL object after some time
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+  }
+}

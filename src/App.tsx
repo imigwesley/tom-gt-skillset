@@ -125,22 +125,20 @@ const App = () => {
 
 const AppContent = ({ signOut, loggedUser }: any) => {
   const location = useLocation();
-  const [navKey, setNavKey] = useState(0);
-
-  // for rerendering navbar when user is created
-  const rerenderNav = () => {
-    setNavKey(navKey + 1);
+  
+  const rerenderPage = () => {
+    window.location.reload();
   }
 
   return (
     <>
       {(location.pathname !== '/login') && (
-        <Navbar signOutFunction={signOut} loggedInUser={loggedUser} key={navKey}/>
+        <Navbar signOutFunction={signOut} loggedInUser={loggedUser} />
       )}
       <ImageCacheProvider>
         <div className="main-body">
           <Routes>
-            <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderNav}/>} />
+            <Route path="/" element={<HomePage loggedInUser={loggedUser} onUserCreation={rerenderPage}/>} />
             <Route path="/activities/:activityName" element={<TrainingModulesPage loggedInUser={loggedUser} />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/members" element={<MembersPage />} />

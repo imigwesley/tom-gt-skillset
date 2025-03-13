@@ -27,7 +27,7 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
     },
     progress: [{
         activityName: '',
-        subsectionsComplete: []
+        subsectionProgress: []
     }]
   });
 

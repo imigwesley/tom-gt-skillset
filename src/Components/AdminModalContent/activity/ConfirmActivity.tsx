@@ -3,10 +3,29 @@ import { ModalPages } from "../../../Types/enums";
 import { AdminModalContentProps } from "../../../Types/props";
 import { isActivityInformation } from "../../../utils/Utils";
 import '../AdminModalContent.scss';
+import { useEffect, useState } from "react";
+import { useImageCache } from "../../../ImageCacheContext";
+
 
 
 const ConfirmActivity = ({saveOrDelete, userInput, tempImage}: AdminModalContentProps) => {
   const localActivityData = isActivityInformation(userInput) ? userInput: undefined;
+  const { getImage } = useImageCache();
+
+  const [localImage, setLocalImage] = useState('')
+
+
+  useEffect(() => {
+    const setImage = async () => {
+      if (tempImage) {
+        setLocalImage(tempImage);
+      } else if (userInput && isActivityInformation(userInput)) {
+        const blobPath = await getImage(userInput.imagePath);
+        setLocalImage(blobPath);
+      }
+    }
+    setImage();
+  }, []);
 
   return (
     <div className='input-info-container'>
@@ -18,7 +37,13 @@ const ConfirmActivity = ({saveOrDelete, userInput, tempImage}: AdminModalContent
         </div>
         <div className='confirm-section'>
           <Typography variant="h6" className='italics'>Subsections:</Typography>
-          <Typography className='indent'>{localActivityData?.subsectionNames.join(', ')}</Typography>
+          <ol>
+            {localActivityData?.subsectionNames.map((sub, index) => (
+              <li key={index}>
+                {sub}
+              </li>
+            ))}
+          </ol>
         </div>
         <div className='confirm-section'>
           <Typography variant="h6" className='italics'>Activity Format:</Typography>
@@ -26,7 +51,7 @@ const ConfirmActivity = ({saveOrDelete, userInput, tempImage}: AdminModalContent
         </div>
         <div className='confirm-section'>
           <Typography variant="h6" className='italics'>Activity Thumbnail:</Typography>
-          {tempImage && <img src={tempImage} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />}
+          {localImage && <img src={localImage} alt="Selected" style={{ width: '200px', height: '200px', objectFit: 'cover' }} />}
         </div>
       </div>
     </div>

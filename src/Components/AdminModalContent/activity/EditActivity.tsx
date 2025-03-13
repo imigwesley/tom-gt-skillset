@@ -8,14 +8,17 @@ import { isActivityInformation, StyledPaper } from "../../../utils/Utils";
 import { getAllSubsections } from "../../../utils/subsectionsApi";
 import { useImageCache } from "../../../ImageCacheContext";
 import '../AdminModalContent.scss';
+import OrderedSubsections from "../../OrderedSubsections/OrderedSubsections";
 
 
 const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreated, userInput, tempImage}: AdminModalContentProps) => {
 
   const [localActivityData, setLocalActivityData] = useState<ActivityInformation>();
+  // const [givenActivities, setGivenActivities] = useState<string[]>([]);
   const [localImage, setLocalImage] = useState('')
   const [allSubsections, setAllSubsections] = useState<SubsectionInformation[]>([]);
   const { getImage } = useImageCache();
+  const passedInput = userInput as ActivityInformation;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,13 +31,12 @@ const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreate
         if (userInput && isActivityInformation(userInput)) {
           console.log('first, userInput is:', userInput)
           setLocalActivityData(userInput);
+          // setGivenActivities(userInput.subsectionNames);
         }
         if (tempImage) {
-          console.log('tempImage already exists, is', tempImage)
           setLocalImage(tempImage);
         } else if (userInput && isActivityInformation(userInput)) {
           const blobPath = await getImage(userInput.imagePath);
-          console.log('tempImage did not exist, now is', blobPath)
           setLocalImage(blobPath);
           onLocalUrlCreated?.(blobPath);
         }
@@ -45,6 +47,7 @@ const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreate
   
     fetchData();
   }, []);
+
 
   const handleChangeActivityName = (event: React.ChangeEvent<HTMLInputElement>) => {
     const temp: ActivityInformation = {
@@ -105,55 +108,36 @@ const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreate
     }
   };
 
+  const handleReorderSubsections = (newOrder: string[]) => {
+    const temp: ActivityInformation = {
+      activityName: localActivityData?.activityName || '',
+      subsectionNames: newOrder,
+      imagePath: localActivityData?.imagePath || '',
+      isTeam: localActivityData?.isTeam || false,
+      isIndividual: localActivityData?.isIndividual || false,
+    };
+    setLocalActivityData(temp);
+    onApiInformationUpdate?.(temp);
+  }
+
   return (
     <div className='input-info-container'>
       <Typography variant='h4'>Edit Activity Information</Typography>
       <div className='input-info-section'>
         <Typography>Activity Name*:</Typography>
-        <TextField fullWidth value={localActivityData?.activityName} onChange={handleChangeActivityName} className='input-box'/>
+        <TextField fullWidth value={localActivityData?.activityName || passedInput?.activityName} onChange={handleChangeActivityName} className='input-box'/>
       </div>
       <div className='input-info-section'>
         <Typography>Activity Subsections*:</Typography>
-        <FormControl fullWidth className='input-box'>
-          <Autocomplete
-            multiple
-            options={allSubsections}
-            value={allSubsections.filter((subsection) => localActivityData?.subsectionNames.includes(subsection.subsectionName))}
-            onChange={handleChangeActivitySubsectionsSelection}
-            disableCloseOnSelect
-            // PaperComponent={(props) => <StyledPaper {...props} />}
-            getOptionLabel={(option) => option.subsectionName}
-            renderInput={(params) => (
-              <TextField {...params} variant="outlined" placeholder={localActivityData?.subsectionNames.length === 0 ? "None Selected" : ''} />
-            )}
-            renderOption={(props, option, { selected }) => (
-              <li {...props} key={option.subsectionName}>
-                <Checkbox checked={selected} />
-                <ListItemText primary={option.subsectionName} />
-              </li>
-            )}
-            renderTags={(selected) =>
-              selected.length === 0 ? (
-                <Typography variant="body2" color="textSecondary">
-                  None Selected
-                </Typography>
-              ) : (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((subsection) => (
-                    <Chip key={subsection.subsectionName} label={subsection.subsectionName} />
-                  ))}
-                </Box>
-              )
-            }
-          />
-        </FormControl>
+        <Typography sx={{fontStyle: 'italic'}} variant="body2">can drag and drop to reorder</Typography>
+        <OrderedSubsections allSubsections={allSubsections} initialChosenOptions={passedInput?.subsectionNames || []} onChange={handleReorderSubsections} />
       </div>
       <div className='input-info-section'>
         <Typography>Activity Format:</Typography>
         <FormControl>
           <RadioGroup
             name="radio-buttons-group"
-            value={localActivityData?.isIndividual ? 'individual' : localActivityData?.isTeam ? 'team' : ''}
+            value={localActivityData ? (localActivityData?.isIndividual ? 'individual' : localActivityData?.isTeam ? 'team' : '') : (passedInput?.isIndividual ? 'individual' : passedInput?.isTeam ? 'team' : '')}
             onChange={handleChangeActivityWorkMode}
           >
             <FormControlLabel value="individual" control={<Radio disableTouchRipple />} label="Individual" />

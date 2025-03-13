@@ -1,12 +1,12 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
 import { ModalPages, Operations } from "./enums";
-import { ActivityInformation, MemberInformation, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
+import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
 
 export interface AdminModalProps {
     currentOperation: Operations,
     closeModal: () => void,
-    passResponseProgress: (waiting: boolean, response: { isSuccess: boolean | null; message: string; }) => void,
+    passResponseProgress: (arg: ResponseInfo) => void,
 }
 
 export interface AdminModalContentProps {
@@ -45,4 +45,36 @@ export interface TableRowProps {
     rowInformation: SubmissionInformation,
     loggedInUser: AuthUser | undefined,
     personal: boolean
+}
+
+// add/order subsections for activity component
+export interface OrderedSubsectionsProps {
+    allSubsections: SubsectionInformation[],
+    initialChosenOptions: string[],
+    onChange: (arg: string[]) => void
+}
+
+export interface SubmissionUploadProps {
+    loggedInUser: AuthUser | undefined,
+    subsection: string,
+    currActivity: string | undefined,
+    passResponseProgress: (arg: ResponseInfo) => void,
+}
+
+// review progress page component
+export interface ReviewProgressProps {
+    isPersonal: boolean,
+    activitySubmissions: ActivitySubmissions[],
+    allUsers: MemberInformation[],
+    passResponseProgress?: (arg: ResponseInfo) => void,
+    onUpdateSubmission: () => void
+}
+
+// subsection link
+export interface SubsectionLinkProps {
+    isApproved: boolean | undefined,
+    name: string,
+    hasDeliverable: boolean | undefined,
+    isCurrent: boolean,
+    index: number
 }

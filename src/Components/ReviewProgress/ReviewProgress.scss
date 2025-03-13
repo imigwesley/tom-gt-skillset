@@ -1,0 +1,33 @@
+@import '../../Themes/TOMThemeVariables.scss';
+
+.subsection-title {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.status {
+    border-radius: 3px;
+    padding: 2px 5px;
+    width: fit-content;
+
+    &.approved {
+        background-color: rgb(237, 247, 237);
+    }
+    
+    &.pending {
+        background-color: rgba($tom-blue, 0.2);
+
+    }
+    
+    &.rejected {
+        background-color: rgb(253, 237, 237);
+        
+    }
+
+}
+
+.css-e87tjb-MuiButtonBase-root-MuiTab-root.Mui-selected {
+    color: $tom-blue !important;
+}
+

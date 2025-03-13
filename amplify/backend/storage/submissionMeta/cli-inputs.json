@@ -1,0 +1,10 @@
+{
+  "resourceName": "submissionMeta",
+  "tableName": "submissionMeta",
+  "partitionKey": {
+    "fieldName": "submissionId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

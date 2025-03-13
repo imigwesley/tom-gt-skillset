@@ -12,7 +12,7 @@ const LinearProgressWithLabel = ({progress}: LinearProgressWithLabelProps) => {
     <div className='progress-container'>
       <LinearProgress variant='determinate' value={progress} className='progress-bar'/>
       <Typography>
-        {progress}%
+        {progress}% complete
       </Typography>
     </div>
   )

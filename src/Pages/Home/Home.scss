@@ -44,4 +44,22 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+
+    .progress-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+
+        .progress-bar {
+            min-width: 35px;
+            flex: 1;
+        }
+    }
+}
+
+.css-1gn4l6i-MuiLinearProgress-root {
+    background-color: rgba($tom-blue, 0.5) !important;
+    color: $tom-blue !important;
 }

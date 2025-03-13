@@ -24,7 +24,7 @@
         "deleteCognitoUser": {
           "userPoolId": "us-east-1_0nC7xySgE",
           "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
-          "s3Key": "amplify-builds/deleteCognitoUser-436158677868754a4c78-build.zip"
+          "s3Key": "amplify-builds/deleteCognitoUser-686f4762626459575538-build.zip"
         },
         "getSubsections": {
           "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
@@ -35,19 +35,26 @@
           "s3Key": "amplify-builds/getActivity-596963622f7659326352-build.zip"
         },
         "skillsetActivities": {},
-        "skillsetSubsections": {}
+        "skillsetSubsections": {},
+        "submissionFunc": {
+          "deploymentBucketName": "amplify-tomgtskillset-prod-f09ab-deployment",
+          "s3Key": "amplify-builds/submissionFunc-4833643748494a325946-build.zip"
+        },
+        "submissionMeta": {}
       },
       "api": {
         "userApi": {},
         "cognitoApi": {},
         "subsectionsApi": {},
-        "activityApi": {}
+        "activityApi": {},
+        "submissionApi": {}
       },
       "storage": {
         "UserData": {},
         "skillsets3": {},
         "skillsetSubsections": {},
-        "skillsetActivities": {}
+        "skillsetActivities": {},
+        "submissionMeta": {}
       }
     }
   },
@@ -87,19 +94,25 @@
         },
         "skillsetActivities": {},
         "skillsetSubsections": {},
-        "UserData": {}
+        "UserData": {},
+        "submissionFunc": {
+          "deploymentBucketName": "amplify-tomgtskillset-dev-93e46-deployment",
+          "s3Key": "amplify-builds/submissionFunc-4833643748494a325946-build.zip"
+        }
       },
       "api": {
         "activityApi": {},
         "cognitoApi": {},
         "subsectionsApi": {},
-        "userApi": {}
+        "userApi": {},
+        "submissionApi": {}
       },
       "storage": {
         "UserData": {},
         "skillsetActivities": {},
         "skillsetSubsections": {},
-        "skillsets3": {}
+        "skillsets3": {},
+        "submissionMeta": {}
       }
     }
   }

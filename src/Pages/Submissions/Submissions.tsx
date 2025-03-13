@@ -1,43 +1,50 @@
-import { Accordion, AccordionDetails, AccordionSummary, IconButton, Menu, MenuItem, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from "@mui/material";
+import { Alert, Backdrop, CircularProgress, Tab, Tabs } from "@mui/material";
 import { PageProps } from "../../Types/props";
-import { KeyboardArrowDown, KeyboardArrowUp, MoreHoriz, RowingSharp } from "@mui/icons-material";
-// import SubmissionsTableRow from "../../Components/SubmissionsTableRow/SubmissionsTableRow";
 import { useState, useEffect } from "react";
-import { ActivityInformation, ActivitySubmissions, MemberInformation, SubmissionInformation, SubsectionSubmissions } from "../../Types/types";
+import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionSubmissions } from "../../Types/types";
 import { getAllActivities } from "../../utils/activityApi";
-import subsSample from "../../SampleData/SubmissionsSample";
-import { getSingleUserData } from "../../utils/userApi";
+import { getAllUsersData } from "../../utils/userApi";
 import './Submissions.scss';
+import { getAllSubmissions } from "../../utils/submissionApi";
+import ReviewProgress from "../../Components/ReviewProgress/ReviewProgress";
 
 
 const SubmissionsPage = ({loggedInUser}: PageProps) => {
 
   const [currentTab, setCurrentTab] = useState(0);
-  const [currUser, setCurrUser] = useState<MemberInformation>()
+  const [currUser, setCurrUser] = useState<MemberInformation>();
+  const [allUsers, setAllUsers] = useState<MemberInformation[]>();
   const [personalActivitySubmissions, setPersonalActivitySubmissions] = useState<ActivitySubmissions[]>([]);
   const [assignedActivitySubmissions, setAssignedActivitySubmissions] = useState<ActivitySubmissions[]>([]);
-  const [submissionMenuOpen, setSubmissionMenuOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
+    {
+      waiting: false, 
+      response: {
+        isSuccess: null, 
+        message: ''
+      }
+    }
+  );
 
   useEffect(() => {
     const fetchData = async () => {
-      const singleUserResponse = await getSingleUserData(loggedInUser?.username);
-      const tempCurrUser: MemberInformation = singleUserResponse[0];
+      setIsLoading(true);
+      const allUsersResponse = await getAllUsersData();
+      setAllUsers(allUsersResponse);
+      const tempCurrUser = allUsersResponse.find((user)=> user.userId === loggedInUser?.username);
       setCurrUser(tempCurrUser);
 
-      const submissionsResponse = subsSample // await getAllSubmissions();
+      const submissionsResponse = await getAllSubmissions();
       const activityResponse = await getAllActivities();
 
-      const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, tempCurrUser);
+      const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, loggedInUser?.username || '');
       const assignedActivitySubs = formatAssignedSubmissions(submissionsResponse, activityResponse);
 
       setPersonalActivitySubmissions(personalActivitySubs);
       setAssignedActivitySubmissions(assignedActivitySubs);
 
-      // setIsLoading(false)
-      console.log('personalActivitySubs is', personalActivitySubs)
+      setIsLoading(false)
     }
     fetchData();
   }, []);
@@ -45,7 +52,7 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
   const formatPersonalSubmissions = (
     submissionsResponse: SubmissionInformation[],
     activityResponse: ActivityInformation[],
-    tempCurrUser: MemberInformation
+    currUserId: string
   ): ActivitySubmissions[] => {
     const activitySubmissionsMap: Record<string, ActivitySubmissions> = {};
   
@@ -54,7 +61,7 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
   
       activity.subsectionNames.forEach((subsectionName) => {
         const matchingSubmissions = submissionsResponse.filter(
-          (submission) => submission.submittedBy && subsectionName === submission.subsectionName // make this check logged in user
+          (submission) => submission.submittedBy === currUserId && subsectionName === submission.subsectionName
         );
   
         subsectionSubmissionsMap[subsectionName] = {
@@ -128,165 +135,66 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
     setCurrentTab(newValue);
   };
 
-  const handleSubmissionMenuClick = (curr: string) => {
-    console.log('performing operation to ', curr);
-    // make api calls here
-    setAnchorEl(null);
-    setSubmissionMenuOpen(false);
-  };
-
-  const handleSubmissionMenuClose = () => {
-    setAnchorEl(null);
-    setSubmissionMenuOpen(false);
+  const handleResponseProgress = (resp: ResponseInfo) => {
+    setResponseInfo(resp);
   }
 
-  const handleOpenSubmissionMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-    setSubmissionMenuOpen(true);
+  const handleReload = async () => {
+    const submissionsResponse = await getAllSubmissions();
+    const activityResponse = await getAllActivities();
+
+    const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, loggedInUser?.username || '');
+    const assignedActivitySubs = formatAssignedSubmissions(submissionsResponse, activityResponse);
+
+    setPersonalActivitySubmissions(personalActivitySubs);
+    setAssignedActivitySubmissions(assignedActivitySubs);
   }
+
 
   return (
     <div className="page-container">
-      <div className="header">
-        <div className="tabs-container">
-          <Tabs value={currentTab} onChange={handleChangeTab}>
-            <Tab disableRipple label='Your Submissions' />
-            {currUser?.roles.isAdmin && <Tab disableRipple label='Review Submissions' />}
-          </Tabs>
+      {isLoading ?
+        <div style={{alignSelf: 'anchor-center', paddingTop: '25%'}}>
+          <CircularProgress />
         </div>
-      </div>
-      <div className="filter-bar">
-        <div style={{flexGrow: 1}} />
-        <div className="searchbar">
-
-        </div>
-      </div>
-      <div className="submissions-table">
-        {currentTab === 0 ?
-          <div>
-          {personalActivitySubmissions.map((activity) => (
-            <div  className="activity-page-section" key={activity.activityName}>
-              <Typography variant="h5">{activity.activityName}</Typography>
-              {activity.subsectionSubmissions.reduce((acc, subsection) => acc + subsection.submissions.length, 0) > 0 ? (
-                <div>
-                  {activity.subsectionSubmissions.map((subsection) => ( 
-                    <Accordion key={subsection.subsectionName} disableGutters>
-                      <AccordionSummary
-                        expandIcon={<KeyboardArrowDown />}
-                        disabled={subsection.submissions.length === 0}
-                      >
-                        <Typography variant="subtitle1">{subsection.subsectionName}</Typography>
-                        <Typography sx={{ marginLeft: "auto", fontStyle: "italic" }}>
-                          {`${subsection.submissions.length} submission${subsection.submissions.length !== 1 ? 's' : ''}`}
-                        </Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        {subsection.submissions.length > 0 ? (
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>Submission Time</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Files</TableCell>
-                                <TableCell />
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {subsection.submissions.map((submission) => (
-                                <TableRow key={submission.id}>
-                                  <TableCell>{new Date(submission.timeSubmitted).toLocaleString()}</TableCell>
-                                  <TableCell>{submission.isApproved ? "Approved" : "Pending approval"}</TableCell>
-                                  <TableCell>{submission.submissionFiles.join(", ") || "No Files"}</TableCell>
-                                  <TableCell>
-                                <IconButton disableRipple onClick={handleOpenSubmissionMenu}>
-                                  <MoreHoriz />
-                                </IconButton> 
-                                <Menu anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
-                                </Menu>
-                              </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        ) : (
-                          <Typography>No submissions yet.</Typography>
-                        )}
-                      </AccordionDetails>
-                    </Accordion>
-                  ))}
-                </div>
-              ) : (
-                <div>
-                  <Typography>You have not submitted anything for this activity.</Typography>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        : 
-        <div>
-        {assignedActivitySubmissions.map((activity) => (
-          <div  className="activity-page-section" key={activity.activityName}>
-            <Typography variant="h5">{activity.activityName}</Typography>
-            <div>
-              {activity.subsectionSubmissions.map((subsection) => ( 
-                <Accordion key={subsection.subsectionName} disableGutters>
-                  <AccordionSummary
-                    expandIcon={<KeyboardArrowDown />}
-                    disabled={subsection.submissions.length === 0}
-                  >
-                    <Typography variant="subtitle1">{subsection.subsectionName}</Typography>
-                    <Typography sx={{ marginLeft: "auto", fontStyle: "italic" }}>
-                      {`${subsection.submissions.length} submission${subsection.submissions.length !== 1 ? 's' : ''}`}
-                    </Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    {subsection.submissions.length > 0 ? (
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Submission Time</TableCell>
-                            <TableCell>Submitted By</TableCell>
-                            <TableCell>Status</TableCell>
-                            <TableCell>Files</TableCell>
-                            <TableCell />
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {subsection.submissions.map((submission) => (
-                            <TableRow key={submission.id}>
-                              <TableCell>{new Date(submission.timeSubmitted).toLocaleString()}</TableCell>
-                              <TableCell>{submission.submittedBy}</TableCell>
-                              <TableCell>{submission.isApproved ? "Approved" : "Pending approval"}</TableCell>
-                              <TableCell>{submission.submissionFiles.join(", ") || "No Files"}</TableCell>
-                              <TableCell>
-                                <IconButton disableRipple onClick={handleOpenSubmissionMenu}>
-                                  <MoreHoriz />
-                                </IconButton> 
-                                <Menu anchorEl={anchorEl} open={submissionMenuOpen} onClose={handleSubmissionMenuClose}>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('download') }>Download Files</MenuItem>
-                                  <MenuItem onClick={() => handleSubmissionMenuClick('approve') }>Approve Submission</MenuItem>
-                                  {/* <MenuItem onClick={() => { handleClose(); }}>Reject Submission</MenuItem> */}
-                                </Menu>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    ) : (
-                      <Typography>No submissions yet.</Typography>
-                    )}
-                  </AccordionDetails>
-                </Accordion>
-              ))}
-            </div>
+      : 
+      <>
+        <div className="header">
+          <div className="tabs-container">
+            <Tabs value={currentTab} onChange={handleChangeTab} >
+              <Tab disableRipple label='Your Submissions' className={!currUser?.roles.isAdmin ? 'non-clickable' : ''}/>
+              {currUser?.roles.isAdmin && <Tab disableRipple label='Review Submissions' />}
+            </Tabs>
           </div>
-        ))}
-      </div>
-        }
-      </div>
+        </div>
+        <div className="filter-bar">
+          <div style={{flexGrow: 1}} />
+          <div className="searchbar">
+
+          </div>
+        </div>
+        <div className="submissions-table">
+          <ReviewProgress 
+            isPersonal={currentTab === 0} 
+            activitySubmissions={currentTab === 0 ? personalActivitySubmissions : assignedActivitySubmissions} 
+            passResponseProgress={handleResponseProgress}
+            allUsers={allUsers || []}
+            onUpdateSubmission={handleReload}
+          />
+        </div>
+      </> 
+      }
+      <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={responseInfo.waiting}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      {responseInfo.response.isSuccess !== null &&
+        <div className='feedback-container'>
+          <Alert className='feedback' severity={responseInfo.response.isSuccess ? 'success' : 'error'}>{responseInfo.response.message}</Alert>
+        </div>
+      }
     </div>
   )
 }

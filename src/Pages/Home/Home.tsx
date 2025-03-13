@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.scss';
 import '../../Feedback.scss';
-import { Alert, Card, CardContent, CardMedia, CircularProgress, Typography } from "@mui/material";
+import { Alert, Card, CardContent, CardMedia, CircularProgress, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
-import { MemberInformation, ApiSendInformation, ActivityInformation } from '../../Types/types';
+import { MemberInformation, ApiSendInformation, ActivityInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 import { Operations } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
@@ -22,8 +22,15 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   const [promptForUserRecordCreation, setPromptForUserRecordCreation] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [responseType, setResponseType] = useState<{isSuccess: boolean | null, message: string}>({isSuccess: null, message: ''});
+  const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
+    {
+      waiting: false, 
+      response: {
+        isSuccess: null, 
+        message: ''
+      }
+    }
+  );
   
   // home page
   const [currUser, setCurrUser] = useState<MemberInformation | null>(null);
@@ -35,6 +42,30 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   });
   const [activities, setActivities] = useState<ActivityInformation[] | null>(null);
   const { getImage } = useImageCache();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setResponseInfo({waiting: true, response: {isSuccess: null, message: ''}});
+
+      const tempCurrUser = await checkForUserAcct();
+      let tempAllActivities = await getAllActivities();
+
+      // load images
+      tempAllActivities = await Promise.all(
+        tempAllActivities.map(async (activity) => {
+          if (!activity.imagePath) return { ...activity, imagePath: "" };
+          const imageUrl = await getImage(activity.imagePath);
+          return { ...activity, imagePath: imageUrl };
+        })
+      );
+
+      setCurrUser(tempCurrUser);
+      setActivities(tempAllActivities);
+      setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
+    };
+
+    fetchData();
+  }, []);
   
 
   /****************************** Helper functions ***********************************/
@@ -69,112 +100,29 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     return tempCurrUser;
   };
 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-
-      const tempCurrUser = await checkForUserAcct();
-      let tempAllActivities = await getAllActivities();
-
-      // load images
-      tempAllActivities = await Promise.all(
-        tempAllActivities.map(async (activity) => {
-          if (!activity.imagePath) return { ...activity, imagePath: "" };
-          const imageUrl = await getImage(activity.imagePath);
-          return { ...activity, imagePath: imageUrl };
-        })
-      );
-
-      setCurrUser(tempCurrUser);
-      setActivities(tempAllActivities);
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-
-
   /*********************************** Event handlers *************************************/
   const handleCardClick = (activityName: string) => {
     console.log(activityName);
     navigate(`/activities/${activityName}`);
   }
 
-  const handleCloseModal = () => {
-    setPromptForUserRecordCreation(false);
-    if (onUserCreation) onUserCreation();
-    // setInvalidUserData(false);
+  const handleRefreshPage = () => {
+    onUserCreation?.();
   }
 
-
-  const handleApiProgress = (waiting: boolean, response: {isSuccess: boolean | null, message: string}) => {
-    setIsLoading(waiting);
-    setResponseType(response);
+  const handleApiProgress = (resp: ResponseInfo) => {
+    setResponseInfo(resp);
   }
-
-  // const handleNext = async () => {
-  //   if (activeStep === 1) {
-  //     // submit button
-  //     handleCloseModal();
-  //     setIsLoading(true);
-  //     console.log('data waiting for the api is: ', apiDataToSend)
-
-  //     if (!apiDataToSend.user) throw new Error;
-  //     console.log('right before creation it is:',apiDataToSend.user)
-  //     const response = await createSingleUserData(apiDataToSend?.user);
-  //     console.log('response is', response)
-  //     setCurrUser(apiDataToSend?.user);
-  //     handleApiResponse(response);
-  //     setIsLoading(false);
-  //   } else {
-  //     // next button
-  //     if (!isDataValid(apiDataToSend, undefined, activeStep)) {
-  //       setInvalidapiDataToSend(true);
-  //     } else {
-  //       setInvalidapiDataToSend(false);
-  //       setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  //     }
-  //   }
-  // };
-  
-  // const handleBack = () => {
-  //   setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  //   setApiDataToSend({
-  //     user: undefined,
-  //     activity: undefined,
-  //     subsection: undefined,
-  //     team: undefined
-  //   });
-  // };
-
-  // const handleApiInfoChange = (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => {
-  //   console.log('changed inside home.tsx', info);
-  //   if (isMemberInformation(info) && loggedInUser?.signInDetails?.loginId) {
-  //     let temp = {...apiDataToSend};
-  //     temp.user = info;
-  //     temp.user.identifiers.accountEmail = loggedInUser?.signInDetails?.loginId;
-  //     temp.user.userId = loggedInUser?.username;
-  //     temp.user.roles = {
-  //       isAdmin: false,
-  //       role: 'Member'
-  //     }
-  //     setApiDataToSend(temp);
-  //   } else {
-  //     console.warn('invalid member information')
-  //   }
-  // }
 
   return (
     <div className='home-page-container'>
-      {isLoading ? 
+      {responseInfo.waiting ? 
         <div style={{padding:'200px', width:'300px'}}>
           <CircularProgress />
         </div>
       :
         <div>
-          { promptForUserRecordCreation && <AdminModal currentOperation={Operations.ADD_USER} closeModal={handleCloseModal} passResponseProgress={handleApiProgress} />}
+          { promptForUserRecordCreation && <AdminModal currentOperation={Operations.ADD_USER} closeModal={handleRefreshPage} passResponseProgress={handleApiProgress} />}
           <div className='header'>
             <Typography variant='h4' align='center'>
               Hello, {currUser?.identifiers?.name}! What would you like to learn today?
@@ -183,8 +131,8 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
           <div className='activity-card-container'>
             {activities?.map((activity, index) => {
               const numSubsections = activity.subsectionNames.length;
-              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionsComplete.length;
-              const percentComplete = numCompleted ? numCompleted / numSubsections : 0.0;
+              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionProgress.length || 0.0;
+              const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
               
               return (
                 <Card className={'activity-card'} onClick={() => handleCardClick(activity.activityName)} key={index}>
@@ -197,7 +145,13 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
                     <Typography>
                       {activity.activityName}
                     </Typography>
-                    <LinearProgressWithLabel progress={percentComplete} />
+                    <div className='progress-container'>
+                      <LinearProgress variant='determinate' value={percentComplete} className='progress-bar'/>
+                      <Typography>
+                        {numCompleted}/{numSubsections} complete
+                      </Typography>
+                    </div>
+                    {/* <LinearProgressWithLabel total={numSubsections} complete={numCompleted} /> */}
                   </CardContent>
                 </Card>
               );
@@ -206,9 +160,9 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
         </div>
       }
 
-      {responseType.isSuccess !== null &&
+      {responseInfo.response.isSuccess !== null &&
         <div className='feedback-container'>
-          <Alert className='feedback' severity={responseType.isSuccess ? 'success' : 'error'}>{responseType.message}</Alert>
+          <Alert className='feedback' severity={responseInfo.response.isSuccess ? 'success' : 'error'}>{responseInfo.response.message}</Alert>
         </div>
       }
     </div>

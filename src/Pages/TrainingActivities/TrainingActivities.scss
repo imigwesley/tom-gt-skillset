@@ -15,31 +15,108 @@
 .activity-page-container {
     display: flex;
     flex-direction: row;
-    padding: 1% 1% 0% 1%;
+    padding: 1% 1% 0;
+    justify-content: flex-start;
+    width: 100%;
     gap: 50px;
 
+    .sidebar-container {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 25%;
+        min-width: 0;
+        gap: 10px;
+        overflow: hidden;
+        transition: flex-basis 0.3s ease-in-out;
+
+        &.collapsed {
+            flex-basis: 5%;
+        }
+
+        &.open {
+            min-width: 260px;
+            transition: 0.3s ease;
+        }
+
+        .toggle-button {
+            transition: 0.3s ease;
+        }
+
+        .motion-container {
+            position: relative;
+            height: 100%;
+            width: 260px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+
+            &.open {
+                transform: translateX(0%);
+            }
+        }
+    }
+
+    .content-section {
+        flex-basis: 100%;
+        transition: flex-basis 0.3s ease;
+
+    }
+
     .background-card {
-        width: fit-content;
-        height: fit-content;
-        margin-top: 2%;
         background-color: $accent-white;
         padding: 15px;
         border-radius: 9px;
-        box-shadow: 0px 0px 5px gainsboro;
+        box-shadow: 0 0 5px gainsboro;
+        height: fit-content;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+
+        &.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
     }
-    
+
     .activity-container {
         display: flex;
         flex-direction: column;
         flex: 1;
-    
-    
+
         .header {
             padding: 20px;
         }
     }
+
+    .sub-start {
+        align-self: flex-start;
+        margin: 12px;
+    }
+
+    .table-title {
+        align-self: flex-start;
+        margin: 20px 12px 0px 13px;
+    }
+
+    .submission-container {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        width: 97%;
+        align-items: center;
+        gap: 10px;
+
+        .upload-component{
+            max-width: 400px;
+        }
+        
+    }
 }
+
+
 
 .links-container {
     padding-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
