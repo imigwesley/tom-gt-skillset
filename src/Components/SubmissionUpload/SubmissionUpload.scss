@@ -9,8 +9,6 @@
     border-radius: 1rem;
     background-color: #f9fafb;
     width: 100%;
-    // max-width: 400px;
-    // margin: auto;
     gap: 5px;
   
     .upload-instructions {
@@ -19,7 +17,7 @@
       text-align: center;
   
       &.drag-active {
-        color: #2563eb;
+        color: #4b5563;
       }
     }
   
@@ -48,48 +46,61 @@
   
       &.active {
         background-color: #e0f7fa;
-        border-color: #64b5f6;
+        border-color: rgba(0, 162, 211, 0.2);
       }
     }
-  
-  .upload-btn {
-    padding-top: 10px;
+}
+
+.file-previews{
+  // min-height: 40px;
+
+  .file-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     width: 100%;
-    background-color: $tom-blue;
-    color: white;
-    border-radius: 0.5rem;
-    cursor: pointer;
 
-    &:hover {
-      background-color: $tom-blue;
-    }
+    .file-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-radius: 6px;
+      width: 100%;
 
-    &:disabled {
-      background-color: #d1d5db;
-      cursor: not-allowed;
+      .delete-icon {
+        &:hover {
+          background-color: transparent;
+        }
+      }
     }
   }
 }
 
-.file-cards-container {
+.buttons-section {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-direction: row;
+  color: white;
+  gap: 10px;
+  justify-content: flex-start;
   width: 100%;
 
-  .file-card {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    border-radius: 6px;
-    width: 100%;
+  .btn {
+    padding-top: 10px;
+    width: fit-content;
+    cursor: pointer;
 
-    .delete-icon {
-      &:hover {
-        background-color: transparent;
-      }
+    &.cancel {
+      background-color: $tom-blue;
     }
+
+    &.submit {
+      background-color: $tom-blue;
+      flex-grow: 1;
+    }
+
+
   }
+  
 }
 
   

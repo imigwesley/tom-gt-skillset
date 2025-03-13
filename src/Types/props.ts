@@ -66,6 +66,15 @@ export interface ReviewProgressProps {
     isPersonal: boolean,
     activitySubmissions: ActivitySubmissions[],
     allUsers: MemberInformation[],
-    passResponseProgress: (arg: ResponseInfo) => void,
+    passResponseProgress?: (arg: ResponseInfo) => void,
     onUpdateSubmission: () => void
+}
+
+// subsection link
+export interface SubsectionLinkProps {
+    isApproved: boolean | undefined,
+    name: string,
+    hasDeliverable: boolean | undefined,
+    isCurrent: boolean,
+    index: number
 }

@@ -68,12 +68,12 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
       // update table on page
       onUpdateSubmission();
 
-      passResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully deleted submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: true, message: 'Successfully deleted submission'}});
     } catch (e) {
-      passResponseProgress({waiting: false, response: {isSuccess: false, message: 'Error deleting submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: false, message: 'Error deleting submission'}});
     }
     setTimeout(() => {
-      passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: null, message: ''}});
     }, 2000);
   }
 
@@ -88,13 +88,13 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     const updatedSubmission = {...submission, isApproved: true};
     try {
       await updateSubmission(updatedSubmission);
-      passResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully approved submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: true, message: 'Successfully approved submission'}});
       onUpdateSubmission();
     } catch (e) {
-      passResponseProgress({waiting: false, response: {isSuccess: false, message: 'Error approving submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: false, message: 'Error approving submission'}});
     }
     setTimeout(() => {
-      passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: null, message: ''}});
     }, 2000);
   }
 
@@ -104,18 +104,18 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     try {
       await updateSubmission(updatedSubmission);
       onUpdateSubmission()
-      passResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully approved submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: true, message: 'Successfully rejected submission'}});
     } catch (e) {
-      passResponseProgress({waiting: false, response: {isSuccess: false, message: 'Error approving submission'}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: false, message: 'Error rejecting submission'}});
     }
     setTimeout(() => {
-      passResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
+      passResponseProgress?.({waiting: false, response: {isSuccess: null, message: ''}});
     }, 2000);
   }
 
   const handleSubmissionMenuClick = (op: string, type: string, submission: SubmissionInformation) => {
     console.log('performing operation to ', op);
-    passResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
+    passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
     switch (op) {
       case 'delete':
         deleteSubmissionRecord(submission);

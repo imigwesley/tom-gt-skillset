@@ -140,7 +140,6 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
           <Typography variant="body2" className="upload-instructions">Drag & drop file(s) here or click to select</Typography>
         )}
       </div>
-
       <div className="file-previews">
         {files.length > 0 && (
           <div className="file-cards-container" style={{listStyleType: 'none'}}>
@@ -157,14 +156,13 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
           </div>
         )}
       </div>
-
-      {files.length > 0 && (
-        <Button disableRipple className="upload-btn" onClick={handleUploadForIndividual}>
-          <Typography color="white">
-            Upload {files.length} file(s)
-          </Typography>
-        </Button>
-      )}
+      <div className='upload-button'>
+        {files.length > 0 && (
+          <Button className='btn submit' variant="contained" disableRipple onClick={handleUploadForIndividual}>
+              Upload {files.length} file(s)
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

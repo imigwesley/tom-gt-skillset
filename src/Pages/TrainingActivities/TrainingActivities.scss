@@ -20,7 +20,6 @@
     width: 100%;
     gap: 50px;
 
-    // Sidebar
     .sidebar-container {
         display: flex;
         flex-direction: column;
@@ -56,14 +55,12 @@
         }
     }
 
-    // Content Section
     .content-section {
         flex-basis: 100%;
         transition: flex-basis 0.3s ease;
 
     }
 
-    // Shared Background Card Style
     .background-card {
         background-color: $accent-white;
         padding: 15px;
@@ -80,25 +77,38 @@
         }
     }
 
-    // Activity Content
     .activity-container {
         display: flex;
         flex-direction: column;
         flex: 1;
-
 
         .header {
             padding: 20px;
         }
     }
 
-    // Submission Container
+    .sub-start {
+        align-self: flex-start;
+        margin: 12px;
+    }
+
+    .table-title {
+        align-self: flex-start;
+        margin: 20px 12px 0px 13px;
+    }
+
     .submission-container {
         display: flex;
         flex-direction: column;
-        max-width: 400px;
         margin: auto;
-        gap: 5px;
+        width: 97%;
+        align-items: center;
+        gap: 10px;
+
+        .upload-component{
+            max-width: 400px;
+        }
+        
     }
 }
 

@@ -49,7 +49,7 @@ export async function getSubmission (submissionId: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Submission: ', response);
+        // console.log('Submission: ', response);
         return response;
     } catch (e) {
         console.log('GET submission call failed: ', e);
