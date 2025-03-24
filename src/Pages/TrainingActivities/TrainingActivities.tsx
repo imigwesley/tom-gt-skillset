@@ -344,69 +344,71 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                             passResponseProgress={handleResponseProgress}
                           />
                         </div>
-                        <Typography variant='h5' className='table-title'>
-                          Submission History:
-                        </Typography>
                         {submissions.filter((sub) => sub.subsectionName === currSubsection.subsectionName).length > 0 && 
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>Submission Time</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Files</TableCell>
-                                <TableCell />
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {submissions.filter((sub) => sub.subsectionName === currSubsection.subsectionName)
-                              .map((submission) => {
-                                return (
-                                  <TableRow key={submission.submissionId}>
-                                    <TableCell>
-                                      {new Date(Number(submission.timeSubmitted)).toLocaleString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })}
-                                    </TableCell>
-                                    <TableCell>
-                                      <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
-                                        {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
-                                      </div>
-                                    </TableCell>
-                                    <TableCell>
-                                      {submission.submissionFiles.length > 0
-                                        ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
-                                        : "No Files"}
-                                    </TableCell>
-                                    <TableCell>
-                                      <IconButton
-                                        disableRipple
-                                        onClick={(event) => handleOpenSubmissionMenu(event, submission.submissionId)}
-                                      >
-                                        <MoreHoriz />
-                                      </IconButton> 
-                                      <Menu
-                                        elevation={1}
-                                        anchorEl={anchorElMap[submission.submissionId] || null}
-                                        open={submissionMenuOpenMap[submission.submissionId] || false}
-                                        onClose={() => handleSubmissionMenuClose(submission.submissionId)}
-                                      >
-                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', 'personal', submission)}>
-                                          Delete Submission
-                                        </MenuItem>
-                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', 'personal', submission)}>
-                                          Download Files
-                                        </MenuItem>
-                                      </Menu>
-                                    </TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
+                          <>
+                            <Typography variant='h5' className='table-title'>
+                              Submission History:
+                            </Typography>
+                            <Table size="small">
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>Submission Time</TableCell>
+                                  <TableCell>Status</TableCell>
+                                  <TableCell>Files</TableCell>
+                                  <TableCell />
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {submissions.filter((sub) => sub.subsectionName === currSubsection.subsectionName)
+                                .map((submission) => {
+                                  return (
+                                    <TableRow key={submission.submissionId}>
+                                      <TableCell>
+                                        {new Date(Number(submission.timeSubmitted)).toLocaleString('en-US', {
+                                          year: 'numeric',
+                                          month: 'long',
+                                          day: 'numeric',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })}
+                                      </TableCell>
+                                      <TableCell>
+                                        <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
+                                          {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
+                                        </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        {submission.submissionFiles.length > 0
+                                          ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
+                                          : "No Files"}
+                                      </TableCell>
+                                      <TableCell>
+                                        <IconButton
+                                          disableRipple
+                                          onClick={(event) => handleOpenSubmissionMenu(event, submission.submissionId)}
+                                        >
+                                          <MoreHoriz />
+                                        </IconButton> 
+                                        <Menu
+                                          elevation={1}
+                                          anchorEl={anchorElMap[submission.submissionId] || null}
+                                          open={submissionMenuOpenMap[submission.submissionId] || false}
+                                          onClose={() => handleSubmissionMenuClose(submission.submissionId)}
+                                        >
+                                          <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', 'personal', submission)}>
+                                            Delete Submission
+                                          </MenuItem>
+                                          <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', 'personal', submission)}>
+                                            Download Files
+                                          </MenuItem>
+                                        </Menu>
+                                      </TableCell>
+                                    </TableRow>
+                                  );
+                                })}
+                              </TableBody>
+                            </Table>
+                          </>
                         }
                       </div>
                     )}

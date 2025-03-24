@@ -1,46 +1,88 @@
-# Getting Started with Create React App
+# Skillset
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Skillset is a web app designed to assist with onboarding new members of Tikkun Olam Makers: Georgia Tech/Emory.  
+It consolidates and hosts information on key skills required for various projects,  
+while also providing a platform to assign and track progress through learning modules.
 
-## Available Scripts
+## Features
+- Centralized resource hub for technical skills
+- Interactive learning modules with tracking
+- AWS Amplify-powered backend
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## **Getting Started**
 
-Runs the app in the development mode.\
+### **1. Clone the Repository**
+```sh
+git clone https://github.com/your-repo/skillset.git
+cd tom-gt-skillset
+```
+
+### **2. Install Dependencies**
+```sh
+npm install
+```
+
+### **3. Set Up AWS Amplify**
+This app connects to a cloud backend built with **AWS Amplify (Gen 1, v6)**.  
+To ensure proper connectivity, configure your Amplify environment using the CLI:
+
+```sh
+amplify pull --appId APP_ID --envName YOUR_ENV
+```
+APP_ID and YOUR_ENV can be found on the AWS management console in the Amplify project.
+
+- Config files are in the `/amplify` folder.
+- More details on [Amplify Gen 1](https://docs.amplify.aws/gen1/react/).
+
+### **4. Run the App**
+```sh
+npm start
+```
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+---
 
-### `npm test`
+## **Project Structure**
+```
+/src
+  ├── Components/       # Reusable UI components
+  ├── Pages/            # Main app pages
+  ├── utils/            # Helper functions
+  ├── fonts/            # typography fonts
+  ├── amplify/          # AWS Amplify configurations
+  ├── Themes/           # Scss theme
+  ├── Types/            # TypeScript types
+  ├── SampleData/       # Sample placeholder data
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## **Available Scripts**
+| Command          | Description |
+|-----------------|-------------|
+| `npm start`     | Runs the app in development mode |
+| `npm test`      | Launches the test runner |
+| `npm run build` | Builds the app for production |
+| `npm run eject` | Ejects from Create React App (irreversible) |
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## **Deployment**
+To deploy via Amplify, simply merge a commit into the `develop` or `master` branch, for the develop and master deployments. A workflow is set up via the Amplify console to automatically redeploy when a new commit is merged into either branch.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+For manual hosting, the built app is in the `/build` directory.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## **Contributing**
+Pull requests are welcome! Before submitting, please:
+- Follow project coding guidelines.
+- Run `npm test` to ensure tests pass.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## **License**
+This project is licensed under [MIT License](LICENSE).
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
