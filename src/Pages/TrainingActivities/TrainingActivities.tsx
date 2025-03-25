@@ -16,7 +16,6 @@ import { deleteSubmission, getAllSubmissions, getSubmission } from '../../utils/
 import { deleteFile, downloadFile } from '../../utils/imagesApi';
 
 
-
 const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const { activityName } = useParams();
   const navigate = useNavigate();
@@ -111,16 +110,13 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
 
   useEffect(() => {  
     fetchLocalSubmissions();
-  }, [currSubsection, currUser, currActivity]);
+  }, [currActivity]);
 
-  const fetchLocalSubmissions = async () => {
-    console.log('Fetching local submissions for all subsections...');
-  
-    // Gather all submission IDs from all subsections within the current activity
+  const fetchLocalSubmissions = async () => {  
+    // get all submission IDs from all subsections within the current activity
     const subsectionProgress = currUser?.progress.find(
       (act) => act.activityName === currActivity.activityName
     )?.subsectionProgress ?? [];
-  
     const ids = subsectionProgress.flatMap((subsection) => subsection.submissionIds ?? []);
   
     if (ids.length === 0) {
@@ -130,7 +126,6 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
           acc[subsection.subsection] = undefined;
           return acc;
         }, {} as { [key: string]: boolean | undefined });
-  
         return { ...prev, ...resetProgress };
       });
       return;
@@ -140,39 +135,42 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
       const responses = await Promise.all(
         ids.map(async (id) => {
           const response = await getSubmission(id);
-          return response[0]; // Assuming response is an array and we need the first item
+          return response[0];
         })
       );
-  
-      console.log('Received submissions:', responses);
-  
-      // Filter submissions belonging to the current user and sort them by timeSubmitted (most recent first)
+    
+      // filter submissions belonging to the current user and sort them by timeSubmitted (most recent first)
       const tempSubmissions = responses
         .filter((resp) => resp?.submittedBy === currUser?.userId)
         .sort((a, b) => Number(b.timeSubmitted) - Number(a.timeSubmitted));
   
       setSubmissions(tempSubmissions);
-  
-      const tempSubsectionApproval: { [key: string]: boolean | undefined } = { ...localSubsectionApproval };
-  
-      tempSubmissions.forEach((submission) => {
-        const { subsectionName, timeSubmitted, isApproved } = submission;
-  
-        if (
-          !tempSubsectionApproval[subsectionName] ||
-          Number(timeSubmitted) > Number(tempSubsectionApproval[subsectionName?.timeSubmitted] ?? 0)
-        ) {
-          tempSubsectionApproval[subsectionName] = isApproved ?? undefined;
-        }
-      });
-  
-      console.log('Updated subsection approval status:', tempSubsectionApproval);
-  
-      setLocalSubsectionApproval(tempSubsectionApproval);
+      combineProgress(tempSubmissions);
     } catch (error) {
       console.error('Error fetching submissions:', error);
     }
   };
+
+  const combineProgress = (tempSubmissions: any[]) => {
+    // submission records (those with deliverables)
+    const tempSubsectionApproval: { [key: string]: boolean | undefined } = { ...localSubsectionApproval };
+    tempSubmissions.forEach((submission) => {
+      const { subsectionName, timeSubmitted, isApproved } = submission;
+      if (
+        !tempSubsectionApproval[subsectionName] ||
+        Number(timeSubmitted) > Number(tempSubsectionApproval[subsectionName?.timeSubmitted] ?? 0)
+      ) {
+        tempSubsectionApproval[subsectionName] = isApproved ?? undefined;
+      }
+    });
+
+    // user progress (no deliverables)
+    currUser?.progress.find((act)=> act.activityName === currActivity.activityName)?.subsectionProgress?.map((sub) => {
+      tempSubsectionApproval[sub.subsection] = true;
+    })
+
+    setLocalSubsectionApproval(tempSubsectionApproval);
+  }
 
   const findNextSubsectionToComplete = (progress: ActivityProgress | undefined, names: string[]): string => {
     if (!progress) return names[0];
@@ -192,10 +190,9 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
 
   const handleResponseProgress = async (resp: ResponseInfo) => {
     setResponseInfo(resp);
-    // hide submission component if successfully submitted
+    // reload page if successfully submitted/deleted
     if (!resp.waiting && resp.response.isSuccess !== false) {
-      // setStartedSubmission(false);
-      await fetchLocalSubmissions();
+      window.location.reload();
     }
   }
 
@@ -237,12 +234,12 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
       // update table on page
       await fetchLocalSubmissions();
 
-      setResponseInfo({waiting: false, response: {isSuccess: true, message: 'Successfully deleted submission'}});
+      handleResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully deleted submission'}});
     } catch (e) {
-      setResponseInfo({waiting: false, response: {isSuccess: false, message: 'Error deleting submission'}});
+      handleResponseProgress({waiting: false, response: {isSuccess: false, message: 'Error deleting submission'}});
     }
     setTimeout(() => {
-      setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
+      handleResponseProgress({waiting: false, response: {isSuccess: null, message: ''}});
     }, 2000);
   }
 
