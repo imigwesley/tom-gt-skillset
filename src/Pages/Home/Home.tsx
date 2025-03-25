@@ -4,7 +4,7 @@ import '../../Feedback.scss';
 import { Alert, Card, CardContent, CardMedia, CircularProgress, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
 import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
-import { MemberInformation, ApiSendInformation, ActivityInformation, ResponseInfo } from '../../Types/types';
+import { MemberInformation, ApiSendInformation, ActivityInformation, ResponseInfo, SubsectionInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 import { Operations } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
@@ -12,6 +12,7 @@ import { getAllActivities } from '../../utils/activityApi';
 import { getFile } from '../../utils/imagesApi';
 import { useImageCache } from '../../ImageCacheContext';
 import AdminModal from '../../Components/AdminModal/AdminModal';
+import { getAllSubsections } from '../../utils/subsectionsApi';
 
 
 
@@ -41,6 +42,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
     team: undefined
   });
   const [activities, setActivities] = useState<ActivityInformation[] | null>(null);
+  const [allSubsections, setAllSubsections] = useState<SubsectionInformation[] | null>(null);
   const { getImage } = useImageCache();
 
   useEffect(() => {
@@ -49,6 +51,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
       const tempCurrUser = await checkForUserAcct();
       let tempAllActivities = await getAllActivities();
+      let tempAllSubsections = await getAllSubsections();
 
       // load images
       tempAllActivities = await Promise.all(
@@ -61,6 +64,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
       setCurrUser(tempCurrUser);
       setActivities(tempAllActivities);
+      setAllSubsections(tempAllSubsections);
       setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
     };
 
@@ -130,7 +134,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
           </div>
           <div className='activity-card-container'>
             {activities?.map((activity, index) => {
-              const numSubsections = activity.subsectionNames.length;
+              const numSubsections = allSubsections?.filter((sub)=> (sub.hasDeliverable && (activity.subsectionNames.includes(sub.subsectionName)))).length || 0;
               const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionProgress.length || 0.0;
               const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
               
@@ -148,7 +152,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
                     <div className='progress-container'>
                       <LinearProgress variant='determinate' value={percentComplete} className='progress-bar'/>
                       <Typography>
-                        {numCompleted}/{numSubsections} complete
+                        {percentComplete}% complete
                       </Typography>
                     </div>
                     {/* <LinearProgressWithLabel total={numSubsections} complete={numCompleted} /> */}
