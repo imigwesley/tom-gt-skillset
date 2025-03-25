@@ -1,12 +1,16 @@
 import { Typography } from "@mui/material";
 import './Profile.scss';
-import { MemberInformation } from '../../Types/types';
+import { ActivityInformation, MemberInformation, SubsectionInformation } from '../../Types/types';
 import { useEffect, useState } from "react";
 import { getSingleUserData } from "../../utils/userApi";
 import { PageProps } from "../../Types/props";
+import { getAllActivities } from "../../utils/activityApi";
+import { getAllSubsections } from "../../utils/subsectionsApi";
 
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
+  const [allActivities, setAllActivities] = useState<ActivityInformation[]>([]);
+  const [allSubsections, setAllSubsections] = useState<SubsectionInformation[]>([]);
   const [currUser, setCurrUser] = useState<MemberInformation>({
     userId: '',
     identifiers: {
@@ -33,7 +37,12 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
     const fetchData = async () => {
       const singleUserResponse = await getSingleUserData(loggedInUser?.username);
       const tempCurrUser: MemberInformation = singleUserResponse[0];
+      const tempAllActivities = await getAllActivities();
+      const tempAllSubsections = await getAllSubsections();
+
       setCurrUser(tempCurrUser);
+      setAllActivities(tempAllActivities);
+      setAllSubsections(tempAllSubsections);
     }
     fetchData();
   }, [])
@@ -75,14 +84,17 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         {currUser.progress ?
         <div>
           {currUser.progress?.map((activity) => {
+              const relevantSubsections = allActivities.find((act) => act.activityName === activity.activityName)?.subsectionNames || [];
+              const numSubsections = allSubsections?.filter((sub)=> (sub.hasDeliverable && (relevantSubsections.includes(sub.subsectionName)))).length || 0;              const numCompleted = activity.subsectionProgress.length || 0.0;
+              const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
+              
             return (
               <div>
-                <Typography className="info-name">Activity:</Typography>
+                <Typography className="info-name">Activity Name:</Typography>
                 <Typography className="info">{activity.activityName}</Typography>
 
                 <Typography className="info-name">Percent Complete:</Typography>
-                {/* <Typography className="info">{activity.percentComplete}</Typography> */}
-                <Typography className="info">MAKE THIS PART</Typography>
+                <Typography className="info">{percentComplete}%</Typography>
               </div>
             )
           })}

@@ -1,5 +1,5 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { Avatar, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import './Navbar.scss';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -82,10 +82,25 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
         <img src='/tom-gt-logo.png' alt='tom logo' className='logo'/>
       </div>
       <div className='nav-subsection'>
-
-        <IconButton onClick={handleMenuClick} disableRipple>
-          <MenuIcon className='icon clickable'/>
-        </IconButton>
+        <Tooltip 
+          title='Menu'
+          slotProps={{
+            popper: {
+              modifiers: [
+                {
+                  name: 'offset',
+                  options: {
+                    offset: [0, -14],
+                  },
+                },
+              ],
+            },
+          }}
+        >
+          <IconButton onClick={handleMenuClick} disableRipple>
+            <MenuIcon className='icon clickable'/>
+          </IconButton>
+        </Tooltip>
         <div className='profile-section clickable' onClick={() => handlePageClick('profile')}>
           <Avatar>
             <>
