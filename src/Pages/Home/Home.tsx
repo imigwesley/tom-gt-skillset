@@ -3,7 +3,6 @@ import './Home.scss';
 import '../../Feedback.scss';
 import { Alert, Card, CardContent, CardMedia, CircularProgress, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
-import LinearProgressWithLabel from '../../Components/LinearProgressWithLabel/LinearProgressWithLabel';
 import { MemberInformation, ApiSendInformation, ActivityInformation, ResponseInfo, SubsectionInformation } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 import { Operations } from '../../Types/enums';
@@ -155,7 +154,6 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
                         {percentComplete}% complete
                       </Typography>
                     </div>
-                    {/* <LinearProgressWithLabel total={numSubsections} complete={numCompleted} /> */}
                   </CardContent>
                 </Card>
               );

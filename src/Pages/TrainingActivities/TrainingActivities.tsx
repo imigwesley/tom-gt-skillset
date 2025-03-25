@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, IconButton, Link, Menu, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Alert, Backdrop, Breadcrumbs, Button, CircularProgress, Divider, IconButton, Link, Menu, MenuItem, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './TrainingActivities.scss';
@@ -12,7 +12,7 @@ import { getAllActivities } from '../../utils/activityApi';
 import { getAllSubsections } from '../../utils/subsectionsApi';
 import SubmissionUpload from '../../Components/SubmissionUpload/SubmissionUpload';
 import { motion } from 'framer-motion';
-import { deleteSubmission, getAllSubmissions, getSubmission } from '../../utils/submissionApi';
+import { deleteSubmission, getSubmission } from '../../utils/submissionApi';
 import { deleteFile, downloadFile } from '../../utils/imagesApi';
 
 
@@ -290,9 +290,11 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
           <div className='activity-page-container'>
             <div className={`sidebar-container ${menuOpen ? 'open' : 'collapsed'}`}>
                 <motion.div className="toggle-button">
+                  <Tooltip title={menuOpen ? 'Hide Subsections' : 'Show Subsections'} placement='right'>
                     <IconButton disableTouchRipple onClick={() => setMenuOpen(!menuOpen)}>
                         {menuOpen ? <West /> : <List />}
                     </IconButton>
+                  </Tooltip>
                 </motion.div>
                 <motion.div className={`motion-container ${menuOpen ? 'open' : ''}`}>
                     <div className={`background-card ${menuOpen ? 'visible' : ''}`}>
