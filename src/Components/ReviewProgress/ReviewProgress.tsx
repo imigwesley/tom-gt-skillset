@@ -1,5 +1,5 @@
 import { KeyboardArrowDown, MoreHoriz } from "@mui/icons-material";
-import { Typography, Accordion, AccordionSummary, AccordionDetails, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Menu, MenuItem } from "@mui/material";
+import { Typography, Accordion, AccordionSummary, AccordionDetails, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Menu, MenuItem, Dialog, Button, TextField } from "@mui/material";
 import { ReviewProgressProps } from "../../Types/props";
 import { ActivitySubmissions, SubmissionInformation } from "../../Types/types";
 import { deleteFile, downloadFile } from "../../utils/imagesApi";
@@ -12,6 +12,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
   const [anchorElMap, setAnchorElMap] = useState<{ [key: string]: HTMLElement | null }>({});
   const [submissionMenuOpenMap, setSubmissionMenuOpenMap] = useState<{ [key: string]: boolean }>({});
   const [sortedSubmissions, setSortedSubmissions] = useState<ActivitySubmissions[]>([]);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [submissionReviewing, setSubmissionReviewing] = useState<SubmissionInformation | null>(null);
+  const [submissionFeedback, setSubmissionFeedback] = useState<string>('');
 
   useEffect(() => {
     if (!activitySubmissions) return;
@@ -83,9 +86,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     })
   }
 
-  const approveSubmission = async (submission: SubmissionInformation) => {
+  const approveSubmission = async (submission: SubmissionInformation, feedback: string) => {
     // update submission record in submissions table
-    const updatedSubmission = {...submission, isApproved: true};
+    const updatedSubmission = {...submission, isApproved: true, submissionFeedback: feedback};
     try {
       await updateSubmission(updatedSubmission);
       passResponseProgress?.({waiting: false, response: {isSuccess: true, message: 'Successfully approved submission'}});
@@ -98,9 +101,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     }, 2000);
   }
 
-  const rejectSubmission = async (submission: SubmissionInformation) => {
+  const rejectSubmission = async (submission: SubmissionInformation, feedback: string) => {
     // update submission record in submissions table
-    const updatedSubmission = {...submission, isApproved: false};
+    const updatedSubmission = {...submission, isApproved: false, submissionFeedback: feedback};
     try {
       await updateSubmission(updatedSubmission);
       onUpdateSubmission()
@@ -113,24 +116,39 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
     }, 2000);
   }
 
-  const handleSubmissionMenuClick = (op: string, type: string, submission: SubmissionInformation) => {
+  const handleSubmissionMenuClick = (op: string, submission: SubmissionInformation) => {
     console.log('performing operation to ', op);
-    passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
     switch (op) {
       case 'delete':
+        passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
         deleteSubmissionRecord(submission);
         break;
       case 'download':
+        passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
         downloadSubmission(submission);
         break;
-      case 'approve':
-        approveSubmission(submission);
-        break; 
-      case 'reject':
-        rejectSubmission(submission);     
+      case 'review':
+        setSubmissionReviewing(submission);
+        setSubmissionFeedback(submission.submissionFeedback);
+        setShowReviewModal(true);
+        break;
     }
     handleSubmissionMenuClose(submission.submissionId);
   };
+
+  const handleAdminReviewSubmission = (submission: SubmissionInformation | null, feedback: string, op: string) => {
+    if (submission === null) return;
+    passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
+    switch (op) {
+      case 'approve':
+        approveSubmission(submission, feedback);
+        break;
+      case 'reject':
+        rejectSubmission(submission, feedback);
+        break;
+    }
+    setShowReviewModal(false);
+  }
 
   const handleOpenSubmissionMenu = (event: React.MouseEvent, submissionId: string) => {
     setAnchorElMap((prev) => ({ ...prev, [submissionId]: event.currentTarget as HTMLElement }));
@@ -144,6 +162,74 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
 
   return (
     <>
+      
+      <Dialog
+        open={showReviewModal}
+        fullWidth
+        maxWidth='md'
+        onClose={()=>{
+          console.log('loading')
+          setShowReviewModal(false);
+          setTimeout(()=> {
+            setSubmissionFeedback('');
+          setSubmissionReviewing(null);
+          },150);
+        }}
+      >
+        <div className="review-dialog">
+          <Typography variant='h4'>
+            Approve or Reject Submission
+          </Typography>
+
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Submission Time</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Files</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow key={submissionReviewing?.submissionId}>
+                <TableCell>
+                  {new Date(Number(submissionReviewing?.timeSubmitted)).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </TableCell>
+                <TableCell>
+                  <div className={`status ${submissionReviewing?.isApproved === null ? "pending" : submissionReviewing?.isApproved ? "approved" : "rejected"}`}>
+                    {submissionReviewing?.isApproved === null ? "Pending approval" : submissionReviewing?.isApproved ? "Approved" : "Submission rejected"}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {submissionReviewing?.submissionFiles?.length ?? 0 > 0
+                    ? submissionReviewing?.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
+                    : "No Files"}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <div className="textfield">
+            <Typography>
+              Leave feedback:
+            </Typography>
+            <TextField multiline minRows={5} fullWidth onChange={(e)=>setSubmissionFeedback(e.target.value)} value={submissionFeedback}></TextField>
+          </div>
+          <div className="buttons">
+            <Button className="reject" disableRipple size="large" variant="contained" onClick={() => handleAdminReviewSubmission(submissionReviewing, submissionFeedback, 'reject')}>
+              Reject
+            </Button>
+            <Button className="approve" disableRipple size="large" variant="contained" onClick={() => handleAdminReviewSubmission(submissionReviewing, submissionFeedback, 'approve')}>
+              Approve
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+      
       {isPersonal ? 
         <div>
           {sortedSubmissions.map((activity) => (
@@ -169,6 +255,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                               <TableRow>
                                 <TableCell>Submission Time</TableCell>
                                 <TableCell>Status</TableCell>
+                                <TableCell>Feedback</TableCell>
                                 <TableCell>Files</TableCell>
                                 <TableCell />
                               </TableRow>
@@ -192,6 +279,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                       </div>
                                     </TableCell>
                                     <TableCell>
+                                      {submission.submissionFeedback || 'N/A'}
+                                    </TableCell>
+                                    <TableCell>
                                       {submission.submissionFiles.length > 0
                                         ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
                                         : "No Files"}
@@ -209,10 +299,10 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                         open={submissionMenuOpenMap[submission.submissionId] || false}
                                         onClose={() => handleSubmissionMenuClose(submission.submissionId)}
                                       >
-                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', 'personal', submission)}>
+                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', submission)}>
                                           Delete Submission
                                         </MenuItem>
-                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', 'personal', submission)}>
+                                        <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', submission)}>
                                           Download Files
                                         </MenuItem>
                                       </Menu>
@@ -251,8 +341,8 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                 {activity.subsectionSubmissions.map((subsection) => {
                   const totalSubmissions = subsection.submissions.length;
                   const pendingSubmissions = subsection.submissions.filter(submission => submission.isApproved === null).length;
-                  console.log('pending submissions', pendingSubmissions)
-                  console.log(subsection)
+                  // console.log('pending submissions', pendingSubmissions)
+                  // console.log(subsection)
 
                   return ( 
                   <Accordion key={subsection.subsectionName} disableGutters>
@@ -284,6 +374,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                               <TableCell>Submission Time</TableCell>
                               <TableCell>Submitted By</TableCell>
                               <TableCell>Status</TableCell>
+                              <TableCell>Feedback</TableCell>
                               <TableCell>Files</TableCell>
                               <TableCell />
                             </TableRow>
@@ -310,6 +401,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                     </div>
                                   </TableCell>
                                   <TableCell>
+                                    {submission.submissionFeedback || 'N/A'}
+                                  </TableCell>
+                                  <TableCell>
                                     {submission.submissionFiles.length > 0
                                       ? submission.submissionFiles.map((file) => file?.split('/').pop()).join(", ")
                                       : "No Files"}
@@ -327,17 +421,14 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                                       open={submissionMenuOpenMap[submission.submissionId] || false}
                                       onClose={() => handleSubmissionMenuClose(submission.submissionId)}
                                     >
-                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('approve', 'assigned', submission)}>
-                                        Approve Submission
-                                      </MenuItem>
-                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('reject', 'assigned', submission)}>
-                                        Reject Submission
-                                      </MenuItem>
-                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', 'assigned', submission)}>
+                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('delete', submission)}>
                                         Delete Submission
                                       </MenuItem>
-                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', 'assigned', submission)}>
+                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('download', submission)}>
                                         Download Files
+                                      </MenuItem>
+                                      <MenuItem disableRipple onClick={() => handleSubmissionMenuClick('review', submission)}>
+                                        Review Submission
                                       </MenuItem>
                                     </Menu>
                                   </TableCell>

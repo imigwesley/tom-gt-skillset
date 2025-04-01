@@ -44,7 +44,8 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
         timeSubmitted: new Date().getTime().toString(),
         isApproved: null,
         submittedBy: loggedInUser?.username || '',
-        submissionFiles: filePaths
+        submissionFiles: filePaths,
+        submissionFeedback: '',
       };
 
       console.log('creating submission with ', submissionRecord)

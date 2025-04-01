@@ -28,8 +28,8 @@ const MembersPage = () => {
       setAllUsers(tempAllUsers);
 
       const tempByRole = {
-        'officers': tempAllUsers?.filter((member) => member.roles.isAdmin === true) || [],
-        'members': tempAllUsers?.filter((member) => member.roles.isAdmin === false).sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1) || [],
+        'officers': tempAllUsers?.filter((member) => member.roles.role !== 'Member') || [],
+        'members': tempAllUsers?.filter((member) => member.roles.role === 'Member').sort((a, b) => a.identifiers.name > b.identifiers.name ? 0 : -1) || [],
       };
       setMembersByRole(tempByRole);
   

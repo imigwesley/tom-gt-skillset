@@ -353,6 +353,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                                 <TableRow>
                                   <TableCell>Submission Time</TableCell>
                                   <TableCell>Status</TableCell>
+                                  <TableCell>Feedback</TableCell>
                                   <TableCell>Files</TableCell>
                                   <TableCell />
                                 </TableRow>
@@ -375,6 +376,9 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                                         <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
                                           {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
                                         </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        {submission.submissionFeedback || 'N/A'}
                                       </TableCell>
                                       <TableCell>
                                         {submission.submissionFiles.length > 0

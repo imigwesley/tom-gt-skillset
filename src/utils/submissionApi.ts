@@ -84,7 +84,8 @@ export async function createSubmission(submissionData: SubmissionInformation) {
             timeSubmitted: submissionData.timeSubmitted,
             isApproved: submissionData.isApproved,
             submittedBy: submissionData.submittedBy,
-            submissionFiles: submissionData.submissionFiles
+            submissionFiles: submissionData.submissionFiles,
+            submissionFeedback: submissionData.submissionFeedback
         };        
         const restOperation = post({
             apiName: 'submissionApi',
@@ -117,7 +118,8 @@ export async function updateSubmission(submissionData: SubmissionInformation) {
             timeSubmitted: submissionData.timeSubmitted,
             isApproved: submissionData.isApproved,
             submittedBy: submissionData.submittedBy,
-            submissionFiles: submissionData.submissionFiles
+            submissionFiles: submissionData.submissionFiles,
+            submissionFeedback: submissionData.submissionFeedback
         };      
         const restOperation = put({
             apiName: 'submissionApi',

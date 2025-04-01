@@ -98,7 +98,8 @@ export interface SubmissionInformation {
     timeSubmitted: string,
     isApproved: boolean | null,
     submittedBy: string,
-    submissionFiles: string[]
+    submissionFiles: string[],
+    submissionFeedback: string
 }
 
 /********************   Misc.       *******************/
