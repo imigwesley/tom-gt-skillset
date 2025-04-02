@@ -352,18 +352,12 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                     >
                       <div className="subsection-title">
                         <Typography variant="subtitle1">{subsection.subsectionName}</Typography>
-                        {pendingSubmissions !== 0 && 
-                          <Typography variant="subtitle1">
-                            <span style={{fontStyle: 'italic'}}>
-                              {' - ' + pendingSubmissions + ' pending'}
-                            </span>
-                          </Typography>
-                        }
                       </div>
                       
+                      {pendingSubmissions > 0 && 
                       <Typography sx={{ marginLeft: "auto", fontStyle: "italic" }}>
-                        {`${totalSubmissions} submission${totalSubmissions !== 1 ? 's' : ''}`}
-                      </Typography>
+                        {`${pendingSubmissions} pending`}
+                      </Typography>}
                       
                     </AccordionSummary>
                     <AccordionDetails>

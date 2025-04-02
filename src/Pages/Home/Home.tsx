@@ -8,10 +8,10 @@ import { getSingleUserData } from '../../utils/userApi';
 import { Operations } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
 import { getAllActivities } from '../../utils/activityApi';
-import { getFile } from '../../utils/imagesApi';
 import { useImageCache } from '../../ImageCacheContext';
 import AdminModal from '../../Components/AdminModal/AdminModal';
 import { getAllSubsections } from '../../utils/subsectionsApi';
+import { getSubmission } from '../../utils/submissionApi';
 
 
 
@@ -20,8 +20,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   const navigate = useNavigate();
   // user creation modal
   const [promptForUserRecordCreation, setPromptForUserRecordCreation] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
-  const [invalidapiDataToSend, setInvalidapiDataToSend] = useState(false);
+  const [percentCompletion, setPercentCompletion] = useState<{activityName: string, percentComplete: number}[]>([]);
   const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
     {
       waiting: false, 
@@ -61,6 +60,38 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
         })
       );
 
+      const updatedProgress = await Promise.all(
+        tempCurrUser.progress.map(async (activity) => {
+          const relevantSubsections =
+            tempAllActivities.find((act) => act.activityName === activity.activityName)?.subsectionNames || [];
+          const numWithDeliverable = tempAllSubsections
+          ?.filter((sub) => sub.hasDeliverable && relevantSubsections.includes(sub.subsectionName))
+          .length || 0;
+      
+          const completedSubs = activity.subsectionProgress;
+      
+          // find number of most recent submissions that have been approved
+          const numCompleted = (
+            await Promise.all(
+              completedSubs.map(async (subRecord) => {
+                const latestSubmissionId = subRecord.submissionIds[subRecord.submissionIds.length - 1];
+                const latestSubmissionInfo = await getSubmission(latestSubmissionId);
+                return latestSubmissionInfo?.[0]?.isApproved ? 1 : 0;
+              })
+            )
+          ).reduce<number>((sum, approved) => sum + approved, 0);
+          const percentComplete = numWithDeliverable ? Math.round((numCompleted / numWithDeliverable) * 100) : 0;
+      
+          return {
+            activityName: activity.activityName,
+            percentComplete,
+          };
+        })
+      );
+      
+      setPercentCompletion(updatedProgress);
+      
+
       setCurrUser(tempCurrUser);
       setActivities(tempAllActivities);
       setAllSubsections(tempAllSubsections);
@@ -69,6 +100,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
     fetchData();
   }, []);
+  
   
 
   /****************************** Helper functions ***********************************/
@@ -138,9 +170,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
           </div>
           <div className='activity-card-container'>
             {activities?.map((activity, index) => {
-              const numSubsections = allSubsections?.filter((sub)=> (sub.hasDeliverable && (activity.subsectionNames.includes(sub.subsectionName)))).length || 0;
-              const numCompleted = currUser?.progress?.find((m) => m.activityName === activity.activityName)?.subsectionProgress.length || 0.0;
-              const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
+              const localPctComplete = percentCompletion.find((obj)=> obj.activityName === activity.activityName)?.percentComplete || 0.0;
               
               return (
                 <Card className={'activity-card'} onClick={() => handleCardClick(activity.activityName)} key={index}>
@@ -154,9 +184,9 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
                       {activity.activityName}
                     </Typography>
                     <div className='progress-container'>
-                      <LinearProgress variant='determinate' value={percentComplete} className='progress-bar'/>
+                      <LinearProgress variant='determinate' value={localPctComplete} className='progress-bar'/>
                       <Typography>
-                        {percentComplete}% complete
+                        {localPctComplete}% complete
                       </Typography>
                     </div>
                   </CardContent>
@@ -164,6 +194,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
               );
             })}
           </div>
+
         </div>
       }
 

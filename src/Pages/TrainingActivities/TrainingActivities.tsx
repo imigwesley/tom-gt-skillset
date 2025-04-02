@@ -151,23 +151,29 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     }
   };
 
-  const combineProgress = (tempSubmissions: any[]) => {
-    // submission records (those with deliverables)
-    const tempSubsectionApproval: { [key: string]: boolean | undefined } = { ...localSubsectionApproval };
+  const combineProgress = (tempSubmissions: SubmissionInformation[]) => {
+    const latestSubmissions: { [key: string]: SubmissionInformation } = {};
+    
+    // find most recent submission for each subsection
     tempSubmissions.forEach((submission) => {
-      const { subsectionName, timeSubmitted, isApproved } = submission;
+      const { subsectionName, timeSubmitted } = submission;
+      
       if (
-        !tempSubsectionApproval[subsectionName] ||
-        Number(timeSubmitted) > Number(tempSubsectionApproval[subsectionName?.timeSubmitted] ?? 0)
+        !latestSubmissions[subsectionName] || 
+        Number(timeSubmitted) > Number(latestSubmissions[subsectionName].timeSubmitted)
       ) {
-        tempSubsectionApproval[subsectionName] = isApproved ?? undefined;
+        latestSubmissions[subsectionName] = submission;
       }
     });
+    
+    // assign approval status based on the most recent submission
+    const tempSubsectionApproval: {[key: string]: boolean | undefined} = { ...localSubsectionApproval };
+    
+    Object.values(latestSubmissions).forEach((submission) => {
+      const { subsectionName, isApproved } = submission;
+      tempSubsectionApproval[subsectionName] = isApproved !== null ? isApproved : undefined;
+    });
 
-    // user progress (no deliverables)
-    currUser?.progress.find((act)=> act.activityName === currActivity.activityName)?.subsectionProgress?.map((sub) => {
-      tempSubsectionApproval[sub.subsection] = true;
-    })
 
     setLocalSubsectionApproval(tempSubsectionApproval);
   }
