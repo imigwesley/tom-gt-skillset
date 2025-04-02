@@ -46,7 +46,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const [submissions, setSubmissions] = useState<SubmissionInformation[]>([]);
   const [anchorElMap, setAnchorElMap] = useState<{ [key: string]: HTMLElement | null }>({});
   const [submissionMenuOpenMap, setSubmissionMenuOpenMap] = useState<{ [key: string]: boolean }>({});
-  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (boolean | undefined)}>({})
+  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (boolean | undefined)}>({});
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/')} className='breadcrumb-link' >
@@ -108,13 +108,18 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     fetchData();
   }, []);
 
-  useEffect(() => {  
+  useEffect(() => {
     fetchLocalSubmissions();
   }, [currActivity]);
 
   const fetchLocalSubmissions = async () => {  
+    // get updated user info for ids
+    const singleUserResponse = await getSingleUserData(loggedInUser?.username);
+    const tempCurrUser: MemberInformation = singleUserResponse[0];
+    setCurrUser(tempCurrUser);
+
     // get all submission IDs from all subsections within the current activity
-    const subsectionProgress = currUser?.progress.find(
+    const subsectionProgress = tempCurrUser?.progress.find(
       (act) => act.activityName === currActivity.activityName
     )?.subsectionProgress ?? [];
     const ids = subsectionProgress.flatMap((subsection) => subsection.submissionIds ?? []);
@@ -198,11 +203,12 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     setResponseInfo(resp);
     // reload page if successfully submitted/deleted
     if (!resp.waiting && resp.response.isSuccess !== false) {
-      window.location.reload();
+      await fetchLocalSubmissions();
     }
   }
 
   const deleteSubmissionRecord = async (submission: SubmissionInformation) => {
+    handleResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
     try {
       // delete submission file(s) in s3
       submission.submissionFiles.map(async (file) => {

@@ -238,7 +238,7 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
               {activity.subsectionSubmissions.reduce((acc, subsection) => acc + subsection.submissions.length, 0) > 0 ? (
                 <div>
                   {activity.subsectionSubmissions.map((subsection) => ( 
-                    <Accordion key={subsection.subsectionName} disableGutters>
+                    <Accordion key={subsection.subsectionName} >
                       <AccordionSummary
                         expandIcon={<KeyboardArrowDown />}
                         disabled={subsection.submissions.length === 0}
@@ -341,11 +341,9 @@ const ReviewProgress = ({isPersonal, activitySubmissions, allUsers, passResponse
                 {activity.subsectionSubmissions.map((subsection) => {
                   const totalSubmissions = subsection.submissions.length;
                   const pendingSubmissions = subsection.submissions.filter(submission => submission.isApproved === null).length;
-                  // console.log('pending submissions', pendingSubmissions)
-                  // console.log(subsection)
 
                   return ( 
-                  <Accordion key={subsection.subsectionName} disableGutters>
+                  <Accordion key={subsection.subsectionName}>
                     <AccordionSummary
                       expandIcon={<KeyboardArrowDown />}
                       disabled={totalSubmissions === 0}

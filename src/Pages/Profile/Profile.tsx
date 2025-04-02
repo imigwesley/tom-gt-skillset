@@ -1,6 +1,6 @@
-import { Button, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Alert, Button, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import './Profile.scss';
-import { MemberInformation } from '../../Types/types';
+import { MemberInformation, ResponseInfo } from '../../Types/types';
 import { useEffect, useState } from "react";
 import { getSingleUserData } from "../../utils/userApi";
 import { PageProps } from "../../Types/props";
@@ -14,7 +14,17 @@ import { getSubmission } from "../../utils/submissionApi";
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
   const [editUserProfile, setEditUserProfile] = useState<boolean>(false);
+  const [rerenderKey, setRerenderkey] = useState(0);
   const [progressData, setProgressData] = useState<{ activityName: string; percentComplete: number; completedNames: string[] }[]>([]);
+  const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
+    {
+      waiting: false, 
+      response: {
+        isSuccess: null, 
+        message: ''
+      }
+    }
+  );
   const [currUser, setCurrUser] = useState<MemberInformation>({
     userId: '',
     identifiers: {
@@ -91,8 +101,16 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
     };
   
     fetchData();
-  }, [loggedInUser]);
+  }, [loggedInUser, rerenderKey]);
   
+  const handleResponseProgress = (resp: ResponseInfo) => {
+    setResponseInfo(resp);
+  }
+
+  const handleCloseModal = () => {
+    setEditUserProfile(false);
+    setRerenderkey(rerenderKey + 1);
+  }
 
   return (
     <>
@@ -105,7 +123,14 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <CircularProgress style={{margin: '0% 46%'}} />
       
     : <>
-        { editUserProfile && <AdminModal currentOperation={Operations.EDIT_SELF} closeModal={() => setEditUserProfile(false)} currentUser={currUser} />}
+        { editUserProfile && 
+          <AdminModal 
+            currentOperation={Operations.EDIT_SELF} 
+            closeModal={handleCloseModal} 
+            currentUser={currUser} 
+            passResponseProgress={handleResponseProgress} 
+          />
+        }
         <div className="name-and-edit">
           <Typography variant="h6" className="info-name">Name:</Typography>
           <Button 
@@ -176,6 +201,11 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         </>}
       </div>
     </div>
+      {responseInfo.response.isSuccess !== null &&
+        <div className='feedback-container'>
+          <Alert className='feedback' severity={responseInfo.response.isSuccess ? 'success' : 'error'}>{responseInfo.response.message}</Alert>
+        </div>
+      }
     </>
   );
 };

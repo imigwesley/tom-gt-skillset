@@ -3,7 +3,7 @@ import './Home.scss';
 import '../../Feedback.scss';
 import { Alert, Card, CardContent, CardMedia, CircularProgress, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useState } from 'react';
-import { MemberInformation, ApiSendInformation, ActivityInformation, ResponseInfo, SubsectionInformation } from '../../Types/types';
+import { MemberInformation, ActivityInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
 import { Operations } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
@@ -23,7 +23,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   const [percentCompletion, setPercentCompletion] = useState<{activityName: string, percentComplete: number}[]>([]);
   const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
     {
-      waiting: false, 
+      waiting: true, 
       response: {
         isSuccess: null, 
         message: ''
@@ -33,14 +33,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   
   // home page
   const [currUser, setCurrUser] = useState<MemberInformation | null>(null);
-  const [apiDataToSend, setApiDataToSend] = useState<ApiSendInformation>({
-    user: undefined,
-    activity: undefined,
-    subsection: undefined,
-    team: undefined
-  });
   const [activities, setActivities] = useState<ActivityInformation[] | null>(null);
-  const [allSubsections, setAllSubsections] = useState<SubsectionInformation[] | null>(null);
   const { getImage } = useImageCache();
 
   useEffect(() => {
@@ -94,7 +87,6 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
       setCurrUser(tempCurrUser);
       setActivities(tempAllActivities);
-      setAllSubsections(tempAllSubsections);
       setResponseInfo({waiting: false, response: {isSuccess: null, message: ''}});
     };
 

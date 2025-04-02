@@ -27,6 +27,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
 
   const handleUploadForIndividual = async () => {
     passResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
+    setFiles([]);
     try {
       // Upload files to S3
       console.log("Uploading files:", files);

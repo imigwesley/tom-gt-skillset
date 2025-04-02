@@ -267,7 +267,8 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
       default:
         // console.log('default')
     }
-    window.location.reload();
+    // window.location.reload();
+    closeModal();
 
     setTimeout(() => {
       passResponseProgress?.({
