@@ -120,7 +120,12 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
   return (
     <div className='home-page-container'>
       {responseInfo.waiting ? 
-        <div style={{padding:'200px', width:'300px'}}>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}>
           <CircularProgress />
         </div>
       :

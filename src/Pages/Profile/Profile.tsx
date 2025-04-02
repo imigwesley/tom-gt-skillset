@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Button, CircularProgress, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import './Profile.scss';
 import { ActivityInformation, MemberInformation, SubsectionInformation } from '../../Types/types';
 import { useEffect, useState } from "react";
@@ -6,9 +6,13 @@ import { getSingleUserData } from "../../utils/userApi";
 import { PageProps } from "../../Types/props";
 import { getAllActivities } from "../../utils/activityApi";
 import { getAllSubsections } from "../../utils/subsectionsApi";
+import { Edit } from "@mui/icons-material";
+import { Operations } from "../../Types/enums";
+import AdminModal from "../../Components/AdminModal/AdminModal";
 
 const ProfilePage = ({loggedInUser}: PageProps) => {
 
+  const [editUserProfile, setEditUserProfile] = useState<boolean>(false);
   const [allActivities, setAllActivities] = useState<ActivityInformation[]>([]);
   const [allSubsections, setAllSubsections] = useState<SubsectionInformation[]>([]);
   const [currUser, setCurrUser] = useState<MemberInformation>({
@@ -45,22 +49,41 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
       setAllSubsections(tempAllSubsections);
     }
     fetchData();
-  }, [])
+  }, []);
 
   return (
+    <>
+
     <div className='profile-container'>
-      <Typography variant='h2' className="header">Your Profile</Typography>
+      <Typography variant='h3' className="header">Your Profile</Typography>
 
       <div className="background-card">
-        <Typography variant="h5" className="info-name">Name:</Typography>
+      {currUser.userId === '' ?
+        <CircularProgress style={{margin: '0% 46%'}} />
+      
+    : <>
+        { editUserProfile && <AdminModal currentOperation={Operations.EDIT_SELF} closeModal={() => window.location.reload()} currentUser={currUser} />}
+        <div className="name-and-edit">
+          <Typography variant="h6" className="info-name">Name:</Typography>
+          <Button 
+            className="button" 
+            disableRipple 
+            size="small" 
+            variant="contained"
+            onClick={() => setEditUserProfile(true)}
+          >
+            <Edit fontSize="small" />
+            Edit profile
+          </Button>
+        </div>
         <Typography className="info">{currUser.identifiers.name}</Typography>
 
-        <Typography variant="h5"  className="info-name">Primary Email:</Typography>
+        <Typography variant="h6"  className="info-name padded">Primary Email:</Typography>
         <Typography className="info">{currUser.identifiers.accountEmail}</Typography>
 
         {currUser.identifiers.otherEmails.length > 1 &&
           <div>
-            <Typography variant="h5" className="info-name">Other emails:</Typography>
+            <Typography variant="h6" className="info-name padded">Other emails:</Typography>
               {currUser.identifiers.otherEmails.map((_email, index) => {
                 if (index > 0) {
                   return (
@@ -77,35 +100,51 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography variant="h5" className="info-name">Advising:</Typography>
         <Typography className="info">{currUser.teams.teamsAdvising.length > 1 ? currUser.teams.teamsAdvising : 'No teams advising'}</Typography> */}
 
-        <Typography variant="h5" className="info-name">Role:</Typography>
+        <Typography variant="h6" className="info-name padded">Role:</Typography>
         <Typography className="info">{currUser.roles.role}</Typography>
 
-        <Typography variant="h5" className="info-name">Section Progress:</Typography>
+        <Typography variant="h6" className="info-name padded">Section Progress:</Typography>
         {currUser.progress ?
-        <div>
-          {currUser.progress?.map((activity) => {
-              const relevantSubsections = allActivities.find((act) => act.activityName === activity.activityName)?.subsectionNames || [];
-              const numSubsections = allSubsections?.filter((sub)=> (sub.hasDeliverable && (relevantSubsections.includes(sub.subsectionName)))).length || 0;              const numCompleted = activity.subsectionProgress.length || 0.0;
-              const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0.0;
-              
-            return (
-              <div>
-                <Typography className="info-name">Activity Name:</Typography>
-                <Typography className="info">{activity.activityName}</Typography>
-
-                <Typography className="info-name">Percent Complete:</Typography>
-                <Typography className="info">{percentComplete}%</Typography>
-              </div>
-            )
-          })}
-        </div>
-        : 
-        <div>
-          'NONE'
-        </div>
+          <div>
+            <Table className="table">
+              <TableHead>
+                <TableRow>
+                  <TableCell className="table-cell"><Typography variant="subtitle1" fontWeight="bold">Activity Name</Typography></TableCell>
+                  <TableCell className="table-cell"><Typography variant="subtitle1" fontWeight="bold">Percent Complete</Typography></TableCell>
+                  <TableCell className="table-cell"><Typography variant="subtitle1" fontWeight="bold">Subsections Complete</Typography></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {currUser.progress?.map((activity) => {
+                  const relevantSubsections = allActivities.find((act) => act.activityName === activity.activityName)?.subsectionNames || [];
+                  const numSubsections = allSubsections?.filter(
+                    (sub) => sub.hasDeliverable && relevantSubsections.includes(sub.subsectionName)
+                  ).length || 0;
+                  const completedSubs = activity.subsectionProgress;
+                  const numCompleted = completedSubs.length || 0;
+                  const completedNames = completedSubs.map((sub)=>sub.subsection);
+                  const percentComplete = numCompleted ? Math.round((numCompleted / numSubsections) * 100) : 0;
+                  
+                  return (
+                    <TableRow key={activity.activityName}>
+                      <TableCell>{activity.activityName}</TableCell>
+                      <TableCell>{percentComplete}%</TableCell>
+                      <TableCell>{completedNames.join(', ')}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          : 
+          <div>
+            No progress yet.
+          </div>
         }
+        </>}
       </div>
     </div>
+    </>
   );
 };
 

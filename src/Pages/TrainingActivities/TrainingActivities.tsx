@@ -277,10 +277,13 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   return (
     <div>      
       {isLoading ?
-        <div className='selector-centering'>
-          <div style={{padding:'200px', width:'300px'}}>
-            <CircularProgress />
-          </div>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}>
+          <CircularProgress />
         </div>
       :
         <>
