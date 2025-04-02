@@ -101,7 +101,7 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
   
     const currentPage = StepSets[currentOperation][activeStep];
     const requiresValidation = infoInputPages.has(currentPage);
-    const isInvalid = !isDataValid(infoFromModalForApi, imageFile, activeStep);
+    const isInvalid = !isDataValid(infoFromModalForApi);
   
     if (requiresValidation && isInvalid) {
       setInvalidinfoFromModalForApi(true);

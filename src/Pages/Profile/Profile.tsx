@@ -149,16 +149,12 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography variant="h6"  className="info-name padded">Primary Email:</Typography>
         <Typography className="info">{currUser.identifiers.accountEmail}</Typography>
 
-        {currUser.identifiers.otherEmails.length > 1 &&
+        {currUser.identifiers.otherEmails.length > 0 &&
           <div>
             <Typography variant="h6" className="info-name padded">Other emails:</Typography>
-              {currUser.identifiers.otherEmails.map((_email, index) => {
-                if (index > 0) {
-                  return (
-                    <Typography className="info">{currUser.identifiers.otherEmails[index]}</Typography>
-                  )
-                }
-              })}
+              {currUser.identifiers.otherEmails.map((_email, index) => (
+                <Typography className="info">{currUser.identifiers.otherEmails[index]}</Typography>
+              ))}
           </div>
         }
         
