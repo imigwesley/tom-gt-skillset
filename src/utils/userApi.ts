@@ -50,7 +50,7 @@ export async function getSingleUserData (givenId: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Single user: ', response);
+        // console.log('Single user: ', response);
         return response;
     } catch (e) {
         console.log('GET single user call failed: ', e);

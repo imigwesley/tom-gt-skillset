@@ -32,7 +32,7 @@ export function isSubmissionInformation(info: any): info is SubmissionInformatio
   return (info as SubmissionInformation)?.submissionId !== undefined;
 }
 
-export const isDataValid = (data: ApiSendInformation, imageFile: File | undefined, activeStep: number) => {
+export const isDataValid = (data: ApiSendInformation) => {
   const emailRegex = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{3,}))$/);
 
   // console.log('validating user: ', data.user)
@@ -51,19 +51,21 @@ export const isDataValid = (data: ApiSendInformation, imageFile: File | undefine
     // && data.user.teams.teamMembership.length > 0
     && data.user.roles.role !== ''
     )
-    || ( // or if team is valid
+    || 
+    ( // or if team is valid
       data.team
       && data.team.teamName !== ''
       && (data.team.membership?.length !== 0 && data.team.membership[0] !== '')
       && (data.team.advisors?.length !== 0 && data.team.advisors[0] !== '')
     )
-    || ( // or if activity is valid (necessary info exists, image is uploaded)
+    || 
+    ( // or if activity is valid (necessary info exists, image is uploaded)
       data.activity
       && data.activity.activityName !== ''
-      // && (data.activity.subsectionNames?.length !== 0 && data.activity.subsectionNames[0] !== '')
       && data.activity.imagePath
     )
-    || ( // or if subsection is valid
+    || 
+    ( // or if subsection is valid
       data.subsection
       && data.subsection.subsectionName !== ''
       && data.subsection.subsectionHtml !== ''

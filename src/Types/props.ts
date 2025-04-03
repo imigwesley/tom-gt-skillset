@@ -6,7 +6,8 @@ import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseIn
 export interface AdminModalProps {
     currentOperation: Operations,
     closeModal: () => void,
-    passResponseProgress: (arg: ResponseInfo) => void,
+    passResponseProgress?: (arg: ResponseInfo) => void,
+    currentUser?: MemberInformation,
 }
 
 export interface AdminModalContentProps {

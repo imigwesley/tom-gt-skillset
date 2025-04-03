@@ -29,6 +29,7 @@ export enum ModalPages {
 
 export enum Operations {
     NULL,
+    EDIT_SELF,
     ADD_USER,
     EDIT_USER,
     DELETE_USER,
@@ -47,6 +48,8 @@ export const StepSets: Record<Operations, ModalPages[]> = {
     [Operations.NULL]: [ModalPages.NULL],
     [Operations.ADD_USER]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
     [Operations.EDIT_USER]: [ModalPages.SELECT_USER, ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
+    // no need to select user when editing own profile
+    [Operations.EDIT_SELF]: [ModalPages.EDIT_USER, ModalPages.CONFIRM_SAVE_USER],
     [Operations.DELETE_USER]: [ModalPages.SELECT_USER, ModalPages.CONFIRM_DELETE_USER],
   
     [Operations.ADD_TEAM]: [ModalPages.EDIT_TEAM, ModalPages.CONFIRM_SAVE_TEAM],

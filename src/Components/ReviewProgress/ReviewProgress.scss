@@ -6,6 +6,34 @@
     gap: 5px;
 }
 
+.review-dialog {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    height: 505px;
+    overflow: scroll;
+
+    .textfield {
+        width: 80%;
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 90px;
+
+        .reject {
+            background-color: #be5757 ;
+        }
+
+        .approve {
+            background-color: #5a8f54;
+        }
+    }
+}
+
 .status {
     border-radius: 3px;
     padding: 2px 5px;

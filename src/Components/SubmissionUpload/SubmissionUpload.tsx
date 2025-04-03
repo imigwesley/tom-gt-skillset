@@ -27,6 +27,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
 
   const handleUploadForIndividual = async () => {
     passResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
+    setFiles([]);
     try {
       // Upload files to S3
       console.log("Uploading files:", files);
@@ -44,7 +45,8 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
         timeSubmitted: new Date().getTime().toString(),
         isApproved: null,
         submittedBy: loggedInUser?.username || '',
-        submissionFiles: filePaths
+        submissionFiles: filePaths,
+        submissionFeedback: '',
       };
 
       console.log('creating submission with ', submissionRecord)

@@ -83,6 +83,7 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
       </div>
       <div className='nav-subsection'>
         <Tooltip 
+          disableInteractive
           title='Menu'
           slotProps={{
             popper: {
@@ -90,7 +91,7 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
                 {
                   name: 'offset',
                   options: {
-                    offset: [0, -14],
+                    offset: [0, -20],
                   },
                 },
               ],

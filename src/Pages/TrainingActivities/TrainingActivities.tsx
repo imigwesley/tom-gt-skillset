@@ -46,7 +46,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const [submissions, setSubmissions] = useState<SubmissionInformation[]>([]);
   const [anchorElMap, setAnchorElMap] = useState<{ [key: string]: HTMLElement | null }>({});
   const [submissionMenuOpenMap, setSubmissionMenuOpenMap] = useState<{ [key: string]: boolean }>({});
-  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (boolean | undefined)}>({})
+  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (boolean | undefined)}>({});
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/')} className='breadcrumb-link' >
@@ -108,13 +108,18 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     fetchData();
   }, []);
 
-  useEffect(() => {  
+  useEffect(() => {
     fetchLocalSubmissions();
   }, [currActivity]);
 
   const fetchLocalSubmissions = async () => {  
+    // get updated user info for ids
+    const singleUserResponse = await getSingleUserData(loggedInUser?.username);
+    const tempCurrUser: MemberInformation = singleUserResponse[0];
+    setCurrUser(tempCurrUser);
+
     // get all submission IDs from all subsections within the current activity
-    const subsectionProgress = currUser?.progress.find(
+    const subsectionProgress = tempCurrUser?.progress.find(
       (act) => act.activityName === currActivity.activityName
     )?.subsectionProgress ?? [];
     const ids = subsectionProgress.flatMap((subsection) => subsection.submissionIds ?? []);
@@ -151,23 +156,29 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     }
   };
 
-  const combineProgress = (tempSubmissions: any[]) => {
-    // submission records (those with deliverables)
-    const tempSubsectionApproval: { [key: string]: boolean | undefined } = { ...localSubsectionApproval };
+  const combineProgress = (tempSubmissions: SubmissionInformation[]) => {
+    const latestSubmissions: { [key: string]: SubmissionInformation } = {};
+    
+    // find most recent submission for each subsection
     tempSubmissions.forEach((submission) => {
-      const { subsectionName, timeSubmitted, isApproved } = submission;
+      const { subsectionName, timeSubmitted } = submission;
+      
       if (
-        !tempSubsectionApproval[subsectionName] ||
-        Number(timeSubmitted) > Number(tempSubsectionApproval[subsectionName?.timeSubmitted] ?? 0)
+        !latestSubmissions[subsectionName] || 
+        Number(timeSubmitted) > Number(latestSubmissions[subsectionName].timeSubmitted)
       ) {
-        tempSubsectionApproval[subsectionName] = isApproved ?? undefined;
+        latestSubmissions[subsectionName] = submission;
       }
     });
+    
+    // assign approval status based on the most recent submission
+    const tempSubsectionApproval: {[key: string]: boolean | undefined} = { ...localSubsectionApproval };
+    
+    Object.values(latestSubmissions).forEach((submission) => {
+      const { subsectionName, isApproved } = submission;
+      tempSubsectionApproval[subsectionName] = isApproved !== null ? isApproved : undefined;
+    });
 
-    // user progress (no deliverables)
-    currUser?.progress.find((act)=> act.activityName === currActivity.activityName)?.subsectionProgress?.map((sub) => {
-      tempSubsectionApproval[sub.subsection] = true;
-    })
 
     setLocalSubsectionApproval(tempSubsectionApproval);
   }
@@ -192,11 +203,12 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     setResponseInfo(resp);
     // reload page if successfully submitted/deleted
     if (!resp.waiting && resp.response.isSuccess !== false) {
-      window.location.reload();
+      await fetchLocalSubmissions();
     }
   }
 
   const deleteSubmissionRecord = async (submission: SubmissionInformation) => {
+    handleResponseProgress({waiting: true, response: {isSuccess: null, message: ''}});
     try {
       // delete submission file(s) in s3
       submission.submissionFiles.map(async (file) => {
@@ -277,10 +289,13 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   return (
     <div>      
       {isLoading ?
-        <div className='selector-centering'>
-          <div style={{padding:'200px', width:'300px'}}>
-            <CircularProgress />
-          </div>
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}>
+          <CircularProgress />
         </div>
       :
         <>
@@ -353,6 +368,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                                 <TableRow>
                                   <TableCell>Submission Time</TableCell>
                                   <TableCell>Status</TableCell>
+                                  <TableCell>Feedback</TableCell>
                                   <TableCell>Files</TableCell>
                                   <TableCell />
                                 </TableRow>
@@ -375,6 +391,9 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                                         <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
                                           {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
                                         </div>
+                                      </TableCell>
+                                      <TableCell>
+                                        {submission.submissionFeedback || 'N/A'}
                                       </TableCell>
                                       <TableCell>
                                         {submission.submissionFiles.length > 0
