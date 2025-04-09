@@ -28,9 +28,8 @@ export async function deleteUserInCognito(givenId: any) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('user deletion success', response);
         return response;
     } catch (e) {
-        console.log('user deletion failure: ', e);
+        console.warn('user deletion failure: ', e);
     }
 };

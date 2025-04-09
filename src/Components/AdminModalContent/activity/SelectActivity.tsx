@@ -38,12 +38,9 @@ const SelectActivity = ({ onApiInformationUpdate }: AdminModalContentProps) => {
               onChange={(_, newValue) => {
                 // const activity = allActivities.find((activity) => activity.activityName === e.target.value);
                 if (newValue) {
-                  console.log('in if')
                   setLocalActivityData(newValue);
                   onApiInformationUpdate?.(newValue);
                 } else {
-                  console.log('in else')
-                  // TODO: does this ever get reached?
                   setLocalActivityData(allActivities?.find((activity) => activity.activityName === localActivityData?.activityName) || {
                     activityName: '',
                     subsectionNames: [],

@@ -39,13 +39,11 @@ const EditUser = ({editOrCreate, onApiInformationUpdate, userInput}: AdminModalC
 
   useEffect(() => {
     const updateUserData = async () => {
-      console.log('user input is', userInput);
       
       if (userInput && isMemberInformation(userInput)) {
         const session = await fetchAuthSession();
   
         if (session) {
-          console.log(userInput?.roles?.role);
           let temp = { ...userInput };
   
           temp.identifiers.accountEmail = userInput.identifiers.accountEmail || session.tokens?.signInDetails?.loginId || '';
@@ -64,7 +62,7 @@ const EditUser = ({editOrCreate, onApiInformationUpdate, userInput}: AdminModalC
   
   
   const handleUserNameBlur = (name: string) => {
-    console.log('name on blur is', name);
+    // console.log('name on blur is', name);
     if (name === '' || !/\s/.test(name)) {
       setIncorrectUserNameError(true);
     }
@@ -117,11 +115,8 @@ const EditUser = ({editOrCreate, onApiInformationUpdate, userInput}: AdminModalC
   };
 
 
-  const handleChangeEmails = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    console.log('changing email');
-    
+  const handleChangeEmails = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {    
     if (validateEmailString(event.target.value)) {
-      console.log('valid on email change');
       setEmailErrors((prev) => {
         const newErrors = [...prev];
         newErrors[index] = false;
@@ -384,9 +379,8 @@ const EditUser = ({editOrCreate, onApiInformationUpdate, userInput}: AdminModalC
       <div className='input-info-section'>
         <Typography>Other Email(s):</Typography>
         {localUserData?.identifiers.otherEmails.map((email, index) => (
-          <div className='other-email-section'>
+          <div className='other-email-section' key={index}>
             <TextField 
-              key={index} 
               fullWidth 
               value={email} 
               onChange={(e) => handleChangeEmails(e as React.ChangeEvent<HTMLInputElement>, index)} 

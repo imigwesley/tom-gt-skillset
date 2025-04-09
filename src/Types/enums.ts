@@ -64,3 +64,10 @@ export const StepSets: Record<Operations, ModalPages[]> = {
     [Operations.EDIT_ACTIVITY]: [ModalPages.SELECT_ACTIVITY, ModalPages.EDIT_ACTIVITY, ModalPages.CONFIRM_SAVE_ACTIVITY],
     [Operations.DELETE_ACTIVITY]: [ModalPages.SELECT_ACTIVITY, ModalPages.CONFIRM_DELETE_ACTIVITY],
 };
+
+export enum SubmissionStatus {
+    NOT_SUBMITTED,
+    PENDING,
+    APPROVED,
+    REJECTED
+}

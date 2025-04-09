@@ -6,7 +6,7 @@ export async function getFile(filePath: string) {
         path: filePath,
         options: {
             onProgress: ({ transferredBytes, totalBytes }) => {
-              if (totalBytes) {
+              if (totalBytes && totalBytes % 20 === 0) {
                 console.log(
                   `Download progress ${
                     Math.round((transferredBytes / totalBytes) * 100)
@@ -21,14 +21,14 @@ export async function getFile(filePath: string) {
 }
 
 export async function uploadFile(file: File, isImage: boolean) {
-    console.log('file to upload is ', file);
+    // console.log('file to upload is ', file);
     try {
         const result = await uploadData({
           path: `public/${isImage ? 'images' : 'submissions'}/${file.name}`, 
           data: file,
           options: {
             onProgress: ({ transferredBytes, totalBytes }) => {
-              if (totalBytes) {
+              if (totalBytes && totalBytes % 20 === 0) {
                 console.log(
                   `Upload progress ${
                     Math.round((transferredBytes / totalBytes) * 100)
@@ -38,21 +38,21 @@ export async function uploadFile(file: File, isImage: boolean) {
             }
           }
         }).result;
-        console.log('Succeeded: ', result);
+        // console.log('Succeeded: ', result);
         return result.path;
     } catch (error) {
-        console.log('Error : ', error);
+        console.warn('Error : ', error);
     }
 }
 
 export async function deleteFile(deletePath: string, isImage: boolean) {
-  console.log('deleting file at this path: ', deletePath);
+  // console.log('deleting file at this path: ', deletePath);
   try{
     await remove({ 
       path: deletePath,
     });
   } catch (e) {
-    console.log('Error deleting file: ', e)
+    console.warn('Error deleting file: ', e)
   }
 }
 
@@ -62,7 +62,7 @@ export async function downloadFile(filePath: string, fileName: string) {
       path: filePath,
       options: {
         onProgress: ({ transferredBytes, totalBytes }) => {
-          if (totalBytes) {
+          if (totalBytes && totalBytes % 20 === 0) {
             console.log(
               `Download progress ${Math.round((transferredBytes / totalBytes) * 100)}%`
             );
@@ -85,6 +85,6 @@ export async function downloadFile(filePath: string, fileName: string) {
     // free up URL object after some time
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (error) {
-    console.error('Error downloading file:', error);
+    console.warn('Error downloading file:', error);
   }
 }

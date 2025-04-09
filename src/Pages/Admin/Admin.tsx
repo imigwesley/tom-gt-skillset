@@ -19,9 +19,6 @@ const AdminPage = () => {
       }
     }
   );
-  // const [isWaitingOnApi, setIsWaitingOnApi] = useState(false);
-  // const [responseType, setResponseType] = useState<{isSuccess: boolean | null, message: string}>({isSuccess: null, message: ''});
-
 
   const handleOpenModal = (entity: Operations) => {
     setCurrOperation(entity);
@@ -47,7 +44,7 @@ const AdminPage = () => {
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Edit User</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Edits user. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Edit user profile (name, contact methods)</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.EDIT_USER)}>Edit User</Button>
           </div>
@@ -55,7 +52,7 @@ const AdminPage = () => {
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Delete User</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Deletes user. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Delete user profile and account</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.DELETE_USER)}>Delete User</Button>
           </div>
@@ -96,16 +93,16 @@ const AdminPage = () => {
         <Paper className='calls-surface'>
           <div className='call-section'>
             <div>
-              <Typography variant='h6'>Add Activity Subsection</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Adds activity subsection. Need to provide information.</Typography>
+              <Typography variant='h6'>Create Activity Subsection</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Creates a new activity subsection. </Typography>
             </div>
-            <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.ADD_SUBSECTION)}>Add Activity Subsection</Button>
+            <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.ADD_SUBSECTION)}>Create Activity Subsection</Button>
           </div>
           <Divider variant='middle' />
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Edit Activity Subsection</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Edits Activity Subsection. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Edit an existing activity subsection</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.EDIT_SUBSECTION)}>Edit Activity Subsection</Button>
           </div>
@@ -113,23 +110,23 @@ const AdminPage = () => {
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Delete Activity Subsection</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Deletes Activity Subsection. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Delete a subsection and remove it from all associated activities</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.DELETE_SUBSECTION)}>Delete Activity Subsection</Button>
           </div>
           <Divider variant='middle' />
           <div className='call-section'>
             <div>
-              <Typography variant='h6'>Add Activity</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Adds Activity. Need to provide information.</Typography>
+              <Typography variant='h6'>Create Activity</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Create an activity and include subsections</Typography>
             </div>
-            <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.ADD_ACTIVITY)}>Add Activity</Button>
+            <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.ADD_ACTIVITY)}>Create Activity</Button>
           </div>
           <Divider variant='middle' />
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Edit Activity</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Edits Activity. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Edit an existing activity</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.EDIT_ACTIVITY)}>Edit Activity</Button>
           </div>
@@ -137,7 +134,7 @@ const AdminPage = () => {
           <div className='call-section'>
             <div>
               <Typography variant='h6'>Delete Activity</Typography>
-              <Typography variant='subtitle2' className='subtitle'>Deletes Activity. Need to provide information.</Typography>
+              <Typography variant='subtitle2' className='subtitle'>Delete an activity</Typography>
             </div>
             <Button disableRipple variant='contained' onClick={() => handleOpenModal(Operations.DELETE_ACTIVITY)}>Delete Activity</Button>
           </div>

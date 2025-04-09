@@ -27,10 +27,9 @@ export async function getAllUsersData(): Promise<MemberInformation[]> {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        // console.log('All users: ', response);
         return response;
     } catch (e) {
-        console.log('GET all users call failed: ', e);
+        console.warn('GET all users call failed: ', e);
         return [];
     }
 }
@@ -50,10 +49,9 @@ export async function getSingleUserData (givenId: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        // console.log('Single user: ', response);
         return response;
     } catch (e) {
-        console.log('GET single user call failed: ', e);
+        console.warn('GET single user call failed: ', e);
     }
 };
 
@@ -71,7 +69,7 @@ export async function deleteSingleUser (givenId: string | undefined) {
         });
         await restOperation.response;
     } catch (e) {
-        console.log('DEL single user call failed: ', e);
+        console.warn('DEL single user call failed: ', e);
     }
 };
 
@@ -103,17 +101,16 @@ export async function createSingleUserData(userData: MemberInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created single user: ', response);
         return response;
     } catch (e) {
-        console.log('create single user call failed: ', e);
+        console.warn('create single user call failed: ', e);
     }
 }
 
 
 
 export async function updateSingleUserData(userData: MemberInformation) {
-    console.log('user data here is', userData);
+    // console.log('user data here is', userData);
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
@@ -141,9 +138,8 @@ export async function updateSingleUserData(userData: MemberInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated single user: ', response);
         return response;
     } catch (e) {
-        console.log('update single user call failed: ', e);
+        console.warn('update single user call failed: ', e);
     }
 }

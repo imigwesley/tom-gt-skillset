@@ -17,3 +17,18 @@
 .non-clickable {
     cursor: default !important;
 }
+
+.filter-bar {
+    display: flex;
+    flex-direction: row;
+}
+
+.search-input {
+    .search-icon {
+        cursor: text;
+        padding: 0px;
+    }
+    .css-2u11ia-MuiInputBase-input-MuiOutlinedInput-input {
+        padding: 9px 8px 9px 5px;
+    }
+}

@@ -49,9 +49,6 @@ const FeedbackPage = ({loggedInUser}: PageProps) => {
   }
 
   const handleSubmitFeedback = () => {
-    console.log('made it');
-    console.log(firstFeedback + secondFeedback);
-    console.log('should be emailing feedback to: ', currUser.identifiers.accountEmail);
     setFirstFeedback('');
     setSecondFeedback('');
     alert('Feedback submitted!'); // or something else like make the button green

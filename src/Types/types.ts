@@ -1,3 +1,5 @@
+import { SubmissionStatus } from "./enums"
+
 /********************   Main data types         *******************/
 export interface MemberInformation {
     userId: string,
@@ -39,7 +41,7 @@ export interface SubsectionInformation {
     hasDeliverable: boolean
 }
 
-/********************   Sub Data Types      *******************/
+/********************   For tracking user progress (used in MemberInformation)      *******************/
 export interface ActivityProgress {
     activityName: string,
     subsectionProgress: SubmissionRecord[]
@@ -96,7 +98,7 @@ export interface SubmissionInformation {
     submissionId: string,
     subsectionName: string,
     timeSubmitted: string,
-    isApproved: boolean | null,
+    status: SubmissionStatus,
     submittedBy: string,
     submissionFiles: string[],
     submissionFeedback: string

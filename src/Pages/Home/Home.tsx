@@ -5,7 +5,7 @@ import { Alert, Card, CardContent, CardMedia, CircularProgress, LinearProgress, 
 import { useEffect, useState } from 'react';
 import { MemberInformation, ActivityInformation, ResponseInfo } from '../../Types/types';
 import { getSingleUserData } from '../../utils/userApi';
-import { Operations } from '../../Types/enums';
+import { Operations, SubmissionStatus } from '../../Types/enums';
 import { PageProps } from '../../Types/props';
 import { getAllActivities } from '../../utils/activityApi';
 import { useImageCache } from '../../ImageCacheContext';
@@ -69,7 +69,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
               completedSubs.map(async (subRecord) => {
                 const latestSubmissionId = subRecord.submissionIds[subRecord.submissionIds.length - 1];
                 const latestSubmissionInfo = await getSubmission(latestSubmissionId);
-                return latestSubmissionInfo?.[0]?.isApproved ? 1 : 0;
+                return latestSubmissionInfo?.[0]?.status === SubmissionStatus.APPROVED ? 1 : 0;
               })
             )
           ).reduce<number>((sum, approved) => sum + approved, 0);
@@ -129,7 +129,6 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
 
   /*********************************** Event handlers *************************************/
   const handleCardClick = (activityName: string) => {
-    console.log(activityName);
     navigate(`/activities/${activityName}`);
   }
 
@@ -172,7 +171,7 @@ const HomePage = ({loggedInUser, onUserCreation}: PageProps) => {
                     src={activity.imagePath}
                   />
                   <CardContent className='activity-card-content'>
-                    <Typography>
+                    <Typography variant='h5'>
                       {activity.activityName}
                     </Typography>
                     <div className='progress-container'>

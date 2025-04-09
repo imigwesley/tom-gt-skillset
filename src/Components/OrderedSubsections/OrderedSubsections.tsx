@@ -17,7 +17,6 @@ const OrderedSubsections = ({allSubsections, initialChosenOptions, onChange}: Or
   const [insertIndex, setInsertIndex] = useState<number>(0);
 
   useEffect(()=> {
-    console.log('initial is', initialChosenOptions)
     let tempItems: DraggableItem[] = [];
     initialChosenOptions.forEach((option) => {
       tempItems.push({id: uuidv4(), text: option})

@@ -13,7 +13,8 @@ import { getAllSubsections } from '../../utils/subsectionsApi';
 import SubmissionUpload from '../../Components/SubmissionUpload/SubmissionUpload';
 import { motion } from 'framer-motion';
 import { deleteSubmission, getSubmission } from '../../utils/submissionApi';
-import { deleteFile, downloadFile } from '../../utils/imagesApi';
+import { deleteFile, downloadFile } from '../../utils/filesApi';
+import { SubmissionStatus } from '../../Types/enums';
 
 
 const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
@@ -46,7 +47,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   const [submissions, setSubmissions] = useState<SubmissionInformation[]>([]);
   const [anchorElMap, setAnchorElMap] = useState<{ [key: string]: HTMLElement | null }>({});
   const [submissionMenuOpenMap, setSubmissionMenuOpenMap] = useState<{ [key: string]: boolean }>({});
-  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (boolean | undefined)}>({});
+  const [localSubsectionApproval, setLocalSubsectionApproval] = useState<{[key: string]: (SubmissionStatus)}>({});
 
   const breadcrumbs = [
     <Link underline="hover" key="1" color="inherit" onClick={() => navigate('/')} className='breadcrumb-link' >
@@ -128,9 +129,9 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
       setSubmissions([]);
       setLocalSubsectionApproval((prev) => {
         const resetProgress = subsectionProgress.reduce((acc, subsection) => {
-          acc[subsection.subsection] = undefined;
+          acc[subsection.subsection] = SubmissionStatus.NOT_SUBMITTED;
           return acc;
-        }, {} as { [key: string]: boolean | undefined });
+        }, {} as { [key: string]: SubmissionStatus });
         return { ...prev, ...resetProgress };
       });
       return;
@@ -172,11 +173,11 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
     });
     
     // assign approval status based on the most recent submission
-    const tempSubsectionApproval: {[key: string]: boolean | undefined} = { ...localSubsectionApproval };
+    const tempSubsectionApproval: {[key: string]: SubmissionStatus} = { ...localSubsectionApproval };
     
     Object.values(latestSubmissions).forEach((submission) => {
-      const { subsectionName, isApproved } = submission;
-      tempSubsectionApproval[subsectionName] = isApproved !== null ? isApproved : undefined;
+      const { subsectionName, status } = submission;
+      tempSubsectionApproval[subsectionName] = status;
     });
 
 
@@ -217,7 +218,6 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
 
       // remove submission id from user's progress
       const userWhoSubmitted = allUsers?.find((user) => user.userId === submission.submittedBy);
-      console.log('user who submitted initial', userWhoSubmitted);
       let currActivity;
       if (userWhoSubmitted) {
         userWhoSubmitted.progress.forEach((activity) => {
@@ -226,7 +226,6 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
               const index = subsection.submissionIds.indexOf(submission.submissionId);
               if (index !== -1) {
                 currActivity = activity.activityName
-                console.log('removing from users progress');
                 subsection.submissionIds.splice(index, 1);
               }
               return subsection;
@@ -234,10 +233,7 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
             .filter((subsection) => subsection.submissionIds.length > 0); // Remove subsection if empty
         });
         userWhoSubmitted.progress = userWhoSubmitted.progress.filter((activity) => activity.subsectionProgress.length > 0);
-        console.log('now is', userWhoSubmitted)
         await updateSingleUserData(userWhoSubmitted);
-      } else {
-        console.log('no user found');
       }
 
       // remove submission record from submissions table
@@ -256,14 +252,12 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
   }
 
   const downloadSubmission = (submission: SubmissionInformation) => {
-    console.log('downloading')
     submission.submissionFiles.map((file) => {
       downloadFile(file, file.split('/').pop() || 'submission')
     })
   }
 
   const handleSubmissionMenuClick = (op: string, type: string, submission: SubmissionInformation) => {
-    console.log('performing operation to ', op);
     switch (op) {
       case 'delete':
         deleteSubmissionRecord(submission);
@@ -304,32 +298,32 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
           </Breadcrumbs>
           <div className='activity-page-container'>
             <div className={`sidebar-container ${menuOpen ? 'open' : 'collapsed'}`}>
-                <motion.div className="toggle-button">
-                  <Tooltip title={menuOpen ? 'Hide Subsections' : 'Show Subsections'} placement='right'>
-                    <IconButton disableTouchRipple onClick={() => setMenuOpen(!menuOpen)}>
-                        {menuOpen ? <West /> : <List />}
-                    </IconButton>
-                  </Tooltip>
-                </motion.div>
-                <motion.div className={`motion-container ${menuOpen ? 'open' : ''}`}>
-                    <div className={`background-card ${menuOpen ? 'visible' : ''}`}>
-                        <Typography variant="h5">{currActivity.activityName}</Typography>
-                        <Divider />
-                        <div className="links-container">
-                            {currActivity.subsectionNames.map((subsection, index) => (
-                                <div key={index} onClick={() => handleSubsectionClick(subsection)}>
-                                    <SubsectionLink
-                                        index={index}
-                                        isCurrent={currSubsection?.subsectionName === subsection}
-                                        isApproved={localSubsectionApproval[subsection]}
-                                        hasDeliverable={allSubsections.find((sub)=> sub.subsectionName === subsection)?.hasDeliverable}
-                                        name={subsection}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </motion.div>
+              <motion.div className="toggle-button">
+                <Tooltip title={menuOpen ? 'Hide Subsections' : 'Show Subsections'} placement='right'>
+                  <IconButton disableTouchRipple onClick={() => setMenuOpen(!menuOpen)}>
+                    {menuOpen ? <West /> : <List />}
+                  </IconButton>
+                </Tooltip>
+              </motion.div>
+              <motion.div className={`motion-container ${menuOpen ? 'open' : ''}`}>
+                <div className={`background-card ${menuOpen ? 'visible' : ''}`}>
+                  <Typography variant="h5">{currActivity.activityName}</Typography>
+                  <Divider />
+                  <div className="links-container">
+                    {currActivity.subsectionNames.map((subsection, index) => (
+                      <div key={index} onClick={() => handleSubsectionClick(subsection)}>
+                          <SubsectionLink
+                            index={index}
+                            isCurrent={currSubsection?.subsectionName === subsection}
+                            status={localSubsectionApproval[subsection]}
+                            hasDeliverable={allSubsections.find((sub)=> sub.subsectionName === subsection)?.hasDeliverable}
+                            name={subsection}
+                          />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
             </div>
             <motion.div className="content-section" transition={{duration: 0.3, ease: 'easeInOut'}} >
               <div className="activity-container background-card visible" >
@@ -388,8 +382,8 @@ const TrainingModulesPage = ({ loggedInUser }: PageProps) => {
                                         })}
                                       </TableCell>
                                       <TableCell>
-                                        <div className={`status ${submission.isApproved === null ? "pending" : submission.isApproved ? "approved" : "rejected"}`}>
-                                          {submission.isApproved === null ? "Pending approval" : submission.isApproved ? "Approved" : "Submission rejected"}
+                                        <div className={`status ${submission.status === SubmissionStatus.PENDING ? "pending" : submission.status === SubmissionStatus.APPROVED ? "approved" : "rejected"}`}>
+                                          {submission.status === SubmissionStatus.APPROVED ? "Approved" : submission.status === SubmissionStatus.REJECTED ? 'Rejected' : 'Pending approval'}
                                         </div>
                                       </TableCell>
                                       <TableCell>

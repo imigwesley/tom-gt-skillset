@@ -30,7 +30,7 @@ export async function getAllSubsections(): Promise<SubsectionInformation[]> {
         // console.log('All subsections: ', response);
         return response;
     } catch (e) {
-        console.log('GET all subsections call failed: ', e);
+        console.warn('GET all subsections call failed: ', e);
         return [];
     }
 }
@@ -49,10 +49,9 @@ export async function getSubsection (subsectionName: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Subsection: ', response);
         return response;
     } catch (e) {
-        console.log('GET subsection call failed: ', e);
+        console.warn('GET subsection call failed: ', e);
     }
 };
 
@@ -71,7 +70,7 @@ export async function deleteSubsection (subsectionName: string | undefined) {
         const response = await restOperation.response;
         return response;
     } catch (e) {
-        console.log('DELETE subsection call failed: ', e);
+        console.warn('DELETE subsection call failed: ', e);
     }
 };
 
@@ -95,17 +94,15 @@ export async function createSubsection(subsectionData: SubsectionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created subsection: ', response);
         return response;
     } catch (e) {
-        console.log('POST subsection call failed: ', e);
+        console.warn('POST subsection call failed: ', e);
     }
 }
 
 
 
 export async function updateSubsection(subsectionData: SubsectionInformation) {
-    console.log('about to send', subsectionData)
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
@@ -125,9 +122,8 @@ export async function updateSubsection(subsectionData: SubsectionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated subsection: ', response);
         return response;
     } catch (e) {
-        console.log('PUT subsection call failed: ', e);
+        console.warn('PUT subsection call failed: ', e);
     }
 }

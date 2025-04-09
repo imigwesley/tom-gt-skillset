@@ -4,12 +4,13 @@ import { Button, IconButton, Typography } from "@mui/material";
 import './SubmissionUpload.scss';
 import { Close } from "@mui/icons-material";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { uploadFile } from "../../utils/imagesApi";
+import { uploadFile } from "../../utils/filesApi";
 import { MemberInformation, SubmissionInformation } from "../../Types/types";
 import { v4 as uuidv4 } from "uuid";
 import { SubmissionUploadProps } from "../../Types/props";
 import { getSingleUserData, updateSingleUserData } from "../../utils/userApi";
 import { createSubmission } from "../../utils/submissionApi";
+import { SubmissionStatus } from "../../Types/enums";
 
 
 
@@ -30,28 +31,24 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
     setFiles([]);
     try {
       // Upload files to S3
-      console.log("Uploading files:", files);
       const filePaths: string[] = await Promise.all(
         files.map(async (file) => {
           return (await uploadFile(file, false)) || '';
         })
       );
-      console.log('file paths are ', filePaths);
 
       // Create submission record and save to DB
       const submissionRecord: SubmissionInformation = {
         submissionId: uuidv4(),
         subsectionName: subsection,
         timeSubmitted: new Date().getTime().toString(),
-        isApproved: null,
+        status: SubmissionStatus.PENDING,
         submittedBy: loggedInUser?.username || '',
         submissionFiles: filePaths,
         submissionFeedback: '',
       };
 
-      console.log('creating submission with ', submissionRecord)
       const submissionResponse = await createSubmission(submissionRecord);
-      console.log('submission response is', submissionResponse);
 
       // Update person's information with submission information
       const singleUserResponse = await getSingleUserData(loggedInUser?.username);
@@ -60,10 +57,8 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
         return;
       }
       const tempCurrUser: MemberInformation = singleUserResponse[0];
-      console.log('tempCurrUser is', tempCurrUser)
 
       const currActivityProgress = tempCurrUser.progress.find((prog) => prog.activityName === activityName);
-      console.log('currActivityProgress is ', currActivityProgress);
 
       if (currActivityProgress) {
         // Found progress for this activity
@@ -91,10 +86,7 @@ const SubmissionUpload = ({loggedInUser, subsection, currActivity, passResponseP
           ]
         });
       }
-
-      console.log('updating single user data with ', tempCurrUser);
       const updatingResponse = await updateSingleUserData(tempCurrUser);
-      console.log('updating response is, ', updatingResponse);
 
       passResponseProgress({waiting: false, response: {isSuccess: true, message: 'Successfully submitted.'}});
       setTimeout(() => {

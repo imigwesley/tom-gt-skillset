@@ -1,6 +1,6 @@
 import { AuthUser } from "@aws-amplify/auth";
 import { AuthEventData } from "@aws-amplify/ui";
-import { ModalPages, Operations } from "./enums";
+import { ModalPages, Operations, SubmissionStatus } from "./enums";
 import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionInformation, TeamInformation } from "./types";
 
 export interface AdminModalProps {
@@ -20,6 +20,7 @@ export interface AdminModalContentProps {
     onImageProvided?:(file: File) => void,
     onLocalUrlCreated?:(tempUrl: string) => void,
     onActivityChosenForSubsection?:(activity: string) => void,
+    onNameFirstChanged?:(name: string) => void,
 }
 
 export interface PageProps {
@@ -73,7 +74,7 @@ export interface ReviewProgressProps {
 
 // subsection link
 export interface SubsectionLinkProps {
-    isApproved: boolean | undefined,
+    status: SubmissionStatus,
     name: string,
     hasDeliverable: boolean | undefined,
     isCurrent: boolean,
