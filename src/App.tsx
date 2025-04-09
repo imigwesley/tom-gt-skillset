@@ -93,12 +93,10 @@ const App = () => {
   const services = {
     async handleSignUp(input: SignUpInput) {
       const { username, password, options } = input;
-      console.log('options are: ', options?.userAttributes);
       const signUpResponse = await signUp({
         username: options?.userAttributes.email as string,
         password,
       });
-      console.log('sign up response is: ', signUpResponse)
       return signUpResponse;
     },
   };

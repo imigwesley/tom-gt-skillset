@@ -7,7 +7,7 @@ import { PageProps } from "../../Types/props";
 import { getAllActivities } from "../../utils/activityApi";
 import { getAllSubsections } from "../../utils/subsectionsApi";
 import { Edit } from "@mui/icons-material";
-import { Operations } from "../../Types/enums";
+import { Operations, SubmissionStatus } from "../../Types/enums";
 import AdminModal from "../../Components/AdminModal/AdminModal";
 import { getSubmission } from "../../utils/submissionApi";
 
@@ -15,7 +15,11 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
 
   const [editUserProfile, setEditUserProfile] = useState<boolean>(false);
   const [rerenderKey, setRerenderkey] = useState(0);
-  const [progressData, setProgressData] = useState<{ activityName: string; percentComplete: number; completedNames: string[] }[]>([]);
+  const [progressData, setProgressData] = useState<{ activityName: string; percentComplete: number; completedNames: string[] }[]>([{
+    activityName: 'temp',
+    percentComplete: 0.0,
+    completedNames: []
+  }]);
   const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
     {
       waiting: false, 
@@ -75,18 +79,18 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
           
               if (!latestSubmissionInfo || latestSubmissionInfo.length === 0) {
                 console.error(`getSubmission returned undefined or empty array for ID: ${latestSubmissionId}`);
-                return { isApproved: false, subsection: subRecord.subsection };
+                return { status: SubmissionStatus.REJECTED, subsection: subRecord.subsection };
               }
           
-              const isApproved = latestSubmissionInfo[0].isApproved === true;
-              return { isApproved, subsection: subRecord.subsection };
+              const status = latestSubmissionInfo[0].status === SubmissionStatus.APPROVED;
+              return { status, subsection: subRecord.subsection };
             })
           );
           
-          const numCompleted = completedResults.filter((result) => result.isApproved).length;
+          const numCompleted = completedResults.filter((result) => result.status === true).length;
           
           const completedNames = completedResults
-            .filter((result) => result.isApproved)
+            .filter((result) => result.status === true)
             .map((result) => result.subsection);
           const percentComplete = numCompleted ? Math.round((numCompleted / numWithDeliverable) * 100) : 0;
   
@@ -119,7 +123,7 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
       <Typography variant='h3' className="header">Your Profile</Typography>
 
       <div className="background-card">
-      {currUser.userId === '' ?
+      {progressData[0]?.activityName === 'temp' ?
         <CircularProgress style={{margin: '0% 46%'}} />
       
     : <>
@@ -153,7 +157,7 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
           <div>
             <Typography variant="h6" className="info-name padded">Other emails:</Typography>
               {currUser.identifiers.otherEmails.map((_email, index) => (
-                <Typography className="info">{currUser.identifiers.otherEmails[index]}</Typography>
+                <Typography key={index} className="info">{currUser.identifiers.otherEmails[index]}</Typography>
               ))}
           </div>
         }
@@ -168,7 +172,7 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
         <Typography className="info">{currUser.roles.role}</Typography>
 
         <Typography variant="h6" className="info-name padded">Section Progress:</Typography>
-        {currUser.progress ?
+        {currUser?.progress?.length > 0 ?
           <div>
             <Table className="table">
               <TableHead>
@@ -190,9 +194,9 @@ const ProfilePage = ({loggedInUser}: PageProps) => {
             </Table>
           </div>
           : 
-          <div>
+          <Typography className="info">
             No progress yet.
-          </div>
+          </Typography>
         }
         </>}
       </div>

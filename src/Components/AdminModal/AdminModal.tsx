@@ -5,7 +5,7 @@ import { AdminModalProps } from "../../Types/props";
 import './AdminModal.scss';
 import { useEffect, useState } from "react";
 import { isActivityInformation, isDataValid, isMemberInformation, isSubsectionInformation, isTeamInformation } from "../../utils/Utils";
-import { ActivityInformation, ApiSendInformation, MemberInformation, NameGTidMap, SubsectionInformation, TeamInformation } from "../../Types/types";
+import { ActivityInformation, ApiSendInformation, MemberInformation, NameGTidMap, SubmissionInformation, SubsectionInformation, TeamInformation } from "../../Types/types";
 import EditSubsection from "../AdminModalContent/subsection/EditSubsection";
 import SelectSubsection from "../AdminModalContent/subsection/SelectSubsection";
 import EditActivity from "../AdminModalContent/activity/EditActivity";
@@ -18,11 +18,12 @@ import ConfirmActivity from "../AdminModalContent/activity/ConfirmActivity";
 import ConfirmUser from "../AdminModalContent/user/ConfirmUser";
 import ConfirmSubsection from "../AdminModalContent/subsection/ConfirmSubsection";
 import ConfirmTeam from "../AdminModalContent/team/ConfirmTeam";
-import { createSingleUserData, deleteSingleUser, updateSingleUserData } from "../../utils/userApi";
-import { createActivity, updateActivity, deleteActivity, addSubsectionToActivity } from "../../utils/activityApi";
+import { createSingleUserData, deleteSingleUser, getAllUsersData, updateSingleUserData } from "../../utils/userApi";
+import { createActivity, updateActivity, deleteActivity, addSubsectionToActivity, getAllActivities } from "../../utils/activityApi";
 import { deleteUserInCognito } from "../../utils/cognitoUtil";
-import { uploadFile, deleteFile } from "../../utils/imagesApi";
+import { uploadFile, deleteFile } from "../../utils/filesApi";
 import { createSubsection, updateSubsection, deleteSubsection } from "../../utils/subsectionsApi";
+import { getAllSubmissions, updateSubmission } from "../../utils/submissionApi";
 
 const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProgress}: AdminModalProps) => {
   const [activeStep, setActiveStep] = useState(0);
@@ -30,6 +31,11 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
   const [invalidinfoFromModalForApi, setInvalidinfoFromModalForApi] = useState(false);
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [activityForSubsection, setActivityForSubsection] = useState('');
+  const [allActivities, setAllActivities] = useState<ActivityInformation[]>([]);
+  const [allSubmissions, setAllSubmissions] = useState<SubmissionInformation[]>([]);
+  const [allUsers, setAllUsers] = useState<MemberInformation[]>([]);
+  const [changedSubsectionName, setChangedSubsectionName] = useState(false);
+  const [originalSubsectionName, setoriginalSubsectionName] = useState('');
 
 
   /******** Data struture to send to api on admin 'submit' function *******/
@@ -41,50 +47,20 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
   });
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
 
-  /*********** Information input from user ***********/
-  const [localUserData, setLocalUserData] = useState<MemberInformation | null>({
-    userId: '',
-    identifiers: {
-      accountEmail: '',
-      name: '',
-      gtID: '',
-      otherEmails: []
-    },
-    roles: {
-        role: '',
-        isAdmin: false
-    },
-    teams: {
-        teamMembership: [],
-        teamsAdvising: []
-    },
-    progress: [{
-        activityName: '',
-        subsectionProgress: []
-    }]
-  });
-  const [localTeamData, setLocalTeamData] = useState<TeamInformation | null>({
-    teamName: '',
-    membership: [],
-    advisors: [],
-    progress: []
-  });
-  const [localActivityData, setLocalActivityData] = useState<ActivityInformation | null>({
-    isTeam: false,
-    isIndividual: false,
-    activityName: '',
-    subsectionNames: [],
-    imagePath: ''
-  })
-  const [localSubsectionData, setLocalSubsectionData] = useState<SubsectionInformation | null>({
-    subsectionName: '',
-    subsectionHtml: '',
-    hasDeliverable: false
-  })
-
   useEffect(() => {
     // open to first page
     setActivePage(StepSets[currentOperation][0]);
+
+    const fetchData = async () => {
+      const activityResponse = await getAllActivities();
+      const submissionsResponse = await getAllSubmissions();
+      const allUsersResponse = await getAllUsersData();
+
+      setAllActivities(activityResponse);
+      setAllSubmissions(submissionsResponse);
+      setAllUsers(allUsersResponse);
+    }
+    fetchData();
   }, []);
 
   const handleNext = async () => {
@@ -122,7 +98,8 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
 
   const handleSubmit = async () => {
     passResponseProgress?.({waiting: true, response: {isSuccess: null, message: ''}});
-    console.log('data waiting for the api is: ', infoFromModalForApi)
+    closeModal();
+    // console.log('data waiting for the api is: ', infoFromModalForApi)
     let dynamoResponse;
     let cognitoResponse;
     let s3Response;
@@ -141,19 +118,20 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
         passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully created user.'} : {isSuccess: false, message: 'Failed to create user. Please try again.'})});
         break;
       case Operations.EDIT_SELF:
-        if (!infoFromModalForApi.user) throw new Error;
+      case Operations.EDIT_USER:
+        if (!infoFromModalForApi.user) throw new Error();
         // console.log('USER IS', infoFromModalForApi.user)
         dynamoResponse = await updateSingleUserData(infoFromModalForApi?.user);
         passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'})});
         break;
 
-      case Operations.EDIT_USER:
-        // edit record in db with information from frontend
-        if (!infoFromModalForApi.user) throw new Error;
-        // console.log('USER IS', infoFromModalForApi.user)
-        dynamoResponse = await updateSingleUserData(infoFromModalForApi?.user);
-        passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'})});
-        break;
+      // case Operations.EDIT_USER:
+      //   // edit record in db with information from frontend
+      //   if (!infoFromModalForApi.user) throw new Error;
+      //   // console.log('USER IS', infoFromModalForApi.user)
+      //   dynamoResponse = await updateSingleUserData(infoFromModalForApi?.user);
+      //   passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully edited user.'} : {isSuccess: false, message: 'Failed to edit user. Please try again.'})});
+      //   break;
 
       case Operations.DELETE_USER:
           if (!infoFromModalForApi.user) throw new Error;
@@ -199,7 +177,6 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
       * SUBSECTIONS API CALLS
       ***********/
       case Operations.ADD_SUBSECTION:
-        console.log('add new subsection submit');
         if (!infoFromModalForApi.subsection) throw new Error;
         dynamoResponse = await createSubsection(infoFromModalForApi.subsection);
         subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
@@ -209,22 +186,73 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
         break;
 
       case Operations.EDIT_SUBSECTION:
-        console.log('edit subsection submit');
-        if (!infoFromModalForApi.subsection) throw new Error;
-        dynamoResponse = await updateSubsection(infoFromModalForApi.subsection);
+        const subsection = infoFromModalForApi.subsection;
+        if (!subsection) throw new Error('Subsection is undefined');
+
+        dynamoResponse = await createSubsection(subsection);
+
         if (activityForSubsection) {
-          subsectionResponse = await addSubsectionToActivity(activityForSubsection, infoFromModalForApi.subsection.subsectionName);
+          subsectionResponse = await addSubsectionToActivity(activityForSubsection, subsection.subsectionName);
         }
-        // console.log('response adding subsection to activity is: ', subsectionResponse)
-        // console.log('response from updating is: ', dynamoResponse);
-        passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully updated subsection.'} : {isSuccess: false, message: 'Failed to update subsection. Please try again.'})});
+
+        if (changedSubsectionName) {
+          const newName = subsection.subsectionName;
+          // delete the old copy 
+          deleteSubsection(originalSubsectionName);
+
+          // update activity information to have the new name
+          allActivities.map(async (act) => {
+            const subNames = act.subsectionNames;
+            if (subNames.includes(originalSubsectionName)) {
+              const index = subNames.indexOf(originalSubsectionName);
+              subNames[index] = newName;
+              const updatedAct = { ...act, subsectionNames: subNames };
+              await updateActivity(updatedAct);
+            }
+          });
+
+          // update submissions
+          allSubmissions.map(async (sub) => {
+            if (sub.subsectionName === originalSubsectionName) {
+              const tempSub = {...sub, subsectionName: newName};
+              await updateSubmission(tempSub);
+            }
+          })
+
+          // update users' progress
+          allUsers.map((user) => {
+            let didUpdate = false;
+            user.progress.forEach((prog) => {
+              prog.subsectionProgress.forEach((subProg) => {
+                if (subProg.subsection === originalSubsectionName) {
+                  subProg.subsection = newName;
+                  didUpdate = true;
+                }
+              });
+            });
+            if (didUpdate) {
+              updateSingleUserData(user);
+            }
+          });
+        }
+
+        passResponseProgress?.({waiting: false, response: dynamoResponse ? { isSuccess: true, message: 'Successfully updated subsection.' } : { isSuccess: false, message: 'Failed to update subsection. Please try again.' }});
+        setChangedSubsectionName(false);
+        setoriginalSubsectionName('');
         break;
 
+
       case Operations.DELETE_SUBSECTION:
-        console.log('delete subsection submit');
         if (!infoFromModalForApi.subsection) throw new Error;
         dynamoResponse = await deleteSubsection(infoFromModalForApi.subsection.subsectionName);
-        // TODO: remove subsection name from all activities it is a part of - maybe a popup confirm??
+        // remove activities' association with this subsection
+        const relevantActivities  = allActivities.filter((act) => act.subsectionNames.includes(infoFromModalForApi.subsection?.subsectionName || 'this string wont be a name'));
+        relevantActivities.map(async (act) => {
+          act = {...act, subsectionNames: act.subsectionNames.filter((name) => name !== infoFromModalForApi.subsection?.subsectionName)}
+          await updateActivity(act);
+        });
+
+
         // console.log('response from deletion is: ', dynamoResponse);
         passResponseProgress?.({waiting: false, response: (dynamoResponse ? {isSuccess: true, message: 'Successfully deleted subsection.'} : {isSuccess: false, message: 'Failed to delete subsection. Please try again.'})});
         break;
@@ -245,8 +273,6 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
       case Operations.EDIT_ACTIVITY:
         // console.log('edit activity submit');
         if (!infoFromModalForApi.activity) throw new Error;
-        console.log('image file is', imageFile);
-        console.log('image path is', infoFromModalForApi.activity.imagePath)
         if (imageFile) {
           s3Response = await uploadFile(imageFile, true);
           if (!s3Response) throw new Error;
@@ -267,8 +293,6 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
       default:
         // console.log('default')
     }
-    // window.location.reload();
-    closeModal();
 
     setTimeout(() => {
       passResponseProgress?.({
@@ -294,8 +318,6 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
   }
 
   const handleApiInfoUpdate = (info: MemberInformation | ActivityInformation | SubsectionInformation | TeamInformation) => {
-    console.log('changed inside AdminModal.tsx', info)
-    console.log('type is, ', typeof info);
     if (isMemberInformation(info)) {
       let temp = {...infoFromModalForApi, user: info};
       setInfoFromModalForApi(temp);
@@ -303,7 +325,11 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
       let temp = {...infoFromModalForApi, activity: info};
       setInfoFromModalForApi(temp);
     } else if (isSubsectionInformation(info)) {
-      let temp = {...infoFromModalForApi, subsection: info};
+      let temp = {...infoFromModalForApi, subsection: {...info, subsectionName: info.subsectionName.replace('--changed', '')}};
+      // turn on flag if name was changed
+      if (info.subsectionName.endsWith('--changed')) {
+        setChangedSubsectionName(true);
+      }
       setInfoFromModalForApi(temp);
     } else if (isTeamInformation(info)) {
       let temp = {...infoFromModalForApi, team: info};
@@ -312,17 +338,19 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
   }
 
   const handleImageProvided = (file: File) => {
-    console.log('image file provided is ', file);
     setImageFile(file);
   }
 
   const handleLocalUrlCreated = (tempUrl: string) => {
-    console.log('tempUrl is', tempUrl);
     setTempImageUrl(tempUrl);
   };
 
   const handleActivityChosenForSubsection = (activity: string) => {
     setActivityForSubsection(activity);
+  }
+
+  const handleNameFirstChanged = (name: string) => {
+    if (!originalSubsectionName) setoriginalSubsectionName(name);
   }
 
 
@@ -370,6 +398,7 @@ const AdminModal = ({currentOperation, currentUser, closeModal, passResponseProg
                       userInput={infoFromModalForApi.subsection}
                       onActivityChosenForSubsection={handleActivityChosenForSubsection}
                       activityChosen={activityForSubsection}
+                      onNameFirstChanged={handleNameFirstChanged}
                     />
                   ) : (activePage === ModalPages.EDIT_ACTIVITY) ?
                   (

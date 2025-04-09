@@ -30,7 +30,7 @@ export async function getAllSubmissions(): Promise<SubmissionInformation[]> {
         // console.log('All submissions: ', response);
         return response;
     } catch (e) {
-        console.log('GET all submissions call failed: ', e);
+        console.warn('GET all submissions call failed: ', e);
         return [];
     }
 }
@@ -52,7 +52,7 @@ export async function getSubmission (submissionId: string | undefined) {
         // console.log('Submission: ', response);
         return response;
     } catch (e) {
-        console.log('GET submission call failed: ', e);
+        console.warn('GET submission call failed: ', e);
     }
 };
 
@@ -71,7 +71,7 @@ export async function deleteSubmission (submissionId: string | undefined) {
         const response = await restOperation.response;
         return response;
     } catch (e) {
-        console.log('DELETE submission call failed: ', e);
+        console.warn('DELETE submission call failed: ', e);
     }
 };
 
@@ -82,7 +82,7 @@ export async function createSubmission(submissionData: SubmissionInformation) {
             submissionId: submissionData.submissionId,
             subsectionName: submissionData.subsectionName,
             timeSubmitted: submissionData.timeSubmitted,
-            isApproved: submissionData.isApproved,
+            status: submissionData.status,
             submittedBy: submissionData.submittedBy,
             submissionFiles: submissionData.submissionFiles,
             submissionFeedback: submissionData.submissionFeedback
@@ -99,24 +99,22 @@ export async function createSubmission(submissionData: SubmissionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created submission: ', response);
         return response;
     } catch (e) {
-        console.log('POST submission call failed: ', e);
+        console.warn('POST submission call failed: ', e);
     }
 }
 
 
 
 export async function updateSubmission(submissionData: SubmissionInformation) {
-    console.log('about to send', submissionData)
     try {
         const authToken = await getAuthToken();
         const fixedBody = {
             submissionId: submissionData.submissionId,
             subsectionName: submissionData.subsectionName,
             timeSubmitted: submissionData.timeSubmitted,
-            isApproved: submissionData.isApproved,
+            status: submissionData.status,
             submittedBy: submissionData.submittedBy,
             submissionFiles: submissionData.submissionFiles,
             submissionFeedback: submissionData.submissionFeedback
@@ -133,9 +131,9 @@ export async function updateSubmission(submissionData: SubmissionInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated submission: ', response);
+        // console.log('Updated submission: ', response);
         return response;
     } catch (e) {
-        console.log('PUT submission call failed: ', e);
+        console.warn('PUT submission call failed: ', e);
     }
 }

@@ -29,7 +29,6 @@ const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreate
   
         // Check if userInput is provided and is valid
         if (userInput && isActivityInformation(userInput)) {
-          console.log('first, userInput is:', userInput)
           setLocalActivityData(userInput);
           // setGivenActivities(userInput.subsectionNames);
         }
@@ -102,7 +101,6 @@ const EditActivity = ({onApiInformationUpdate, onImageProvided, onLocalUrlCreate
       setLocalImage(selectedImage);
       onLocalUrlCreated?.(selectedImage);
       setLocalActivityData(temp);
-      console.log('about to update data for AdminModal.tsx');
       onApiInformationUpdate?.(temp);
       onImageProvided?.(file);
     }

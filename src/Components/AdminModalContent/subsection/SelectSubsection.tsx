@@ -38,11 +38,9 @@ const SelectSubsection = ({onApiInformationUpdate}: AdminModalContentProps) => {
               onChange={(event, newValue) => {
                 // const subsection = subsectionsData.find((subsection) => subsection.subsectionName === e.target.value);
                 if (newValue) {
-                  console.log('in the if')
                   setLocalSubsectionData(newValue);
                   onApiInformationUpdate?.(newValue);
                 } else {
-                  console.log('in the else')
                   setLocalSubsectionData(allSubsections?.find((subsection) => subsection.subsectionName === localSubsectionData?.subsectionName) || {
                     subsectionName: '',
                     subsectionHtml: '',

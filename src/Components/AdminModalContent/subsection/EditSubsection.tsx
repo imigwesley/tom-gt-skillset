@@ -12,11 +12,11 @@ const toolbarOptions = [
   ['blockquote', 'code-block'],
   ['italic', 'underline', 'strike'],
   [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-  ['link', 'video'], // TODO: image handler
+  ['link', 'image', 'video'], // TODO: image handler
   ['clean']
 ];
 
-const EditSubsection = ({onApiInformationUpdate, onActivityChosenForSubsection, userInput, activityChosen}: AdminModalContentProps) => {
+const EditSubsection = ({onNameFirstChanged, onApiInformationUpdate, onActivityChosenForSubsection, userInput, activityChosen}: AdminModalContentProps) => {
 
   const quillRef = useRef<ReactQuill>(null);
   const [incorrectSubsectionNameError, setIncorrectSubsectionNameError] = useState(false);
@@ -52,7 +52,9 @@ const EditSubsection = ({onApiInformationUpdate, onActivityChosenForSubsection, 
       hasDeliverable: localSubsectionData?.hasDeliverable || false,
     };
     setLocalSubsectionData(temp);
-    onApiInformationUpdate?.(temp);
+    onApiInformationUpdate?.({...temp, subsectionName: temp.subsectionName + '--changed'});
+    onNameFirstChanged?.(localSubsectionData.subsectionName);
+
   };
 
   const handleSubsectionNameBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -143,8 +145,6 @@ const EditSubsection = ({onApiInformationUpdate, onActivityChosenForSubsection, 
             value={chosenActivity}
             onChange={(e) => {
               const activity = allActivities.find((activity) => activity.activityName === e.target.value);
-              console.log('e is ', e)
-              console.log('activity is ', activity)
               setChosenActivity(activity?.activityName || '');
               onActivityChosenForSubsection?.(activity?.activityName || '');
             }}              

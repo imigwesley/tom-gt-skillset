@@ -30,7 +30,7 @@ export async function getAllActivities(): Promise<ActivityInformation[]> {
         // console.log('All activities: ', response);
         return response;
     } catch (e) {
-        console.log('GET all activities call failed: ', e);
+        console.warn('GET all activities call failed: ', e);
         return [];
     }
 }
@@ -49,10 +49,9 @@ export async function getActivity (activityName: string | undefined) {
         });
         const { body } = await restOperation.response;
         const response = JSON.parse(JSON.stringify(await body.json()));
-        console.log('Activity: ', response);
         return response;
     } catch (e) {
-        console.log('GET activity call failed: ', e);
+        console.warn('GET activity call failed: ', e);
     }
 };
 
@@ -71,7 +70,7 @@ export async function deleteActivity (activityName: string | undefined) {
         const response = await restOperation.response;
         return response;
     } catch (e) {
-        console.log('DELETE activity call failed: ', e);
+        console.warn('DELETE activity call failed: ', e);
     }
 };
 
@@ -85,7 +84,6 @@ export async function createActivity(activityData: ActivityInformation) {
             subsectionNames: activityData.subsectionNames,
             imagePath: activityData.imagePath
         };
-        console.log('fixed body is', fixedBody)
         const restOperation = post({
             apiName: 'activityApi',
             path: '/activity/',
@@ -98,10 +96,9 @@ export async function createActivity(activityData: ActivityInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Created activity: ', response);
         return response;
     } catch (e) {
-        console.log('POST activity call failed: ', e);
+        console.warn('POST activity call failed: ', e);
     }
 }
 
@@ -129,21 +126,18 @@ export async function updateActivity(activityData: ActivityInformation) {
             }
         });
         const response = await restOperation.response;
-        console.log('Updated activity: ', response);
         return response;
     } catch (e) {
-        console.log('PUT activity call failed: ', e);
+        console.warn('PUT activity call failed: ', e);
     }
 }
 
 export async function addSubsectionToActivity(activityName: string, subsectionName: string) {
     const activity = await getActivity(activityName);
-    console.log('Got activity! it is', activity);
     const updatedActivity = { 
         ...activity[0], 
         subsectionNames: [...activity[0].subsectionNames, subsectionName] 
     };
-    console.log('updated Activity is', updatedActivity)
     return updateActivity(updatedActivity);
 }
 

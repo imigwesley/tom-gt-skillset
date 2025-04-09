@@ -58,10 +58,10 @@ const MembersPage = () => {
       });
       setMembersAlphabetically(tempAlphabetically);
   
-      console.log('finished sorting')
-      console.log(membersByRole);
-      console.log(membersByTeam);
-      console.log(membersAlphabetically);
+      // console.log('finished sorting')
+      // console.log(membersByRole);
+      // console.log(membersByTeam);
+      // console.log(membersAlphabetically);
       setIsLoading(false);
     }
     setIsLoading(true);

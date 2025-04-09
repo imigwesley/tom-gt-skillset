@@ -127,14 +127,14 @@ const Navbar = ({ signOutFunction, loggedInUser }: NavbarProps) => {
           }}
           transitionDuration={10}
         >
-          <MenuItem onClick={() => handlePageClick('home')}>Home</MenuItem>
+          <MenuItem disableRipple onClick={() => handlePageClick('home')}>Home</MenuItem>
           {/* <MenuItem onClick={() => handlePageClick('about')}>About</MenuItem> */}
           {/* <MenuItem onClick={() => handlePageClick('tomWebsite')}>TOM Website</MenuItem> */}
-          <MenuItem onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
-          <MenuItem onClick={() => handlePageClick('submissions')}>Review Submissions</MenuItem>
+          <MenuItem disableRipple onClick={() => handlePageClick('members')}>Club Directory</MenuItem>
+          <MenuItem disableRipple onClick={() => handlePageClick('submissions')}>Review Submissions</MenuItem>
           {isAdmin && <MenuItem onClick={() => handlePageClick('admin')}>Admin</MenuItem>}
           {/* <MenuItem onClick={() => handlePageClick('contact')}>Contact</MenuItem> */}
-          <MenuItem onClick={signOutFunction}>Sign Out</MenuItem>
+          <MenuItem disableRipple onClick={signOutFunction}>Sign Out</MenuItem>
         </Menu>
     </div>
   );

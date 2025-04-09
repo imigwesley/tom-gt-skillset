@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
-import { getFile } from "./utils/imagesApi";
+import { getFile } from "./utils/filesApi";
 
 type ImageCacheType = {
   imageCache: Map<string, string>;

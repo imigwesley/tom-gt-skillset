@@ -1,12 +1,13 @@
-import { Alert, Backdrop, CircularProgress, Tab, Tabs } from "@mui/material";
+import { Alert, Backdrop, CircularProgress, IconButton, InputAdornment, Tab, Tabs, TextField } from "@mui/material";
 import { PageProps } from "../../Types/props";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ActivityInformation, ActivitySubmissions, MemberInformation, ResponseInfo, SubmissionInformation, SubsectionSubmissions } from "../../Types/types";
 import { getAllActivities } from "../../utils/activityApi";
 import { getAllUsersData } from "../../utils/userApi";
 import './Submissions.scss';
 import { getAllSubmissions } from "../../utils/submissionApi";
 import ReviewProgress from "../../Components/ReviewProgress/ReviewProgress";
+import { Search } from "@mui/icons-material";
 
 
 const SubmissionsPage = ({loggedInUser}: PageProps) => {
@@ -14,9 +15,14 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
   const [currentTab, setCurrentTab] = useState(0);
   const [currUser, setCurrUser] = useState<MemberInformation>();
   const [allUsers, setAllUsers] = useState<MemberInformation[]>();
-  const [personalActivitySubmissions, setPersonalActivitySubmissions] = useState<ActivitySubmissions[]>([]);
-  const [assignedActivitySubmissions, setAssignedActivitySubmissions] = useState<ActivitySubmissions[]>([]);
+  const [allPersonalActivitySubmissions, setAllPersonalActivitySubmissions] = useState<ActivitySubmissions[]>([]);
+  const [allReviewActivitySubmissions, setAllReviewActivitySubmissions] = useState<ActivitySubmissions[]>([]);
+  const [searchedPersonalActivitySubmissions, setSearchedPersonalActivitySubmissions] = useState<ActivitySubmissions[]>([]);
+  const [searchedReviewActivitySubmissions, setSearchedReviewActivitySubmissions] = useState<ActivitySubmissions[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
   const [responseInfo, setResponseInfo] = useState<ResponseInfo>(
     {
       waiting: false, 
@@ -39,15 +45,81 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
       const activityResponse = await getAllActivities();
 
       const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, loggedInUser?.username || '');
-      const assignedActivitySubs = formatAssignedSubmissions(submissionsResponse, activityResponse);
+      const reviewActivitySubs = formatReviewSubmissions(submissionsResponse, activityResponse);
 
-      setPersonalActivitySubmissions(personalActivitySubs);
-      setAssignedActivitySubmissions(assignedActivitySubs);
+      setAllPersonalActivitySubmissions(personalActivitySubs);
+      setAllReviewActivitySubmissions(reviewActivitySubs);
+      setSearchedPersonalActivitySubmissions(personalActivitySubs);
+      setSearchedReviewActivitySubmissions(reviewActivitySubs);
 
       setIsLoading(false)
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (searchQuery === '') {
+      // reset
+      setSearchedPersonalActivitySubmissions(allPersonalActivitySubmissions);
+      setSearchedReviewActivitySubmissions(allReviewActivitySubmissions);
+    } else {
+      if (currentTab === 0) {
+        // your submissions
+        const filtered = filterByQuery(allPersonalActivitySubmissions);
+        setSearchedPersonalActivitySubmissions(filtered);
+      } else {
+        // reviewing submissions
+        const filtered = filterByQuery(allReviewActivitySubmissions);
+        setSearchedReviewActivitySubmissions(filtered);
+      }
+    }
+  }, [searchQuery]);
+
+  const filterByQuery = (submissions: ActivitySubmissions[]) => {
+    const lowerQuery = searchQuery.toLowerCase();
+    const results = submissions.map(activity => {
+      // Copy the activity object
+      const filteredActivity = { ...activity };
+      
+      // Filter subsections
+      filteredActivity.subsectionSubmissions = activity.subsectionSubmissions.map(subsection => {
+        // Copy the subsection object
+        const filteredSubsection = { ...subsection };
+        
+        // Filter submissions that contain the query in any of their values
+        filteredSubsection.submissions = subsection.submissions.filter(submission => {
+          // Format date for searching
+          const formattedDate = new Date(Number(submission.timeSubmitted)).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).toLowerCase();
+          
+          // Get user's name
+          const userName = allUsers?.find((user) => user.userId === submission.submittedBy)?.identifiers.name?.toLowerCase() || '';
+          
+          // Check if any of the submission's properties contain the search query
+          return (
+            submission.submissionId.toLowerCase().includes(lowerQuery) ||
+            submission.subsectionName.toLowerCase().includes(lowerQuery) ||
+            formattedDate.includes(lowerQuery) ||
+            submission.status.toString().toLowerCase().includes(lowerQuery) ||
+            userName.includes(lowerQuery) ||
+            submission.submissionFiles.some(file => file.toLowerCase().includes(lowerQuery)) ||
+            submission.submissionFeedback.toLowerCase().includes(lowerQuery)
+          );
+        });
+        
+        return filteredSubsection;
+      });
+      
+      return filteredActivity;
+    });
+    
+    return results;
+  };
 
   const formatPersonalSubmissions = (
     submissionsResponse: SubmissionInformation[],
@@ -90,7 +162,7 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
     );
   };
 
-  const formatAssignedSubmissions = (
+  const formatReviewSubmissions = (
     submissionsResponse: SubmissionInformation[],
     activityResponse: ActivityInformation[]
   ): ActivitySubmissions[] => {
@@ -131,8 +203,8 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
   }
   
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
-    console.log('new Value is', newValue)
     setCurrentTab(newValue);
+    setSearchQuery('');
   };
 
   const handleResponseProgress = (resp: ResponseInfo) => {
@@ -144,12 +216,22 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
     const activityResponse = await getAllActivities();
 
     const personalActivitySubs = formatPersonalSubmissions(submissionsResponse, activityResponse, loggedInUser?.username || '');
-    const assignedActivitySubs = formatAssignedSubmissions(submissionsResponse, activityResponse);
+    const reviewActivitySubs = formatReviewSubmissions(submissionsResponse, activityResponse);
 
-    setPersonalActivitySubmissions(personalActivitySubs);
-    setAssignedActivitySubmissions(assignedActivitySubs);
+    setAllPersonalActivitySubmissions(personalActivitySubs);
+    setAllReviewActivitySubmissions(reviewActivitySubs);
+
+    // filter and assign here, too
   }
 
+  const handleIconClick = () => {
+    setSearchFocused(true);
+    inputRef.current?.focus();
+  }
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
 
   return (
     <div className="page-container">
@@ -169,14 +251,36 @@ const SubmissionsPage = ({loggedInUser}: PageProps) => {
         </div>
         <div className="filter-bar">
           <div style={{flexGrow: 1}} />
-          <div className="searchbar">
-
-          </div>
+          <TextField
+            variant="outlined"
+            className="search-input"
+            placeholder={!searchFocused ? 'search for a submission' : ''}
+            inputRef={inputRef}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton className="search-icon" onClick={handleIconClick} disableRipple tabIndex={-1}>
+                    <Search />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              backgroundColor: 'white',
+              borderRadius: 2,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+              },
+            }}
+          />
         </div>
         <div className="submissions-table">
           <ReviewProgress 
             isPersonal={currentTab === 0} 
-            activitySubmissions={currentTab === 0 ? personalActivitySubmissions : assignedActivitySubmissions} 
+            activitySubmissions={currentTab === 0 ? searchedPersonalActivitySubmissions : searchedReviewActivitySubmissions} 
             passResponseProgress={handleResponseProgress}
             allUsers={allUsers || []}
             onUpdateSubmission={handleReload}
